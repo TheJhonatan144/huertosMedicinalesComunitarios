@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Actividad', ~{::section})}">
+<body>
+<section>
+    <nav aria-label="breadcrumb"><ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/gestor/actividades}">Actividades</a></li>
+        <li class="breadcrumb-item active" aria-current="page" th:text="'Actividad #' + ${detalle.id()}">Actividad</li>
+    </ol></nav>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <h1 class="h3 mb-0"><span th:text="${detalle.tipo().etiqueta()}">Riego</span> · <span th:text="${detalle.fecha()}">01/01/2026</span></h1>
+        <span th:replace="~{fragmentos/componentes :: estado(${detalle.estado()})}"></span>
+    </div>
+    <p class="mt-2" th:text="${detalle.descripcion()}">Descripción</p>
+    <p class="small text-muted">Registrada por <span th:text="${detalle.registradaPor()}">Gestor</span> el <span th:text="${detalle.creadaEn()}">fecha</span></p>
+
+    <div class="alert alert-success" th:if="${detalle.estado().name() == 'APROBADA'}">
+        Aprobada: cada participante recibió <strong th:text="${detalle.puntosPorParticipante()}">0</strong> puntos individuales;
+        la comunidad sumó <strong th:text="${detalle.puntosComunitarios()}">0</strong> puntos y
+        <strong th:text="${detalle.progreso()}">0</strong> de progreso.
+    </div>
+    <div class="alert alert-warning" th:if="${detalle.estado().name() == 'PENDIENTE'}">
+        Pendiente de revisión: todavía no genera puntos ni progreso.
+        <a th:href="@{/gestor/actividades/{id}/editar(id=${detalle.id()})}">Editar actividad</a>
+    </div>
+
+    <h2 class="h5 mt-4">Participantes (lista fija)</h2>
+    <ul class="list-inline">
+        <li class="list-inline-item badge text-bg-light fw-normal fs-6" th:each="p : ${detalle.participantes()}" th:text="${p.nombre()}">Nombre</li>
+    </ul>
+
+    <h2 class="h5 mt-4">Historial de envíos y revisiones</h2>
+    <div class="card mb-3" th:each="e : ${detalle.envios()}">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between">
+                <strong th:text="'Envío ' + ${e.numero()}">Envío 1</strong>
+                <span th:replace="~{fragmentos/componentes :: estado(${e.estado()})}"></span>
+            </div>
+            <div class="small text-muted" th:text="'Enviado el ' + ${e.enviadoEn()} + ' · archivo: ' + ${e.archivo()}">fecha</div>
+            <p class="mb-2" th:if="${e.comentario() != null}"><em>Comentario del gestor:</em> <span th:text="${e.comentario()}"></span></p>
+            <a th:href="@{/evidencias/envios/{id}/foto(id=${e.id()})}" target="_blank" rel="noopener">
+                <img class="miniatura" th:src="@{/evidencias/envios/{id}/foto(id=${e.id()})}" th:alt="'Fotografía del envío ' + ${e.numero()}">
+            </a>
+            <div class="observacion mt-2" th:if="${e.observaciones() != null}">
+                <strong>Observaciones del revisor</strong> (<span th:text="${e.revisor()}">Revisor</span>, <span th:text="${e.revisadoEn()}">fecha</span>):
+                <span th:text="${e.observaciones()}"></span>
+            </div>
+            <div class="small mt-2" th:if="${e.observaciones() == null and e.revisor() != null}">
+                Aprobado por <span th:text="${e.revisor()}">Revisor</span> el <span th:text="${e.revisadoEn()}">fecha</span>.
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-danger" th:if="${detalle.estado().name() == 'RECHAZADA'}">
+        <div class="card-body">
+            <h2 class="h5">Corregir y reenviar</h2>
+            <p class="small text-muted">Atiende las observaciones. Los envíos anteriores se conservan en el historial; los participantes no cambian.</p>
+            <form th:action="@{/gestor/actividades/{id}/reenviar(id=${detalle.id()})}" th:object="${form}" method="post"
+                  enctype="multipart/form-data" data-una-vez>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="tipo" class="form-label">Tipo de actividad</label>
+                        <select id="tipo" class="form-select" th:field="*{tipo}" required>
+                            <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.etiqueta()}">Riego manual</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" id="fecha" class="form-control" th:field="*{fecha}" th:max="${hoy}" required>
+                    </div>
+                    <div class="col-12">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea id="descripcion" class="form-control" rows="3" th:field="*{descripcion}" maxlength="2000" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="comentario" class="form-label">Comentario para el revisor (opcional)</label>
+                        <textarea id="comentario" name="comentario" class="form-control" rows="2" maxlength="1000"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="foto" class="form-label">Nueva fotografía (JPEG o PNG, hasta 5 MB)</label>
+                        <input type="file" id="foto" name="foto" class="form-control" accept="image/jpeg,image/png" required>
+                    </div>
+                </div>
+                <button class="btn btn-huerto mt-3" type="submit">Reenviar a revisión</button>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

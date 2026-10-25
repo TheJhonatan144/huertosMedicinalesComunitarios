@@ -1,0 +1,24 @@
+:root {
+    --huerto: #2f6b3a;
+    --huerto-oscuro: #1f4a28;
+    --huerto-claro: #e8f3e9;
+}
+
+.bg-huerto { background-color: var(--huerto) !important; }
+.progress-bar.bg-huerto { background-color: var(--huerto) !important; }
+.text-huerto { color: var(--huerto); }
+.btn-huerto { background-color: var(--huerto); border-color: var(--huerto); color: #fff; }
+.btn-huerto:hover, .btn-huerto:focus { background-color: var(--huerto-oscuro); border-color: var(--huerto-oscuro); color: #fff; }
+
+body { background-color: #fafcfa; }
+.tarjeta-huerto { border-left: 4px solid var(--huerto); }
+.heroe { background: var(--huerto-claro); border-radius: .75rem; }
+#mapa { height: 460px; border-radius: .5rem; border: 1px solid #cfd8cf; }
+.foto-evidencia { max-width: 100%; max-height: 420px; border-radius: .5rem; border: 1px solid #cfd8cf; }
+.miniatura { width: 96px; height: 72px; object-fit: cover; border-radius: .35rem; border: 1px solid #cfd8cf; }
+.observacion { border-left: 4px solid #dc3545; background: #fdf0f1; padding: .5rem .75rem; border-radius: .25rem; }
+
+@media (max-width: 575.98px) {
+    #mapa { height: 340px; }
+    .table-responsive-stack td, .table-responsive-stack th { white-space: normal; }
+}

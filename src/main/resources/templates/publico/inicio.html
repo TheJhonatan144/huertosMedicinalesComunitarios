@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Inicio', ~{::section})}">
+<body>
+<section>
+    <div class="heroe p-4 p-md-5 mb-4">
+        <h1 class="display-6 fw-semibold">Huertos medicinales comunitarios del Ecuador</h1>
+        <p class="lead mb-3">
+            Las comunidades cuidan sus huertos, registran sus actividades con fotografías y, tras una revisión humana,
+            suman puntos y hacen crecer su huerto virtual.
+        </p>
+        <a class="btn btn-huerto me-2" th:href="@{/mapa}">Explorar el mapa</a>
+        <a class="btn btn-outline-success" th:href="@{/ranking}">Ver el ranking</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-7">
+            <h2 class="h5">¿Cómo funciona?</h2>
+            <ol>
+                <li>El gestor del huerto registra una actividad (por ejemplo, un riego manual) con sus participantes y una fotografía.</li>
+                <li>Un administrador de evidencias asignado revisa la evidencia.</li>
+                <li>Si se aprueba, los participantes reciben puntos individuales y la comunidad suma puntos y progreso.</li>
+                <li>Si se rechaza, el gestor recibe observaciones, corrige y reenvía; el historial se conserva.</li>
+            </ol>
+            <p class="small text-muted">
+                Hay <strong th:text="${huertos}">0</strong> huertos registrados. El riego es siempre una tarea manual de las personas.
+            </p>
+        </div>
+        <div class="col-md-5">
+            <h2 class="h5">Ranking comunitario</h2>
+            <p class="text-muted" th:if="${ranking.isEmpty()}">Aún no hay comunidades registradas.</p>
+            <ol class="list-group list-group-numbered" th:unless="${ranking.isEmpty()}">
+                <li class="list-group-item d-flex justify-content-between" th:each="f : ${ranking}">
+                    <a th:href="@{/comunidades/{id}(id=${f.comunidadId()})}" th:text="${f.nombre()}">Comunidad</a>
+                    <span class="badge text-bg-success" th:text="${f.puntos()} + ' pts'">0 pts</span>
+                </li>
+            </ol>
+        </div>
+    </div>
+</section>
+</body>
+</html>

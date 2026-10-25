@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina(${ficha.comunidad().nombre}, ~{::section})}">
+<body>
+<section>
+    <nav aria-label="breadcrumb"><ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/mapa}">Mapa</a></li>
+        <li class="breadcrumb-item active" aria-current="page" th:text="${ficha.comunidad().nombre}">Comunidad</li>
+    </ol></nav>
+    <h1 class="h3" th:text="${ficha.comunidad().nombre}">Comunidad</h1>
+    <p class="text-muted"><span th:text="${ficha.comunidad().canton}">Cantón</span>, <span th:text="${ficha.comunidad().provincia}">Provincia</span></p>
+    <p th:text="${ficha.comunidad().descripcion}">Descripción</p>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card tarjeta-huerto h-100"><div class="card-body">
+                <h2 class="h5">Huerto</h2>
+                <th:block th:if="${ficha.huerto() != null}">
+                    <p class="mb-1 fw-semibold" th:text="${ficha.huerto().nombre}">Huerto</p>
+                    <p th:text="${ficha.huerto().descripcion}">Descripción</p>
+                </th:block>
+                <p th:if="${ficha.huerto() == null}" class="text-muted">Esta comunidad aún no registra un huerto.</p>
+                <h3 class="h6">Progreso del huerto virtual</h3>
+                <div th:replace="~{fragmentos/componentes :: progreso(${ficha.progreso()})}"></div>
+            </div></div>
+        </div>
+        <div class="col-md-6">
+            <div class="card tarjeta-huerto h-100"><div class="card-body">
+                <h2 class="h5">Resultados comunitarios</h2>
+                <p class="display-6 mb-0" th:text="${ficha.puntosComunitarios()}">0</p>
+                <p class="text-muted">puntos comunitarios</p>
+                <p class="mb-1" th:if="${ficha.posicionRanking() != null}">Posición en el ranking: <strong th:text="${ficha.posicionRanking()}">1</strong></p>
+                <p class="mb-0 small text-muted">Integrantes activos: <span th:text="${ficha.integrantesActivos()}">0</span></p>
+                <a class="btn btn-sm btn-outline-success mt-2" th:href="@{/ranking}">Ver ranking</a>
+            </div></div>
+        </div>
+    </div>
+
+    <h2 class="h5 mt-4">Plantas del huerto</h2>
+    <p class="small text-muted">Información de referencia registrada por la comunidad. No constituye una recomendación clínica ni terapéutica.</p>
+    <p class="text-muted" th:if="${ficha.plantas().isEmpty()}">Aún no hay plantas registradas.</p>
+    <ul class="list-group" th:unless="${ficha.plantas().isEmpty()}">
+        <li class="list-group-item" th:each="p : ${ficha.plantas()}">
+            <strong th:text="${p.nombreComun}">Planta</strong>
+            <em class="text-muted" th:if="${p.nombreCientifico != null}" th:text="'(' + ${p.nombreCientifico} + ')'"></em>
+            <span class="badge text-bg-light" th:text="${p.cantidad} + ' unidades'">1 unidades</span>
+            <div class="small text-muted" th:if="${p.descripcion != null}" th:text="${p.descripcion}"></div>
+        </li>
+    </ul>
+</section>
+</body>
+</html>

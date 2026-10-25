@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Acceso denegado', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Acceso denegado</h1>
+    <p>No tienes permiso para ver este contenido o realizar esta acción. Si crees que es un error, inicia sesión con la cuenta correspondiente.</p>
+    <a class="btn btn-huerto" th:href="@{/}">Volver al inicio</a>
+</section>
+</body>
+</html>

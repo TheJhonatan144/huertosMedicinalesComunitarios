@@ -1,0 +1,8 @@
+# Perfil de demostración: carga datos sintéticos y cuentas conocidas SOLO si la base está vacía.
+app:
+  demo:
+    habilitado: true
+    clave: ${DEMO_CLAVE:Demo-2026!}
+spring:
+  thymeleaf:
+    cache: false

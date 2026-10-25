@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<span th:fragment="estado(e)" class="badge"
+      th:classappend="${e.name() == 'APROBADA'} ? 'text-bg-success' : (${e.name() == 'RECHAZADA'} ? 'text-bg-danger' : 'text-bg-warning')"
+      th:text="${e.etiqueta()}">Pendiente</span>
+
+<div th:fragment="progreso(p)">
+    <div class="d-flex justify-content-between small">
+        <span>Etapa: <strong th:text="${p.etapa()}">Semilla</strong></span>
+        <span th:text="${p.progreso()} + ' / ' + ${p.meta()}">0 / 100</span>
+    </div>
+    <div class="progress" role="progressbar" aria-label="Progreso del huerto virtual"
+         th:attr="aria-valuenow=${p.porcentaje()}" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar bg-huerto" th:style="'width:' + ${p.porcentaje()} + '%'"></div>
+    </div>
+    <div class="small text-muted mt-1" th:if="${p.siguienteEtapa() != null}">
+        Faltan <span th:text="${p.faltanParaSiguiente()}">0</span> de progreso para «<span th:text="${p.siguienteEtapa()}">Brote</span>».
+    </div>
+</div>
+</body>
+</html>

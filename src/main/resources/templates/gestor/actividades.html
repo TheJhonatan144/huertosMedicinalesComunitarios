@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Actividades', ~{::section})}">
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Actividades del huerto</h1>
+        <a class="btn btn-huerto" th:href="@{/gestor/actividades/nueva}">Registrar actividad</a>
+    </div>
+    <p class="text-muted" th:if="${actividades.isEmpty()}">Aún no has registrado actividades. Empieza con «Registrar actividad».</p>
+    <div class="table-responsive" th:unless="${actividades.isEmpty()}">
+        <table class="table align-middle">
+            <caption class="visually-hidden">Actividades registradas</caption>
+            <thead><tr><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Participantes</th><th scope="col">Envíos</th><th scope="col">Estado</th><th scope="col"><span class="visually-hidden">Ver</span></th></tr></thead>
+            <tbody>
+            <tr th:each="a : ${actividades}">
+                <td th:text="${a.fecha()}">01/01/2026</td>
+                <td th:text="${a.tipo()}">Riego manual</td>
+                <td th:text="${a.participantes()}">1</td>
+                <td th:text="${a.envios()}">1</td>
+                <td><span th:replace="~{fragmentos/componentes :: estado(${a.estado()})}"></span></td>
+                <td class="text-end"><a class="btn btn-sm btn-outline-success" th:href="@{/gestor/actividades/{id}(id=${a.id()})}">Abrir</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

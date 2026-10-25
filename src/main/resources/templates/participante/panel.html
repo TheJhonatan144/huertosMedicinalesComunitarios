@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Mi progreso', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Mi progreso</h1>
+    <p class="text-muted">Comunidad: <strong th:text="${panel.comunidad()}">Comunidad</strong></p>
+    <div class="alert alert-warning" th:unless="${panel.activo()}">
+        Actualmente no estás activo en la comunidad. Puedes consultar tu historial, pero no participar en nuevas actividades.
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4"><div class="card tarjeta-huerto h-100"><div class="card-body">
+            <div class="small text-muted">Mis puntos individuales</div>
+            <div class="display-6" th:text="${panel.puntos().puntos()}">0</div>
+            <div>Nivel: <strong th:text="${panel.puntos().nivel().etiqueta()}">Aprendiz</strong></div>
+            <div class="small text-muted" th:if="${panel.puntos().siguiente() != null}"
+                 th:text="'Te faltan ' + ${panel.puntos().faltan()} + ' puntos para ' + ${panel.puntos().siguiente().etiqueta()} + '.'"></div>
+            <div class="small text-muted" th:if="${panel.puntos().siguiente() == null}">Alcanzaste el nivel más alto.</div>
+        </div></div></div>
+        <div class="col-md-4"><div class="card tarjeta-huerto h-100"><div class="card-body">
+            <div class="small text-muted">Puntos comunitarios (aparte de los individuales)</div>
+            <div class="display-6" th:text="${panel.puntosComunitarios()}">0</div>
+            <a th:href="@{/ranking}">Ver ranking</a>
+        </div></div></div>
+        <div class="col-md-4"><div class="card tarjeta-huerto h-100"><div class="card-body">
+            <div class="small text-muted mb-1">Huerto virtual de mi comunidad</div>
+            <div th:replace="~{fragmentos/componentes :: progreso(${panel.progreso()})}"></div>
+        </div></div></div>
+    </div>
+
+    <h2 class="h5">Actividades en las que participé</h2>
+    <p class="text-muted" th:if="${panel.participaciones().isEmpty()}">Todavía no te han seleccionado en ninguna actividad.</p>
+    <div class="table-responsive" th:unless="${panel.participaciones().isEmpty()}">
+        <table class="table align-middle">
+            <caption class="visually-hidden">Mis actividades</caption>
+            <thead><tr><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Estado</th><th scope="col" class="text-end">Puntos recibidos</th></tr></thead>
+            <tbody>
+            <tr th:each="p : ${panel.participaciones()}">
+                <td th:text="${p.fecha()}">01/01/2026</td>
+                <td th:text="${p.tipo()}">Riego manual</td>
+                <td><span th:replace="~{fragmentos/componentes :: estado(${p.estado()})}"></span></td>
+                <td class="text-end" th:text="${p.puntos() != null} ? ${p.puntos()} : '—'">—</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

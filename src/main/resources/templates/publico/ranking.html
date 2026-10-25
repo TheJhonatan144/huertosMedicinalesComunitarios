@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Ranking comunitario', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Ranking comunitario</h1>
+    <p class="text-muted">Se ordena únicamente por puntos comunitarios, que se generan solo con actividades aprobadas.
+        Las comunidades con los mismos puntos comparten posición.</p>
+    <p class="text-muted" th:if="${ranking.isEmpty()}">Todavía no hay comunidades registradas.</p>
+    <div class="table-responsive" th:unless="${ranking.isEmpty()}">
+        <table class="table align-middle">
+            <caption class="visually-hidden">Ranking de comunidades por puntos comunitarios</caption>
+            <thead><tr><th scope="col">Posición</th><th scope="col">Comunidad</th><th scope="col">Provincia</th><th scope="col" class="text-end">Puntos</th></tr></thead>
+            <tbody>
+            <tr th:each="f : ${ranking}">
+                <td th:text="${f.posicion()}">1</td>
+                <td><a th:href="@{/comunidades/{id}(id=${f.comunidadId()})}" th:text="${f.nombre()}">Comunidad</a></td>
+                <td th:text="${f.provincia()}">Provincia</td>
+                <td class="text-end fw-semibold" th:text="${f.puntos()}">0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

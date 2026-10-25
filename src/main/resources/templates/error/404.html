@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('No encontrado', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">No encontramos lo que buscas</h1>
+    <p th:text="${mensaje} ?: 'La página o el recurso no existe.'">La página no existe.</p>
+    <a class="btn btn-huerto" th:href="@{/}">Volver al inicio</a>
+</section>
+</body>
+</html>
