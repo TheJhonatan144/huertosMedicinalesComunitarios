@@ -73,7 +73,7 @@ public class FabricaDatos {
             us.add(u);
             is.add(integrantes.save(new Integrante(comunidad.getId(), u.getId(), false)));
         }
-        Usuario revisor = usuario("revisor" + n, Rol.ADMIN_EVIDENCIAS);
+        Usuario revisor = usuario("revisor" + n, Rol.ADMIN_MINISTERIO_SALUD);
         asignaciones.save(new AsignacionRevisor(revisor.getId(), comunidad.getId()));
         return new Escenario(comunidad, huerto, gestorUsuario, gestor, us, is, revisor);
     }

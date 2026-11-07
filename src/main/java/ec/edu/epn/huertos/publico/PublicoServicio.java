@@ -12,7 +12,6 @@ import ec.edu.epn.huertos.huertos.HuertoRepository;
 import ec.edu.epn.huertos.huertos.HuertoServicio;
 import ec.edu.epn.huertos.huertos.Planta;
 import java.util.List;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +45,7 @@ public class PublicoServicio {
 
     @Transactional(readOnly = true)
     public List<HuertoMapa> huertosParaMapa() {
-        return comunidades.findAll(Sort.by("nombre")).stream().map(c -> {
+        return comunidades.findByActivaTrueAndEliminacionPendienteFalseOrderByNombreAsc().stream().map(c -> {
             Huerto h = huertos.findByComunidadId(c.getId()).orElse(null);
             ProgresoHuerto p = gamificacion.progreso(c.getId());
             return new HuertoMapa(c.getId(), c.getNombre(), h == null ? null : h.getNombre(), c.getProvincia(),

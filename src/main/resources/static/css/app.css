@@ -1,24 +1,406 @@
+/*
+ * Sistema visual base de Huertos Medicinales Comunitarios.
+ * Bootstrap provee la estructura; estas variables y componentes definen
+ * la identidad compartida por las pantallas.
+ */
 :root {
-    --huerto: #2f6b3a;
-    --huerto-oscuro: #1f4a28;
-    --huerto-claro: #e8f3e9;
+    color-scheme: light;
+
+    --huerto: #285b45;
+    --huerto-oscuro: #1d4435;
+    --huerto-profundo: #15372b;
+    --huerto-suave: #e8f0e8;
+    --huerto-hoja: #c9dbc9;
+
+    --tierra: #a75d36;
+    --tierra-suave: #f5e9df;
+    --sol: #d6a447;
+
+    --fondo: #f5f7f3;
+    --superficie: #ffffff;
+    --texto: #25332b;
+    --texto-suave: #647169;
+    --borde: #dce4dc;
+    --exito: #2c704b;
+    --aviso: #95671c;
+    --error: #a33e3e;
+
+    --radio-sm: .45rem;
+    --radio: .8rem;
+    --radio-lg: 1.15rem;
+    --sombra-suave: 0 .25rem 1rem rgb(26 52 37 / 6%);
+    --sombra-tarjeta: 0 .35rem 1.25rem rgb(26 52 37 / 8%);
+    --anillo-foco: 0 0 0 .22rem rgb(74 126 91 / 24%);
 }
 
-.bg-huerto { background-color: var(--huerto) !important; }
-.progress-bar.bg-huerto { background-color: var(--huerto) !important; }
-.text-huerto { color: var(--huerto); }
-.btn-huerto { background-color: var(--huerto); border-color: var(--huerto); color: #fff; }
-.btn-huerto:hover, .btn-huerto:focus { background-color: var(--huerto-oscuro); border-color: var(--huerto-oscuro); color: #fff; }
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 1rem;
+}
 
-body { background-color: #fafcfa; }
-.tarjeta-huerto { border-left: 4px solid var(--huerto); }
-.heroe { background: var(--huerto-claro); border-radius: .75rem; }
-#mapa { height: 460px; border-radius: .5rem; border: 1px solid #cfd8cf; }
-.foto-evidencia { max-width: 100%; max-height: 420px; border-radius: .5rem; border: 1px solid #cfd8cf; }
-.miniatura { width: 96px; height: 72px; object-fit: cover; border-radius: .35rem; border: 1px solid #cfd8cf; }
-.observacion { border-left: 4px solid #dc3545; background: #fdf0f1; padding: .5rem .75rem; border-radius: .25rem; }
+body {
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: var(--huerto);
+    text-underline-offset: .16em;
+}
+
+a:hover {
+    color: var(--huerto-oscuro);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 0;
+    box-shadow: var(--anillo-foco);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--huerto-profundo);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+h1 { letter-spacing: -.025em; }
+
+.text-muted,
+.form-text {
+    color: var(--texto-suave) !important;
+}
+
+/* Navigation and page frame */
+.app-navbar,
+.bg-huerto {
+    background-color: var(--huerto-profundo) !important;
+}
+
+.app-navbar {
+    border-bottom: 3px solid var(--huerto);
+    box-shadow: 0 .2rem .8rem rgb(16 42 30 / 12%);
+}
+
+.app-navbar .navbar-brand {
+    color: #fff;
+    letter-spacing: -.015em;
+}
+
+.app-navbar .nav-link {
+    border-radius: var(--radio-sm);
+    color: rgb(255 255 255 / 82%);
+    font-weight: 550;
+    margin-inline: .1rem;
+    padding-inline: .7rem;
+    transition: background-color .16s ease, color .16s ease;
+}
+
+.app-navbar .nav-link:hover,
+.app-navbar .nav-link:focus-visible {
+    background: rgb(255 255 255 / 12%);
+    color: #fff;
+}
+
+.app-navbar .navbar-toggler {
+    border-color: rgb(255 255 255 / 35%);
+}
+
+.app-main {
+    padding-bottom: 3rem !important;
+    padding-top: 2rem !important;
+}
+
+.app-footer {
+    background: var(--superficie);
+    border-color: var(--borde) !important;
+    color: var(--texto-suave) !important;
+    margin-top: auto;
+}
+
+/* Brand color helpers */
+.text-huerto { color: var(--huerto) !important; }
+.bg-huerto-suave { background-color: var(--huerto-suave) !important; }
+.border-huerto { border-color: var(--huerto-hoja) !important; }
+
+/* Buttons */
+.btn {
+    border-radius: .62rem;
+    font-weight: 620;
+    line-height: 1.35;
+    padding: .55rem .9rem;
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-huerto,
+.btn-success {
+    background-color: var(--huerto);
+    border-color: var(--huerto);
+    color: #fff;
+}
+
+.btn-huerto:hover,
+.btn-huerto:focus,
+.btn-success:hover,
+.btn-success:focus {
+    background-color: var(--huerto-oscuro);
+    border-color: var(--huerto-oscuro);
+    color: #fff;
+}
+
+.btn-outline-success,
+.btn-outline-huerto {
+    border-color: var(--huerto);
+    color: var(--huerto);
+}
+
+.btn-outline-success:hover,
+.btn-outline-huerto:hover {
+    background: var(--huerto);
+    border-color: var(--huerto);
+    color: #fff;
+}
+
+.btn-outline-danger {
+    color: var(--error);
+}
+
+.btn-light {
+    color: var(--huerto-profundo);
+    font-weight: 650;
+}
+
+/* Panels and cards */
+.card {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+}
+
+.card-header {
+    background: #f8faf7;
+    border-bottom-color: var(--borde);
+    color: var(--huerto-profundo);
+    font-weight: 650;
+}
+
+.card-title { color: var(--huerto-profundo); }
+
+.tarjeta-huerto {
+    border-left: 4px solid var(--huerto);
+    overflow: hidden;
+    transition: box-shadow .18s ease, transform .18s ease;
+}
+
+.tarjeta-huerto:hover {
+    box-shadow: var(--sombra-tarjeta);
+    transform: translateY(-2px);
+}
+
+.heroe {
+    background: linear-gradient(125deg, #e6f0e6 0%, #f2f3e9 68%, #f5eadd 100%);
+    border: 1px solid #dce8dc;
+    border-radius: var(--radio-lg);
+}
+
+/* Forms */
+.form-label {
+    color: var(--huerto-profundo);
+    font-size: .94rem;
+    font-weight: 650;
+    margin-bottom: .35rem;
+}
+
+.form-control,
+.form-select {
+    background-color: #fff;
+    border-color: #cbd7cc;
+    border-radius: .58rem;
+    color: var(--texto);
+    min-height: 2.75rem;
+    padding: .55rem .75rem;
+}
+
+textarea.form-control { min-height: 6rem; }
+
+.form-control::placeholder { color: #87928a; }
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #6d9877;
+    box-shadow: var(--anillo-foco);
+}
+
+.form-check-input:checked {
+    background-color: var(--huerto);
+    border-color: var(--huerto);
+}
+
+.form-check-input:focus { box-shadow: var(--anillo-foco); }
+
+/* Shared visual option cards for future garden, soil, fence and plant selectors */
+.opcion-visual {
+    display: block;
+    height: 100%;
+    position: relative;
+}
+
+.opcion-visual > input {
+    height: 1px;
+    opacity: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.opcion-visual__contenido {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    cursor: pointer;
+    height: 100%;
+    overflow: hidden;
+    transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.opcion-visual__contenido:hover {
+    border-color: #8eae94;
+    box-shadow: var(--sombra-suave);
+    transform: translateY(-2px);
+}
+
+.opcion-visual > input:checked + .opcion-visual__contenido {
+    background: #f4f8f3;
+    border: 2px solid var(--huerto);
+    box-shadow: var(--anillo-foco);
+}
+
+.opcion-visual > input:focus-visible + .opcion-visual__contenido {
+    box-shadow: var(--anillo-foco);
+}
+
+.opcion-visual__imagen {
+    aspect-ratio: 16 / 10;
+    background: var(--huerto-suave);
+    object-fit: cover;
+    width: 100%;
+}
+
+.opcion-visual__texto { padding: .75rem; }
+
+/* Data tables, status, alerts and progress */
+.table {
+    --bs-table-color: var(--texto);
+    --bs-table-border-color: var(--borde);
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: #f1f5f0;
+    color: var(--huerto-profundo);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .025em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.table > :not(caption) > * > * { padding: .78rem .7rem; }
+.table tbody tr:last-child > * { border-bottom-width: 0; }
+
+.badge { border-radius: 999px; font-weight: 650; padding: .38em .68em; }
+.text-bg-success { background-color: #e3f1e7 !important; color: #24623c !important; }
+.text-bg-warning { background-color: #fff2d5 !important; color: #775315 !important; }
+.text-bg-danger { background-color: #f8e4e2 !important; color: #8e3333 !important; }
+.text-bg-light { background-color: #edf2ed !important; color: #435249 !important; }
+
+.alert {
+    border: 1px solid transparent;
+    border-radius: var(--radio);
+}
+
+.alert-success { background: #e8f3e9; border-color: #c8dfcc; color: #285b39; }
+.alert-info { background: #eaf2f4; border-color: #d1e1e5; color: #315867; }
+.alert-warning { background: #fff4dc; border-color: #eedba9; color: #755318; }
+.alert-danger { background: #f9e9e7; border-color: #ebcdca; color: #8c3535; }
+
+.progress {
+    background: #e5ece5;
+    border-radius: 999px;
+    height: .8rem;
+    overflow: hidden;
+}
+
+.progress-bar.bg-huerto { background-color: var(--huerto) !important; }
+
+/* Maps and evidence */
+#mapa {
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+    height: 460px;
+    overflow: hidden;
+}
+
+.foto-evidencia {
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    max-height: 420px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.miniatura {
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-sm);
+    height: 72px;
+    object-fit: cover;
+    width: 96px;
+}
+
+.observacion {
+    background: #f9e9e7;
+    border-left: 4px solid var(--error);
+    border-radius: var(--radio-sm);
+    padding: .65rem .85rem;
+}
+
+.huerto-opcion { cursor: pointer; overflow: hidden; transition: border-color .15s ease, box-shadow .15s ease; }
+.huerto-opcion:hover { border-color: #2f6b4f; }
+.btn-check:checked + .huerto-opcion { border: 2px solid #2f6b4f; box-shadow: 0 0 0 .2rem rgb(47 107 79 / 18%); }
+.btn-check:focus-visible + .huerto-opcion { outline: 3px solid #1b5e8a; outline-offset: 2px; }
+.ilustracion-opcion { height: 92px; object-fit: cover; }
+
+.huerto-virtual { border: 1px solid var(--borde); background: #f3efe6; min-height: 170px; }
+.huerto-virtual-suelo { width: min(100%, 320px); height: 110px; object-fit: cover; border-radius: .65rem; }
+.planta-virtual { background: rgb(255 255 255 / 82%); border: 1px solid var(--borde); border-radius: 999px; padding: .35rem .8rem; }
+.suelo-arcilloso { background: #ead8ca; }
+.suelo-limoso { background: #e9e2cc; }
+.suelo-arenoso { background: #f0e4bb; }
+.suelo-margoso { background: #dfe6d0; }
+.suelo-gredoso { background: #e3d3bf; }
+.suelo-pantanoso { background: #d9e2d5; }
 
 @media (max-width: 575.98px) {
+    .app-main { padding-top: 1.25rem !important; }
     #mapa { height: 340px; }
-    .table-responsive-stack td, .table-responsive-stack th { white-space: normal; }
+    .table-responsive-stack td,
+    .table-responsive-stack th { white-space: normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
 }

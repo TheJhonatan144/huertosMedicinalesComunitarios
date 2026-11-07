@@ -15,7 +15,7 @@ aprobación/rechazo → puntos y progreso → ranking e historial. El riego es m
 |---|---|---|
 | 1 | Inicio y cierre de sesión | Implementado y verificado |
 | 2 | Permisos por rol y aislamiento entre comunidades | Implementado y verificado |
-| 3 | Comunidades, integrantes activos (cupo 25) y huertos | Implementado y verificado (alta de usuarios: provisional) |
+| 3 | Comunidades, integrantes activos (cupo por tipo: persona 1, familia 10, condominio 20, barrio 25) y huertos | Implementado; alta autenticada por administrador/gestor |
 | 4 | Consulta pública del mapa, comunidad y huerto | Implementado; mapa con Leaflet **no probado en navegador** |
 | 5 | Gestión básica de plantas | Implementado y verificado por HTTP |
 | 6 | Actividades y participantes | Implementado y verificado |
@@ -35,18 +35,19 @@ RF24 está **pendiente de revisión** y RF25 **reservado**: no se les atribuye f
 ## Explícitamente no implementado
 
 Registro público, recuperación de contraseña por correo, integraciones institucionales (MSP u otras), sensores/bombas/válvulas/Arduino/ESP32,
-servicios de IA, microservicios. El rol «Administrador de evidencias» representa **funcionalmente** a personal autorizado del MSP,
-sin afirmar designación ni integración real.
+servicios de IA, microservicios. El rol «Administrador del Ministerio de Salud» representa una cuenta institucional provisionada
+por un proceso autorizado; el prototipo no afirma integración real con el MSP.
 
 ## Actores
 
-Visitante (sin cuenta) · Gestor de huerto · Participante · Administrador de evidencias. Cada usuario autenticado tiene un único rol.
+Visitante (sin cuenta) · Gestor de huerto · Participante · Administrador del Ministerio de Salud. Cada cuenta comunitaria tiene un solo rol activo;
+la cuenta del Ministerio es institucional y no pertenece a comunidades ni participa en el ranking.
 Correspondencia con constantes técnicas en [arquitectura](arquitectura.md#roles).
 
 ## Limitaciones conocidas del prototipo
 
 - Un huerto por comunidad (restricción del modelo del prototipo).
-- Un usuario pertenece a una sola comunidad.
-- El alta de usuarios es manual/por cargador de demostración; el gestor solo da de baja y reactiva integrantes.
+- Una cuenta puede tener una sola pertenencia comunitaria activa; el historial de pertenencias inactivas se conserva.
+- La cuenta personal puede registrarse sin rol comunitario. La comunidad se crea desde una cuenta sin pertenencia o se acepta por invitación; las cuentas del Ministerio no se registran públicamente.
 - Tras una baja, las actividades ya registradas conservan su lista fija de participantes (la baja no los retira ni les quita la recompensa).
 - Valores de recompensa, umbrales y límites de fotografía son **de demostración/provisionales**.

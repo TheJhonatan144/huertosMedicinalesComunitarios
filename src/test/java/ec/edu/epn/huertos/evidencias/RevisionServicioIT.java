@@ -152,7 +152,7 @@ class RevisionServicioIT extends PruebaIntegracion {
     @Test
     void aprobacionesConcurrentesDeVariosRevisoresGeneranUnaSolaRecompensa() throws Exception {
         Escenario e = fabrica.escenario(3);
-        Usuario segundo = fabrica.usuario("segundo-revisor-" + e.comunidad().getId(), Rol.ADMIN_EVIDENCIAS);
+        Usuario segundo = fabrica.usuario("segundo-revisor-" + e.comunidad().getId(), Rol.ADMIN_MINISTERIO_SALUD);
         asignaciones.save(new AsignacionRevisor(segundo.getId(), e.comunidad().getId()));
         Long actividad = fabrica.registrarActividad(e, e.participantes());
         Long envio = envioPendiente(actividad);

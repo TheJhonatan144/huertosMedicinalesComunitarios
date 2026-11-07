@@ -8,6 +8,10 @@
             <h1 class="h3 mb-3">Iniciar sesión</h1>
             <div th:if="${param.error}" class="alert alert-danger" role="alert">Usuario o contraseña incorrectos.</div>
             <div th:if="${param.logout}" class="alert alert-info" role="status">Cerraste la sesión.</div>
+            <div th:if="${param.registro}" class="alert alert-success" role="status">Cuenta creada. Inicia sesión para continuar.</div>
+            <div th:if="${param.comunidadCreada}" class="alert alert-success" role="status">Comunidad y huerta creadas. Inicia sesión otra vez para entrar como gestor.</div>
+            <div th:if="${param.invitacionAceptada}" class="alert alert-success" role="status">Te uniste a la comunidad. Inicia sesión otra vez para entrar como participante.</div>
+            <div th:if="${param.comunidadDejada}" class="alert alert-info" role="status">Saliste de la comunidad. Tu historial se conserva y ahora puedes aceptar otra invitación o crear una comunidad.</div>
             <form th:action="@{/login}" method="post" data-una-vez>
                 <div class="mb-3">
                     <label for="username" class="form-label">Usuario</label>
@@ -19,10 +23,7 @@
                 </div>
                 <button class="btn btn-huerto w-100" type="submit">Entrar</button>
             </form>
-            <p class="small text-muted mt-3">
-                Las cuentas son provistas por el equipo del proyecto (no hay registro público ni recuperación por correo).
-                En el perfil de demostración encontrarás las cuentas en el README.
-            </p>
+            <p class="small text-muted mt-3">¿Aún no tienes cuenta? <a th:href="@{/registro}">Regístrate aquí</a>.</p>
         </div>
     </div>
 </section>

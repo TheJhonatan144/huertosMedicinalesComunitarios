@@ -16,15 +16,19 @@ y **hilos reales** para la concurrencia. Cada prueba crea datos con nombres úni
 
 | Clase | Pruebas | Qué demuestra |
 |---|---|---|
-| `CupoComunidadIT` | 7 | Máx. 25 activos (BD rechaza el 26.º), bajas liberan cupo, reactivaciones y altas concurrentes (4 hilos) no superan el cupo, permisos del gestor |
+| `CupoComunidadIT` | 8 | Cupo por tipo (condominio 20, barrio 25), BD rechaza integrantes sobre el límite, regreso tras baja con nueva invitación aceptada, aceptaciones y altas concurrentes (4 hilos) no superan el cupo, permisos del gestor |
 | `ActividadServicioIT` | 12 | Registro con participantes/foto, 0 puntos mientras está pendiente, participantes ajenos/inactivos rechazados, lista inmutable (también por SQL), edición solo pendiente, reenvío con historial |
 | `RevisionServicioIT` | 13 | Misma recompensa para seleccionados, puntos individuales ≠ comunitarios, rechazo con observaciones, decisión repetida sin duplicar, **8 hilos y 2 revisores aprobando a la vez → 1 recompensa**, aprobar vs. rechazar simultáneos (5 rondas), reenvíos concurrentes, revisor no asignado/rol incorrecto/autorrevisión, ranking y empates, restricciones y triggers de BD |
-| `SeguridadWebIT` | 10 | Acceso público, privacidad de fichas, redirección al login, permisos por rol, aislamiento entre comunidades, privacidad de fotos, CSRF, login/hash |
+| `SeguridadWebIT` | 13 | Acceso público, privacidad de fichas, permisos por rol, aislamiento entre comunidades, privacidad de fotos, CSRF, login/hash; archivo mantiene sesión y muestra historial; baja no ofrece reactivación |
 | `RecorridoPrincipalIT` | 1 | Recorrido HTTP completo: visitante → registro → rechazo (sin y con observaciones) → reenvío → aprobación doble → puntos/ranking/historial |
 | `PlantasIT` | 3 | Gestión de plantas, ficha pública solo con activas, aislamiento y validación |
 | `ValidadorImagenTest` | 10 | PNG/JPEG reales; texto con extensión `.jpg`, GIF, firma PNG + basura, PNG truncado, vacío, tamaño, dimensiones; saneo del nombre |
 | `AlmacenamientoLocalTest` | 4 | Nombre interno seguro, sin restos temporales, sobrevive a una instancia nueva, rechaza recorrido de directorios |
 | `GamificacionReglasTest` | 3 | Umbrales de niveles, Maestro sin tope, etapas del huerto (valores de demostración) |
+
+## Verificación dirigida más reciente (2026-11-06)
+
+`CupoComunidadIT` y `SeguridadWebIT`: **20 pruebas, 0 fallos, 0 errores**, ejecutadas con PostgreSQL 17 mediante Testcontainers. El resultado completo de 63 pruebas de la tabla anterior corresponde a la ejecución del 2026-10-23.
 
 ## Verificaciones manuales realizadas (no automatizadas)
 

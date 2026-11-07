@@ -72,7 +72,7 @@ public class RevisionServicio {
 
     @Transactional(readOnly = true)
     public List<ItemBandeja> bandeja(Long revisorId) {
-        autorizacion.exigirRol(revisorId, Rol.ADMIN_EVIDENCIAS);
+        autorizacion.exigirRol(revisorId, Rol.ADMIN_MINISTERIO_SALUD);
         List<Long> asignadas = comunidades.comunidadesAsignadas(revisorId);
         if (asignadas.isEmpty()) {
             return List.of();
@@ -93,7 +93,7 @@ public class RevisionServicio {
 
     @Transactional(readOnly = true)
     public DetalleRevision detalle(Long revisorId, Long envioId) {
-        autorizacion.exigirRol(revisorId, Rol.ADMIN_EVIDENCIAS);
+        autorizacion.exigirRol(revisorId, Rol.ADMIN_MINISTERIO_SALUD);
         EnvioEvidencia envio = envios.findById(envioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("El envío no existe."));
         Actividad actividad = actividadRevisable(revisorId, envio);
@@ -102,7 +102,7 @@ public class RevisionServicio {
 
     @Transactional(readOnly = true)
     public List<ItemHistorial> historial(Long revisorId) {
-        autorizacion.exigirRol(revisorId, Rol.ADMIN_EVIDENCIAS);
+        autorizacion.exigirRol(revisorId, Rol.ADMIN_MINISTERIO_SALUD);
         return revisiones.findByRevisorIdOrderByRevisadaEnDesc(revisorId).stream().map(r -> {
             EnvioEvidencia envio = envios.findById(r.getEnvioId()).orElseThrow();
             Actividad a = actividades.findById(envio.getActividadId()).orElseThrow();
@@ -118,7 +118,7 @@ public class RevisionServicio {
      */
     @Transactional
     public Resultado decidir(Long revisorId, Long envioId, EstadoRevision decision, String observaciones) {
-        autorizacion.exigirRol(revisorId, Rol.ADMIN_EVIDENCIAS);
+        autorizacion.exigirRol(revisorId, Rol.ADMIN_MINISTERIO_SALUD);
         if (decision != EstadoRevision.APROBADA && decision != EstadoRevision.RECHAZADA) {
             throw new ReglaNegocioException("La decisión debe ser aprobar o rechazar.");
         }

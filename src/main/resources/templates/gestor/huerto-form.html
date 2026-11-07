@@ -1,23 +1,40 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragmentos/base :: pagina('Datos del huerto', ~{::section})}">
-<body>
-<section>
-    <h1 class="h3">Datos del huerto</h1>
-    <form th:action="@{/gestor/huerto}" th:object="${form}" method="post" data-una-vez novalidate>
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" id="nombre" class="form-control" th:field="*{nombre}" th:errorclass="is-invalid" maxlength="120" required>
-            <div class="invalid-feedback" th:errors="*{nombre}"></div>
-        </div>
-        <div class="mb-3">
-            <label for="descripcion" class="form-label">Descripción</label>
-            <textarea id="descripcion" class="form-control" rows="4" th:field="*{descripcion}" th:errorclass="is-invalid" maxlength="2000" required></textarea>
-            <div class="invalid-feedback" th:errors="*{descripcion}"></div>
-        </div>
-        <button class="btn btn-huerto" type="submit">Guardar</button>
-        <a class="btn btn-link" th:href="@{/gestor}">Cancelar</a>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina('Datos del huerto', ~{::section})}">
+<body><section>
+    <h1 class="h3">Datos de la comunidad y del huerto</h1>
+    <form th:action="@{/gestor/huerto}" th:object="${form}" method="post" data-una-vez novalidate class="row g-4">
+        <div class="col-12 alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}"><p class="mb-1">Revisa estos campos:</p><ul class="mb-0"><li th:each="err : ${#fields.allErrors()}" th:text="${err}">Campo inválido</li></ul></div>
+        <h2 class="h5">Datos de la comunidad</h2>
+        <div class="col-md-6"><label class="form-label" for="nombreComunidad">Nombre de la comunidad</label><input class="form-control" id="nombreComunidad" th:field="*{nombreComunidad}" maxlength="120" required></div>
+        <div class="col-md-6"><label class="form-label" for="tipoComunidad">¿A quién representa?</label><select class="form-select" id="tipoComunidad" th:field="*{tipoComunidad}" required><option value="PERSONA">Solo yo · máximo 1 integrante</option><option value="FAMILIA">Familia · máximo 10 integrantes</option><option value="CONDOMINIO">Condominio · máximo 20 integrantes</option><option value="BARRIO">Barrio · máximo 25 integrantes</option></select></div>
+        <div class="col-12"><label class="form-label" for="descripcionComunidad">Descripción de la comunidad</label><textarea class="form-control" id="descripcionComunidad" th:field="*{descripcionComunidad}" rows="2" maxlength="2000" required></textarea></div>
+        <div class="col-md-4"><label class="form-label" for="provinciaComunidad">Provincia</label><input class="form-control" id="provinciaComunidad" th:field="*{provinciaComunidad}" maxlength="60" required></div>
+        <div class="col-md-4"><label class="form-label" for="cantonComunidad">Cantón</label><input class="form-control" id="cantonComunidad" th:field="*{cantonComunidad}" maxlength="60" required></div>
+        <div class="col-md-4"><label class="form-label" for="direccionComunidad">Dirección de la comunidad</label><input class="form-control" id="direccionComunidad" th:field="*{direccionComunidad}" maxlength="250" required></div>
+        <div class="col-md-6"><label class="form-label" for="latitudComunidad">Latitud de la comunidad</label><input class="form-control" id="latitudComunidad" type="number" step="any" th:field="*{latitudComunidad}" min="-5.1" max="1.8" required></div>
+        <div class="col-md-6"><label class="form-label" for="longitudComunidad">Longitud de la comunidad</label><input class="form-control" id="longitudComunidad" type="number" step="any" th:field="*{longitudComunidad}" min="-92.5" max="-75" required></div>
+        <h2 class="h5">Datos del huerto</h2>
+        <div class="col-md-6"><label class="form-label" for="nombre">Nombre</label><input class="form-control" id="nombre" th:field="*{nombre}" th:errorclass="is-invalid" maxlength="120" required><div class="invalid-feedback" th:errors="*{nombre}"></div></div>
+        <div class="col-md-6"><label class="form-label" for="areaM2">Área (m²)</label><input class="form-control" id="areaM2" type="number" step="0.01" min="0.01" max="1000000" th:field="*{areaM2}" th:errorclass="is-invalid" required><div class="invalid-feedback" th:errors="*{areaM2}"></div></div>
+        <div class="col-12"><label class="form-label" for="descripcion">Descripción</label><textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="3" maxlength="2000" required></textarea></div>
+        <h2 class="h5">Ubicación</h2>
+        <div class="col-md-4"><label class="form-label" for="provincia">Provincia</label><input class="form-control" id="provincia" th:field="*{provincia}" maxlength="60" required></div>
+        <div class="col-md-4"><label class="form-label" for="parroquia">Parroquia</label><input class="form-control" id="parroquia" th:field="*{parroquia}" maxlength="100" required></div>
+        <div class="col-md-4"><label class="form-label" for="direccion">Dirección o referencia</label><input class="form-control" id="direccion" th:field="*{direccion}" maxlength="250" required></div>
+        <div class="col-md-6"><label class="form-label" for="latitud">Latitud</label><input class="form-control" id="latitud" type="number" step="any" th:field="*{latitud}" min="-5.1" max="1.8" required></div>
+        <div class="col-md-6"><label class="form-label" for="longitud">Longitud</label><input class="form-control" id="longitud" type="number" step="any" th:field="*{longitud}" min="-92.5" max="-75" required></div>
+
+        <fieldset class="col-12"><legend class="h5">Diseño</legend><div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-3" th:each="op : ${disenos}"><input class="btn-check" type="radio" th:id="|diseno-${op[0]}|" th:field="*{diseno}" th:value="${op[0]}" required><label class="card h-100 huerto-opcion" th:for="|diseno-${op[0]}|"><img class="card-img-top ilustracion-opcion" th:src="@{/img/huerto/diseno.svg}" alt="Ilustración referencial de diseño de huerto"><span class="card-body py-2" th:text="${op[1]}">Diseño</span></label></div>
+        </div></fieldset>
+        <fieldset class="col-12"><legend class="h5">Tipo de suelo</legend><div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-2" th:each="op : ${suelos}"><input class="btn-check" type="radio" th:id="|suelo-${op[0]}|" th:field="*{tipoSuelo}" th:value="${op[0]}" required><label class="card h-100 huerto-opcion" th:for="|suelo-${op[0]}|"><img class="card-img-top ilustracion-opcion" th:src="@{/img/huerto/suelo.svg}" alt="Ilustración referencial de capas del suelo"><span class="card-body py-2" th:text="${op[1]}">Suelo</span></label></div>
+        </div></fieldset>
+        <div class="col-md-6"><label class="form-label" for="fuenteAgua">Fuente de agua</label><input class="form-control" id="fuenteAgua" th:field="*{fuenteAgua}" maxlength="120" required></div>
+        <div class="col-md-6"><label class="form-label" for="abonoNatural">Abono natural</label><select class="form-select" id="abonoNatural" th:field="*{abonoNatural}" required><option th:each="op : ${abonos}" th:value="${op[0]}" th:text="${op[1]}"></option></select></div>
+        <fieldset class="col-12"><legend class="h5">Cerramiento</legend><div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-2" th:each="op : ${cerramientos}"><input class="btn-check" type="radio" th:id="|cerramiento-${op[0]}|" th:field="*{cerramiento}" th:value="${op[0]}" required><label class="card h-100 huerto-opcion" th:for="|cerramiento-${op[0]}|"><img class="card-img-top ilustracion-opcion" th:src="@{/img/huerto/cerramiento.svg}" alt="Ilustración referencial de cerramiento"><span class="card-body py-2" th:text="${op[1]}">Cerramiento</span></label></div>
+        </div></fieldset>
+        <div class="col-12"><button class="btn btn-huerto" type="submit">Guardar cambios</button> <a class="btn btn-link" th:href="@{/gestor}">Cancelar</a></div>
     </form>
-</section>
-</body>
-</html>
+</section></body></html>

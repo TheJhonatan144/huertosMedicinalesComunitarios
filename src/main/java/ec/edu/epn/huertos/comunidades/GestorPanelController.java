@@ -2,7 +2,9 @@ package ec.edu.epn.huertos.comunidades;
 
 import ec.edu.epn.huertos.actividades.ActividadResumen;
 import ec.edu.epn.huertos.actividades.ActividadServicio;
+import ec.edu.epn.huertos.autenticacion.Usuario;
 import ec.edu.epn.huertos.autenticacion.UsuarioAutenticado;
+import ec.edu.epn.huertos.autenticacion.UsuarioRepository;
 import ec.edu.epn.huertos.compartido.ReglaNegocioException;
 import ec.edu.epn.huertos.evidencias.EstadoRevision;
 import ec.edu.epn.huertos.gamificacion.GamificacionServicio;
@@ -13,9 +15,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import jakarta.servlet.http.HttpServletRequest;
 
 /** Panel del gestor de huerto y administración de integrantes de su comunidad. */
 @Controller
@@ -25,13 +34,15 @@ public class GestorPanelController {
     private final HuertoServicio huertos;
     private final ActividadServicio actividades;
     private final GamificacionServicio gamificacion;
+    private final UsuarioRepository usuarios;
 
     public GestorPanelController(ComunidadServicio comunidades, HuertoServicio huertos, ActividadServicio actividades,
-                                 GamificacionServicio gamificacion) {
+                                 GamificacionServicio gamificacion, UsuarioRepository usuarios) {
         this.comunidades = comunidades;
         this.huertos = huertos;
         this.actividades = actividades;
         this.gamificacion = gamificacion;
+        this.usuarios = usuarios;
     }
 
     @GetMapping("/gestor")
@@ -41,9 +52,12 @@ public class GestorPanelController {
         Huerto huerto = huertos.huertoDeGestor(usuario.getId());
         List<ActividadResumen> lista = actividades.listar(usuario.getId());
         model.addAttribute("comunidad", comunidad);
+        model.addAttribute("eliminacionPendiente", comunidad.isEliminacionPendiente());
         model.addAttribute("huerto", huerto);
+        model.addAttribute("plantasPlantadas", huertos.plantasPlantadasDeGestor(usuario.getId()));
         model.addAttribute("activos", comunidades.activos(comunidad.getId()));
-        model.addAttribute("cupo", comunidades.cupoMaximo());
+        model.addAttribute("cupo", comunidades.cupoMaximo(comunidad));
+        model.addAttribute("cuposDisponibles", comunidades.cuposDisponibles(comunidad.getId()));
         model.addAttribute("puntosComunitarios", gamificacion.puntosComunitarios(comunidad.getId()));
         model.addAttribute("progreso", gamificacion.progreso(comunidad.getId()));
         model.addAttribute("misPuntos", gamificacion.resumenIndividual(gestor.getId()));
@@ -57,20 +71,61 @@ public class GestorPanelController {
     String integrantes(@AuthenticationPrincipal UsuarioAutenticado usuario, Model model) {
         Integrante gestor = comunidades.gestorDe(usuario.getId());
         model.addAttribute("comunidad", comunidades.comunidad(gestor.getComunidadId()));
+        model.addAttribute("eliminacionPendiente", comunidades.comunidad(gestor.getComunidadId()).isEliminacionPendiente());
         model.addAttribute("integrantes", comunidades.integrantesDeMiComunidad(usuario.getId()));
         model.addAttribute("activos", comunidades.activos(gestor.getComunidadId()));
-        model.addAttribute("cupo", comunidades.cupoMaximo());
+        model.addAttribute("cupo", comunidades.cupoMaximo(gestor.getComunidadId()));
+        model.addAttribute("cuposDisponibles", comunidades.cuposDisponibles(gestor.getComunidadId()));
+        if (!model.containsAttribute("formulario")) model.addAttribute("formulario", new FormularioInvitacion());
+        model.addAttribute("invitaciones", comunidades.invitacionesEnviadas(usuario.getId()));
         return "gestor/integrantes";
+    }
+
+    @PostMapping("/gestor/integrantes/invitar")
+    String invitarIntegrante(@AuthenticationPrincipal UsuarioAutenticado usuario,
+                             @ModelAttribute("formulario") FormularioInvitacion formulario,
+                             RedirectAttributes flash) {
+        try {
+            comunidades.invitarIntegrante(usuario.getId(), formulario);
+            flash.addFlashAttribute("mensaje", "Invitación enviada. La persona debe aceptarla desde su cuenta.");
+        } catch (ReglaNegocioException e) {
+            flash.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/gestor/integrantes";
+    }
+
+    @PostMapping("/gestor/invitaciones/{id}/cancelar")
+    String cancelarInvitacion(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario,
+                              RedirectAttributes flash) {
+        return ejecutar(flash, () -> comunidades.cancelarInvitacion(usuario.getId(), id), "Invitación cancelada.");
+    }
+
+    @PostMapping("/gestor/integrantes/{id}/transferir")
+    String proponerGestor(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario,
+                          RedirectAttributes flash) {
+        return ejecutar(flash, () -> comunidades.invitarTraspasoGestor(usuario.getId(), id),
+                "Solicitud de traspaso enviada. La persona debe aceptarla.");
+    }
+
+    @PostMapping("/gestor/comunidad/archivar")
+    String archivar(@AuthenticationPrincipal UsuarioAutenticado usuario, HttpServletRequest request,
+                    RedirectAttributes flash) {
+        comunidades.archivarComunidad(usuario.getId());
+        Usuario cuentaActualizada = usuarios.findById(usuario.getId()).orElseThrow();
+        UsuarioAutenticado principalActualizado = new UsuarioAutenticado(cuentaActualizada);
+        Authentication autenticacionActualizada = new UsernamePasswordAuthenticationToken(
+                principalActualizado, null, principalActualizado.getAuthorities());
+        SecurityContext contexto = SecurityContextHolder.createEmptyContext();
+        contexto.setAuthentication(autenticacionActualizada);
+        SecurityContextHolder.setContext(contexto);
+        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, contexto);
+        flash.addFlashAttribute("mensaje", "La comunidad y su huerto se archivaron. Puedes consultar su ficha histórica.");
+        return "redirect:/cuenta/archivadas";
     }
 
     @PostMapping("/gestor/integrantes/{id}/baja")
     String baja(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario, RedirectAttributes flash) {
         return ejecutar(flash, () -> comunidades.darDeBaja(usuario.getId(), id), "Integrante dado de baja. Se liberó un cupo.");
-    }
-
-    @PostMapping("/gestor/integrantes/{id}/reactivar")
-    String reactivar(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario, RedirectAttributes flash) {
-        return ejecutar(flash, () -> comunidades.reactivar(usuario.getId(), id), "Integrante reactivado.");
     }
 
     private String ejecutar(RedirectAttributes flash, Runnable accion, String exito) {

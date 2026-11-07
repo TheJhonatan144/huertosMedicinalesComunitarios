@@ -47,12 +47,13 @@ public class EvidenciaServicio {
                 .orElseThrow(() -> new RecursoNoEncontradoException("La fotografía no existe."));
         Actividad actividad = actividades.findById(envio.getActividadId()).orElseThrow();
         boolean permitido = switch (usuario.getRol()) {
-            case GESTOR_HUERTO -> integrantes.findByUsuarioId(usuarioId)
+            case GESTOR_HUERTO -> integrantes.findByUsuarioIdAndActivoTrue(usuarioId)
                     .filter(i -> i.isEsGestor() && i.isActivo() && i.getComunidadId().equals(actividad.getComunidadId()))
                     .isPresent();
-            case ADMIN_EVIDENCIAS -> comunidades.revisorAsignado(usuarioId, actividad.getComunidadId())
+            case ADMIN_MINISTERIO_SALUD -> comunidades.revisorAsignado(usuarioId, actividad.getComunidadId())
                     && !actividad.getRegistradaPor().equals(usuarioId);
             case PARTICIPANTE -> false;
+            case SIN_ASIGNAR -> false;
         };
         if (!permitido) {
             throw new AccessDeniedException("Sin acceso a esta evidencia");

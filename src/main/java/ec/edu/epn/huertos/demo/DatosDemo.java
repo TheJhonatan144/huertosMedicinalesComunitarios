@@ -100,9 +100,9 @@ public class DatosDemo implements ApplicationRunner {
         alta(chimborazo, "participante_b2", "Participante Demo B2", true);
 
         // Revisores: cada uno con una sola comunidad asignada.
-        Usuario revisorA = crear("revisor_a", "Revisor Demo A", Rol.ADMIN_EVIDENCIAS);
+        Usuario revisorA = crear("revisor_a", "Administrador Ministerio Demo A", Rol.ADMIN_MINISTERIO_SALUD);
         asignaciones.save(new AsignacionRevisor(revisorA.getId(), imbabura.getId()));
-        Usuario revisorB = crear("revisor_b", "Revisor Demo B", Rol.ADMIN_EVIDENCIAS);
+        Usuario revisorB = crear("revisor_b", "Administrador Ministerio Demo B", Rol.ADMIN_MINISTERIO_SALUD);
         asignaciones.save(new AsignacionRevisor(revisorB.getId(), chimborazo.getId()));
 
         log.info("Perfil demo: datos sintéticos cargados (2 comunidades, 9 cuentas de demostración).");

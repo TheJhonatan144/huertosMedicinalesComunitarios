@@ -4,10 +4,14 @@
 <body>
 <section>
     <h1 class="h3">Integrantes de <span th:text="${comunidad.nombre}">Comunidad</span></h1>
+    <div th:if="${eliminacionPendiente}" class="alert alert-warning" role="status">Hay una solicitud de eliminación pendiente de aprobación ministerial. La comunidad está en modo de solo lectura hasta que se resuelva.</div>
     <p class="text-muted">
-        Activos: <strong th:text="${activos} + ' de ' + ${cupo}">1 de 25</strong> (incluye al gestor).
-        Una baja libera un cupo; reactivar a alguien lo consume.
+        Tipo: <strong th:text="${comunidad.tipoComunidad}">BARRIO</strong> · Activos: <strong th:text="${activos} + ' de ' + ${cupo}">1 de 25</strong> (incluye al gestor) · Cupos disponibles: <strong th:text="${cuposDisponibles}">24</strong>.
+        Una baja libera un cupo. Para regresar a la comunidad, la persona debe aceptar una nueva invitación.
     </p>
+    <div class="alert alert-info" th:if="${cuposDisponibles == 0 and !eliminacionPendiente}">
+        La comunidad alcanzó su capacidad. Puedes cambiar “¿A quién representa?” en <a th:href="@{/gestor/huerto}">Datos de la comunidad</a> para ampliar los cupos; los integrantes actuales se conservarán.
+    </div>
     <div class="table-responsive">
         <table class="table align-middle">
             <caption class="visually-hidden">Integrantes de la comunidad</caption>
@@ -19,18 +23,41 @@
                 <td th:text="${i.gestor()} ? 'Gestor' : 'Participante'">Participante</td>
                 <td><span class="badge" th:classappend="${i.activo()} ? 'text-bg-success' : 'text-bg-secondary'" th:text="${i.activo()} ? 'Activo' : 'De baja'">Activo</span></td>
                 <td class="text-end">
-                    <form th:if="${i.activo() and !i.gestor()}" th:action="@{/gestor/integrantes/{id}/baja(id=${i.id()})}" method="post" data-una-vez>
-                        <button class="btn btn-sm btn-outline-danger" type="submit" data-confirmar="¿Dar de baja a este integrante?">Dar de baja</button>
-                    </form>
-                    <form th:if="${!i.activo()}" th:action="@{/gestor/integrantes/{id}/reactivar(id=${i.id()})}" method="post" data-una-vez>
-                        <button class="btn btn-sm btn-outline-success" type="submit">Reactivar</button>
-                    </form>
+                    <div th:if="${!eliminacionPendiente and i.activo() and !i.gestor()}" class="d-flex gap-1 justify-content-end">
+                        <form th:action="@{/gestor/integrantes/{id}/transferir(id=${i.id()})}" method="post"><button class="btn btn-sm btn-outline-success" type="submit" data-confirmar="¿Proponer a esta persona como nueva gestora? Tu salida se completará cuando acepte.">Proponer como gestor</button></form>
+                        <form th:action="@{/gestor/integrantes/{id}/baja(id=${i.id()})}" method="post" data-una-vez>
+                            <button class="btn btn-sm btn-outline-danger" type="submit" data-confirmar="¿Dar de baja a este integrante?">Dar de baja</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
-    <p class="small text-muted">El alta de nuevos usuarios es provisional: la realiza el equipo del proyecto (ver README).</p>
+    <h2 class="h5 mt-4">Invitar a una persona</h2>
+    <p class="small text-muted">La persona debe tener una cuenta y aceptar la invitación. Si pertenece a otra comunidad, deberá dejarla antes de aceptar.</p>
+    <form th:if="${!eliminacionPendiente and cuposDisponibles > 0}" th:action="@{/gestor/integrantes/invitar}" th:object="${formulario}" method="post" class="row g-3">
+        <div class="col-md-6"><label class="form-label" for="usuarioInvitado">Nombre de usuario</label><input class="form-control" id="usuarioInvitado" th:field="*{nombreUsuario}" maxlength="50" required></div>
+        <div class="col-md-6 align-self-end"><button class="btn btn-huerto" type="submit">Enviar invitación</button></div>
+    </form>
+    <h3 class="h6 mt-4" th:if="${!invitaciones.isEmpty()}">Invitaciones pendientes</h3>
+    <ul class="list-group" th:if="${!invitaciones.isEmpty()}">
+        <li class="list-group-item d-flex justify-content-between align-items-center" th:each="i : ${invitaciones}">
+            <span th:text="${i.invitador()} + ' · ' + ${i.tipo()}">Cuenta · PARTICIPANTE</span>
+            <form th:if="${!eliminacionPendiente}" th:action="@{/gestor/invitaciones/{id}/cancelar(id=${i.id()})}" method="post"><button class="btn btn-sm btn-outline-danger" type="submit">Cancelar</button></form>
+        </li>
+    </ul>
+    <hr class="my-4">
+    <h2 class="h5">Salir de la comunidad</h2>
+    <p class="small text-muted">Puedes proponer a un participante activo como gestor. Si nadie puede asumir la gestión, archiva la comunidad; sus actividades y puntos históricos se conservarán.</p>
+    <div th:if="${!eliminacionPendiente}" class="d-flex flex-column gap-3 align-items-start">
+        <form th:action="@{/gestor/comunidad/archivar}" method="post"><button class="btn btn-outline-danger" type="submit" data-confirmar="Se archivará la comunidad y nadie podrá registrar nuevas actividades. Se conservará el historial. ¿Continuar?">Archivar comunidad</button></form>
+        <form th:action="@{/comunidades/{id}/solicitar-eliminacion(id=${comunidad.id})}" method="post" class="w-100" style="max-width: 42rem">
+            <label class="form-label" for="motivoEliminacion">O solicita la eliminación permanente</label>
+            <textarea class="form-control mb-2" id="motivoEliminacion" name="motivo" rows="2" maxlength="2000" required placeholder="Explica por qué solicitas eliminar la comunidad"></textarea>
+            <button class="btn btn-danger" type="submit" data-confirmar="La eliminación debe aprobarla el Ministerio. Si se aprueba, se borrarán definitivamente la comunidad, las actividades, las fotografías y los puntos. ¿Enviar solicitud?">Solicitar eliminación definitiva</button>
+        </form>
+    </div>
 </section>
 </body>
 </html>

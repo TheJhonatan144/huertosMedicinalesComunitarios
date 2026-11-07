@@ -8,4 +8,8 @@ public interface PlantaRepository extends JpaRepository<Planta, Long> {
     List<Planta> findByHuertoIdOrderByActivaDescNombreComunAsc(Long huertoId);
 
     List<Planta> findByHuertoIdAndActivaTrueOrderByNombreComunAsc(Long huertoId);
+
+    List<Planta> findByHuertoIdAndPlantadaTrueOrderByNombreComunAsc(Long huertoId);
+
+    long countByHuertoIdAndPlantadaTrue(Long huertoId);
 }

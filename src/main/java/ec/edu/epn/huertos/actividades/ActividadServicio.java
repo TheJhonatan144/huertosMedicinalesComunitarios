@@ -56,6 +56,7 @@ public class ActividadServicio {
     @Transactional
     public Long registrar(Long gestorUsuarioId, FormularioActividad form, MultipartFile foto) {
         Integrante gestor = comunidades.gestorDe(gestorUsuarioId);
+        comunidades.exigirComunidadOperativa(gestor.getComunidadId());
         Huerto huerto = huertos.findByComunidadId(gestor.getComunidadId())
                 .orElseThrow(() -> new ReglaNegocioException("Tu comunidad aún no tiene un huerto registrado."));
         validarFecha(form.getFecha());
@@ -77,6 +78,7 @@ public class ActividadServicio {
     @Transactional
     public void editar(Long gestorUsuarioId, Long actividadId, FormularioActividad form) {
         Integrante gestor = comunidades.gestorDe(gestorUsuarioId);
+        comunidades.exigirComunidadOperativa(gestor.getComunidadId());
         Actividad actividad = actividadDe(gestor, actividadId);
         if (actividad.getEstado() != EstadoRevision.PENDIENTE) {
             throw new ConflictoException("Solo se puede editar una actividad mientras está pendiente de revisión.");
@@ -90,6 +92,7 @@ public class ActividadServicio {
     public void reenviar(Long gestorUsuarioId, Long actividadId, FormularioActividad form, String comentario,
                          MultipartFile foto) {
         Integrante gestor = comunidades.gestorDe(gestorUsuarioId);
+        comunidades.exigirComunidadOperativa(gestor.getComunidadId());
         Actividad actividad = actividades.bloquearPorId(actividadId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("La actividad no existe."));
         if (!actividad.getComunidadId().equals(gestor.getComunidadId())) {
@@ -141,7 +144,7 @@ public class ActividadServicio {
             throw new ReglaNegocioException("Selecciona al menos un participante.");
         }
         LinkedHashSet<Long> unicos = new LinkedHashSet<>(ids);
-        if (unicos.size() > comunidades.cupoMaximo()) {
+        if (unicos.size() > comunidades.cupoMaximo(gestor.getComunidadId())) {
             throw new ReglaNegocioException("La lista de participantes excede el máximo de la comunidad.");
         }
         List<Integrante> encontrados = integrantes.findAllById(unicos);

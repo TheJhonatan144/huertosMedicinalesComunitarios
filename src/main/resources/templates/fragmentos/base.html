@@ -9,7 +9,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 <a class="visually-hidden-focusable" href="#contenido">Saltar al contenido</a>
-<nav class="navbar navbar-expand-lg navbar-dark bg-huerto">
+<nav class="app-navbar navbar navbar-expand-lg navbar-dark bg-huerto">
     <div class="container">
         <a class="navbar-brand fw-semibold" th:href="@{/}">🌿 Huertos Medicinales</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
@@ -29,13 +29,21 @@
                 <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'PARTICIPANTE'}">
                     <li class="nav-item"><a class="nav-link" th:href="@{/participante}">Mi progreso</a></li>
                 </th:block>
-                <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'ADMIN_EVIDENCIAS'}">
-                    <li class="nav-item"><a class="nav-link" th:href="@{/revision}">Bandeja de revisión</a></li>
-                    <li class="nav-item"><a class="nav-link" th:href="@{/revision/historial}">Mis revisiones</a></li>
+                <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'SIN_ASIGNAR'}">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/cuenta}">Mi cuenta</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/cuenta/comunidad/nueva}">Crear huerta</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/cuenta/solicitudes-comunidad}">Mis solicitudes</a></li>
+                </th:block>
+                <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'ADMIN_MINISTERIO_SALUD'}">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/revision}">Evidencias</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/revision/solicitudes-comunidad}">Solicitudes comunitarias</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/revision/historial}">Historial</a></li>
                 </th:block>
             </ul>
             <div class="d-flex align-items-center gap-2 text-white">
                 <th:block th:if="${usuarioActual != null}">
+                    <a class="btn btn-outline-light btn-sm" th:href="@{/cuenta/solicitudes-comunidad}">Mis solicitudes</a>
+                    <a th:if="${usuarioActual.rol.name() != 'ADMIN_MINISTERIO_SALUD'}" class="btn btn-outline-light btn-sm" th:href="@{/cuenta/invitaciones}">Invitaciones</a>
                     <span class="small"><span th:text="${usuarioActual.nombreCompleto}">Usuario</span>
                         · <span th:text="${usuarioActual.rol.etiqueta()}">Rol</span></span>
                     <form th:action="@{/logout}" method="post" class="m-0">
@@ -43,18 +51,19 @@
                     </form>
                 </th:block>
                 <a th:if="${usuarioActual == null}" class="btn btn-light btn-sm" th:href="@{/login}">Iniciar sesión</a>
+                <a th:if="${usuarioActual == null}" class="btn btn-outline-light btn-sm" th:href="@{/registro}">Registrarse</a>
             </div>
         </div>
     </div>
 </nav>
 
-<main class="container py-4 flex-grow-1" id="contenido">
+<main class="app-main container py-4 flex-grow-1" id="contenido">
     <div th:if="${mensaje}" class="alert alert-success" role="status" th:text="${mensaje}"></div>
     <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
     <th:block th:replace="${contenido}"/>
 </main>
 
-<footer class="border-top py-3 small text-muted">
+<footer class="app-footer border-top py-3 small text-muted">
     <div class="container">
         Prototipo académico · Calidad de Software · Escuela Politécnica Nacional.
         Los datos y textos de demostración son ficticios o ilustrativos; no constituyen recomendaciones clínicas.

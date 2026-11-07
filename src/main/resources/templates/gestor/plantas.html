@@ -12,18 +12,23 @@
     <div class="table-responsive" th:unless="${plantas.isEmpty()}">
         <table class="table align-middle">
             <caption class="visually-hidden">Plantas del huerto</caption>
-            <thead><tr><th scope="col">Nombre común</th><th scope="col">Nombre científico</th><th scope="col">Cantidad</th><th scope="col">Estado</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+            <thead><tr><th scope="col">Nombre común</th><th scope="col">Nombre científico</th><th scope="col">Cantidad</th><th scope="col">Estado</th><th scope="col">Huerto virtual</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
             <tbody>
             <tr th:each="p : ${plantas}">
                 <td th:text="${p.nombreComun}">Planta</td>
                 <td><em th:text="${p.nombreCientifico}">Nombre científico</em></td>
                 <td th:text="${p.cantidad}">1</td>
                 <td><span class="badge" th:classappend="${p.activa} ? 'text-bg-success' : 'text-bg-secondary'" th:text="${p.activa} ? 'Activa' : 'Inactiva'">Activa</span></td>
+                <td><span class="badge" th:classappend="${p.plantada} ? 'text-bg-success' : 'text-bg-light text-dark'" th:text="${p.plantada} ? 'Plantada' : 'No plantada'">No plantada</span></td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-secondary" th:href="@{/gestor/plantas/{id}/editar(id=${p.id})}">Editar</a>
                     <form class="d-inline" th:action="@{/gestor/plantas/{id}/estado(id=${p.id})}" method="post" data-una-vez>
                         <input type="hidden" name="activa" th:value="${!p.activa}">
                         <button class="btn btn-sm btn-outline-secondary" type="submit" th:text="${p.activa} ? 'Desactivar' : 'Activar'">Desactivar</button>
+                    </form>
+                    <form class="d-inline" th:action="@{/gestor/plantas/{id}/plantada(id=${p.id})}" method="post" data-una-vez>
+                        <input type="hidden" name="plantada" th:value="${!p.plantada}">
+                        <button class="btn btn-sm btn-outline-success" type="submit" th:text="${p.plantada} ? 'Quitar de vista virtual' : 'Marcar plantada'">Marcar plantada</button>
                     </form>
                 </td>
             </tr>

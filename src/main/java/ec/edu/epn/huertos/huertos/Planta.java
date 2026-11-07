@@ -34,6 +34,9 @@ public class Planta {
     @Column(nullable = false)
     private boolean activa = true;
 
+    @Column(nullable = false)
+    private boolean plantada = false;
+
     @Column(name = "creada_en", nullable = false)
     private Instant creadaEn = Instant.now();
 
@@ -55,6 +58,8 @@ public class Planta {
     public void cambiarActiva(boolean activa) {
         this.activa = activa;
     }
+
+    public void cambiarPlantada(boolean plantada) { this.plantada = plantada; }
 
     private static String vacioANulo(String valor) {
         return valor == null || valor.isBlank() ? null : valor.trim();
@@ -87,4 +92,6 @@ public class Planta {
     public boolean isActiva() {
         return activa;
     }
+
+    public boolean isPlantada() { return plantada; }
 }
