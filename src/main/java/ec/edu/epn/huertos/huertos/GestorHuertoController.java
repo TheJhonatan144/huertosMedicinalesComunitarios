@@ -48,9 +48,7 @@ public class GestorHuertoController {
 
     @GetMapping("/gestor/plantas/nueva")
     String nueva(Model model) {
-        model.addAttribute("form", new FormularioPlanta());
-        model.addAttribute("accion", "/gestor/plantas");
-        return "gestor/planta-form";
+        return "redirect:/gestor/plantas/catalogo";
     }
 
     @PostMapping("/gestor/plantas")
@@ -67,9 +65,8 @@ public class GestorHuertoController {
 
     @GetMapping("/gestor/plantas/{id}/editar")
     String editar(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario, Model model) {
-        model.addAttribute("form", FormularioPlanta.de(huertos.plantaDeGestor(usuario.getId(), id)));
-        model.addAttribute("accion", "/gestor/plantas/" + id);
-        return "gestor/planta-form";
+        huertos.plantaDeGestor(usuario.getId(), id);
+        return "redirect:/gestor/plantas/" + id + "/siembra";
     }
 
     @PostMapping("/gestor/plantas/{id}")

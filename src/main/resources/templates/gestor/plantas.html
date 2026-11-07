@@ -1,35 +1,6 @@
-<!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragmentos/base :: pagina('Plantas del huerto', ~{::section})}">
-<body>
-<section>
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Plantas del huerto</h1>
-        <a class="btn btn-huerto" th:href="@{/gestor/plantas/nueva}">Agregar planta</a>
-    </div>
-    <p class="small text-muted">Los textos son descriptivos y los escribe la comunidad. El sistema no ofrece recomendaciones clínicas.</p>
-    <p class="text-muted" th:if="${plantas.isEmpty()}">Todavía no registras plantas. Usa «Agregar planta».</p>
-    <div class="table-responsive" th:unless="${plantas.isEmpty()}">
-        <table class="table align-middle">
-            <caption class="visually-hidden">Plantas del huerto</caption>
-            <thead><tr><th scope="col">Nombre común</th><th scope="col">Nombre científico</th><th scope="col">Cantidad</th><th scope="col">Estado</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
-            <tbody>
-            <tr th:each="p : ${plantas}">
-                <td th:text="${p.nombreComun}">Planta</td>
-                <td><em th:text="${p.nombreCientifico}">Nombre científico</em></td>
-                <td th:text="${p.cantidad}">1</td>
-                <td><span class="badge" th:classappend="${p.activa} ? 'text-bg-success' : 'text-bg-secondary'" th:text="${p.activa} ? 'Activa' : 'Inactiva'">Activa</span></td>
-                <td class="text-end">
-                    <a class="btn btn-sm btn-outline-secondary" th:href="@{/gestor/plantas/{id}/editar(id=${p.id})}">Editar</a>
-                    <form class="d-inline" th:action="@{/gestor/plantas/{id}/estado(id=${p.id})}" method="post" data-una-vez>
-                        <input type="hidden" name="activa" th:value="${!p.activa}">
-                        <button class="btn btn-sm btn-outline-secondary" type="submit" th:text="${p.activa} ? 'Desactivar' : 'Activar'">Desactivar</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-</body>
-</html>
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina('Mis plantas', ~{::section})}"><body><section>
+<link rel="stylesheet" th:href="@{/css/plantas.css}">
+<header class="plantas-heroe mb-4"><div><p class="plantas-ceja">El huerto de mi comunidad</p><h1 class="h2">Plantas que cultivamos</h1><p class="mb-0 text-muted">La especie es compartida; su cantidad y siembra pertenecen a tu comunidad.</p></div><a class="btn btn-huerto" th:href="@{/gestor/plantas/catalogo}">Seleccionar del catálogo</a></header><nav class="d-flex flex-wrap gap-2 mb-4" aria-label="Plantas y bodega"><a class="btn btn-outline-success" th:href="@{/gestor/plantas}">Mis plantas</a><a class="btn btn-outline-success" th:href="@{/gestor/plantas/catalogo}">Catálogo común</a><a class="btn btn-outline-success" th:href="@{/gestor/bodega}">Bodega</a></nav>
+<p class="text-muted" th:if="${plantas.isEmpty()}">Aún no has seleccionado plantas. Explora el catálogo común para comenzar.</p>
+<div class="table-responsive" th:unless="${plantas.isEmpty()}"><table class="table align-middle"><caption>La ficha activa y el estado de siembra son independientes.</caption><thead><tr><th scope="col">Planta</th><th scope="col">Cantidad</th><th scope="col">Ficha</th><th scope="col">Siembra</th><th scope="col">Acciones</th></tr></thead><tbody><tr th:each="p : ${plantas}"><td><a class="fw-semibold" th:href="@{/gestor/plantas/catalogo/{id}(id=${p.especie.id})}" th:text="${p.nombreComun}"></a><div class="small text-muted fst-italic" th:text="${p.nombreCientifico}"></div></td><td th:text="${p.cantidad}"></td><td><span class="badge" th:classappend="${p.activa} ? 'text-bg-success' : 'text-bg-secondary'" th:text="${p.activa} ? 'Activa' : 'Inactiva'"></span></td><td th:text="${p.plantada} ? 'Ya está plantada' : 'No plantada'"></td><td><a class="btn btn-sm btn-outline-success" th:href="@{/gestor/plantas/{id}/siembra(id=${p.id})}">Editar mi siembra</a><form class="d-inline" method="post" th:action="@{/gestor/plantas/{id}/estado(id=${p.id})}"><input type="hidden" name="activa" th:value="${!p.activa}"><button class="btn btn-sm btn-outline-secondary" type="submit" th:text="${p.activa} ? 'Desactivar ficha' : 'Activar ficha'"></button></form></td></tr></tbody></table></div>
+</section></body></html>

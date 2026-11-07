@@ -1,0 +1,84 @@
+package ec.edu.epn.huertos.huertos;
+
+import ec.edu.epn.huertos.autenticacion.*;
+import ec.edu.epn.huertos.compartido.*;
+import ec.edu.epn.huertos.evidencias.*;
+import jakarta.validation.Validator;
+import java.text.Normalizer;
+import java.util.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+
+/** Datos compartidos de especies. La siembra pertenece exclusivamente a Planta/huerto. */
+@Service
+public class CatalogoServicio {
+ private final EspecieRepository especies;
+ private final AutorizacionServicio permisos;
+ private final HuertoServicio huertos;
+ private final ValidadorImagen imagenes;
+ private final AlmacenamientoArchivos archivos;
+ private final Validator validador;
+ public CatalogoServicio(EspecieRepository especies, AutorizacionServicio permisos, HuertoServicio huertos,
+        ValidadorImagen imagenes, AlmacenamientoArchivos archivos, Validator validador) {
+  this.especies = especies; this.permisos = permisos; this.huertos = huertos;
+  this.imagenes = imagenes; this.archivos = archivos; this.validador = validador;
+ }
+ private void gestor(Long usuarioId) { permisos.exigirRol(usuarioId, Rol.GESTOR_HUERTO); }
+ @Transactional(readOnly = true)
+ public List<Especie> listar(Long usuarioId, String texto, RegionPlanta region, String provincia, Integer altitud) {
+  gestor(usuarioId);
+  String q = normalizarBusqueda(texto);
+  String prov = normalizarBusqueda(provincia);
+  return especies.findAll().stream()
+   .filter(e -> normalizarBusqueda(e.getNombreComun() + " " + Objects.toString(e.getNombreCientifico(), "") + " " + Objects.toString(e.getOtrosNombres(), "")).contains(q))
+   .filter(e -> region == null || e.getRegiones().contains(region))
+   .filter(e -> prov.isEmpty() || normalizarBusqueda(e.getProvincias()).contains(prov))
+   .filter(e -> altitud == null || (e.getAltitudMinima() != null && e.getAltitudMaxima() != null && altitud >= e.getAltitudMinima() && altitud <= e.getAltitudMaxima()))
+   .sorted(Comparator.comparing(Especie::getNombreComun, String.CASE_INSENSITIVE_ORDER)).toList();
+ }
+ private static String normalizarBusqueda(String valor) {
+  if (valor == null) return "";
+  return Normalizer.normalize(valor.strip().toLowerCase(Locale.ROOT), Normalizer.Form.NFD)
+   .replaceAll("\\p{M}+", "").replaceAll("\\s+", " ");
+ }
+ @Transactional(readOnly = true)
+ public Especie obtener(Long usuarioId, Long id) {
+  gestor(usuarioId); return especies.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("La especie no existe en el catálogo."));
+ }
+ @Transactional
+ public Especie guardar(Long usuarioId, Long id, FichaEspecie ficha, MultipartFile foto) {
+  gestor(usuarioId);
+  if (!validador.validate(ficha).isEmpty()) throw new ReglaNegocioException("Revisa los datos de la ficha y sus fuentes.");
+  Especie especie = id == null ? new Especie(ficha.getNombreComun(), ficha.getNombreCientifico()) : obtener(usuarioId, id);
+  if (id != null && especie.getVersion() != ficha.getVersion()) throw new ConflictoException("La ficha cambió. Vuelve a abrirla antes de editar.");
+  especie.actualizar(ficha);
+  if (foto != null && !foto.isEmpty()) {
+   ImagenValidada imagen = imagenes.validar(foto);
+   String anterior = especie.getFotoClave(); String nueva = archivos.guardar(imagen);
+   TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+    @Override public void afterCompletion(int estado) {
+     if (estado != STATUS_COMMITTED) archivos.eliminar(nueva);
+     else if (anterior != null) archivos.eliminar(anterior);
+    }
+   });
+   especie.cambiarFoto(nueva, imagen.tipoContenido());
+  }
+  return especies.save(especie);
+ }
+ @Transactional
+ public Planta seleccionar(Long usuarioId, Long especieId, SiembraPlanta form) {
+  if (!validador.validate(form).isEmpty()) throw new ReglaNegocioException("Revisa la cantidad de plantas.");
+  return huertos.seleccionarEspecie(usuarioId, obtener(usuarioId, especieId), form.getCantidad(), form.isPlantada());
+ }
+ @Transactional(readOnly = true)
+ public Resource foto(Long usuarioId, Long id) {
+  Especie e = obtener(usuarioId, id);
+  if (e.getFotoClave() == null) throw new RecursoNoEncontradoException("Fotografía pendiente de registrar.");
+  Resource recurso = archivos.cargar(e.getFotoClave());
+  if (!recurso.exists()) throw new RecursoNoEncontradoException("La fotografía no está disponible.");
+  return recurso;
+ }
+}

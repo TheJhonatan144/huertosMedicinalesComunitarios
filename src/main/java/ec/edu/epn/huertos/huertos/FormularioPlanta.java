@@ -23,12 +23,17 @@ public class FormularioPlanta {
     @Max(value = 100000, message = "La cantidad es demasiado grande.")
     private Integer cantidad = 1;
 
+    private boolean plantada;
+    public boolean isPlantada() { return plantada; }
+    public void setPlantada(boolean plantada) { this.plantada = plantada; }
+
     public static FormularioPlanta de(Planta p) {
         FormularioPlanta f = new FormularioPlanta();
         f.nombreComun = p.getNombreComun();
         f.nombreCientifico = p.getNombreCientifico();
         f.descripcion = p.getDescripcion();
         f.cantidad = p.getCantidad();
+        f.plantada = p.isPlantada();
         return f;
     }
 

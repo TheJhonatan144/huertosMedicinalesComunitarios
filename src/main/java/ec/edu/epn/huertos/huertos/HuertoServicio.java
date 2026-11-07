@@ -52,15 +52,17 @@ public class HuertoServicio {
     @Transactional
     public Planta crearPlanta(Long gestorUsuarioId, FormularioPlanta form) {
         Huerto huerto = huertoDeGestor(gestorUsuarioId);
-        return plantas.save(new Planta(huerto.getId(), form.getNombreComun().trim(), form.getNombreCientifico(),
-                form.getDescripcion(), form.getCantidad()));
+        Planta planta = new Planta(huerto.getId(), form.getNombreComun().trim(), form.getNombreCientifico(), form.getDescripcion(), form.getCantidad());
+        planta.cambiarSiembra(form.getCantidad(), form.isPlantada());
+        return plantas.save(planta);
     }
 
     @Transactional
     public void actualizarPlanta(Long gestorUsuarioId, Long plantaId, FormularioPlanta form) {
-        plantaDeGestor(gestorUsuarioId, plantaId)
-                .actualizar(form.getNombreComun().trim(), form.getNombreCientifico(), form.getDescripcion(),
-                        form.getCantidad());
+        Planta planta = plantaDeGestor(gestorUsuarioId, plantaId);
+        planta.actualizar(form.getNombreComun().trim(), form.getNombreCientifico(), form.getDescripcion(), form.getCantidad());
+        planta.getEspecie().cambiarNombre(form.getNombreComun().trim(), form.getNombreCientifico());
+        planta.cambiarSiembra(form.getCantidad(), form.isPlantada());
     }
 
     @Transactional
@@ -71,5 +73,22 @@ public class HuertoServicio {
     @Transactional(readOnly = true)
     public List<Planta> plantasActivasPublicas(Long huertoId) {
         return plantas.findByHuertoIdAndActivaTrueOrderByNombreComunAsc(huertoId);
+    }
+    @Transactional
+    public Planta seleccionarEspecie(Long usuarioId, Especie especie, int cantidad, boolean plantada) {
+        Long huertoId = huertoDeGestor(usuarioId).getId();
+        // Serializa selecciones de la misma comunidad para no duplicar una especie.
+        plantas.bloquearHuerto(huertoId);
+        if (plantas.existsByHuertoIdAndEspecieId(huertoId, especie.getId()))
+            throw new ec.edu.epn.huertos.compartido.ConflictoException("Esta especie ya está en tu lista. Edita su cantidad o siembra.");
+        return plantas.save(new Planta(huertoId, especie, cantidad, plantada));
+    }
+    @Transactional
+    public void actualizarSiembra(Long usuarioId, Long id, SiembraPlanta form) {
+        plantaDeGestor(usuarioId, id).cambiarSiembra(form.getCantidad(), form.isPlantada());
+    }
+    @Transactional(readOnly = true)
+    public List<Planta> plantasPlantadasDeGestor(Long usuarioId) {
+        return plantas.findByHuertoIdAndPlantadaTrueOrderByNombreComunAsc(huertoDeGestor(usuarioId).getId());
     }
 }

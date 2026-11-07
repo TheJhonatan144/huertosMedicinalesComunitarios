@@ -37,11 +37,17 @@ public class Planta {
     @Column(name = "creada_en", nullable = false)
     private Instant creadaEn = Instant.now();
 
+    @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.EAGER, cascade = jakarta.persistence.CascadeType.PERSIST)
+    @jakarta.persistence.JoinColumn(name = "especie_id", nullable = false)
+    private Especie especie;
+    @Column(nullable = false) private boolean plantada;
+
     protected Planta() {
     }
 
     public Planta(Long huertoId, String nombreComun, String nombreCientifico, String descripcion, int cantidad) {
         this.huertoId = huertoId;
+        this.especie = new Especie(nombreComun, nombreCientifico);
         actualizar(nombreComun, nombreCientifico, descripcion, cantidad);
     }
 
@@ -69,11 +75,11 @@ public class Planta {
     }
 
     public String getNombreComun() {
-        return nombreComun;
+        return especie == null ? nombreComun : especie.getNombreComun();
     }
 
     public String getNombreCientifico() {
-        return nombreCientifico;
+        return especie == null ? nombreCientifico : especie.getNombreCientifico();
     }
 
     public String getDescripcion() {
@@ -87,4 +93,12 @@ public class Planta {
     public boolean isActiva() {
         return activa;
     }
+    public Planta(Long huertoId, Especie especie, int cantidad, boolean plantada) {
+        this.huertoId = huertoId; this.especie = especie;
+        actualizar(especie.getNombreComun(), especie.getNombreCientifico(), null, cantidad);
+        this.plantada = plantada;
+    }
+    public Especie getEspecie() { return especie; }
+    public boolean isPlantada() { return plantada; }
+    public void cambiarSiembra(int cantidad, boolean plantada) { this.cantidad = cantidad; this.plantada = plantada; }
 }
