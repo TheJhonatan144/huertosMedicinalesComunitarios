@@ -30,6 +30,7 @@ En `Descargas` hay otros documentos de nombre parecido (`Propuesta_Arquitectura_
 | P-10 | Fecha de entrega (13/11/2026) y cronograma | No confirmada |
 | P-11 | Designación real/integración con el MSP para el rol de revisor | Hoy es solo funcional |
 | P-12 | Requisitos de rendimiento (p. ej. consultas en 3 s): definir operación, carga y entorno | No se afirma ni se mide |
+| P-13 | Lista definitiva de tipos de suelo y de diseños del huerto (hoy propuesta: 5 suelos, 4 diseños) y más ilustraciones de plantas (hoy 3 + genérica) | Huerto virtual 2D, ver [huerto-virtual](huerto-virtual.md) |
 
 ## Verificaciones que faltan
 

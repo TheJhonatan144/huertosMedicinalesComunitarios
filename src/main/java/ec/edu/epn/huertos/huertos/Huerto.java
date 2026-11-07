@@ -2,6 +2,8 @@ package ec.edu.epn.huertos.huertos;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,6 +36,15 @@ public class Huerto {
     @Column(name = "creado_en", nullable = false)
     private Instant creadoEn = Instant.now();
 
+    /** Opcional: nulo = sin registrar (el huerto virtual usa apariencia neutra). */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_suelo")
+    private TipoSuelo tipoSuelo;
+
+    /** Opcional: nulo = sin registrar. */
+    @Enumerated(EnumType.STRING)
+    private DisenoHuerto diseno;
+
     protected Huerto() {
     }
 
@@ -45,9 +56,19 @@ public class Huerto {
         this.longitud = longitud;
     }
 
-    public void actualizar(String nombre, String descripcion) {
+    public void actualizar(String nombre, String descripcion, TipoSuelo tipoSuelo, DisenoHuerto diseno) {
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.tipoSuelo = tipoSuelo;
+        this.diseno = diseno;
+    }
+
+    public TipoSuelo getTipoSuelo() {
+        return tipoSuelo;
+    }
+
+    public DisenoHuerto getDiseno() {
+        return diseno;
     }
 
     public Long getId() {

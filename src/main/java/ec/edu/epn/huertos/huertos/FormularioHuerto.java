@@ -13,11 +13,35 @@ public class FormularioHuerto {
     @Size(max = 2000, message = "La descripción admite hasta 2000 caracteres.")
     private String descripcion;
 
+    /** Opcional: vacío = sin registrar. */
+    private TipoSuelo tipoSuelo;
+
+    /** Opcional: vacío = sin registrar. */
+    private DisenoHuerto diseno;
+
     public static FormularioHuerto de(Huerto h) {
         FormularioHuerto f = new FormularioHuerto();
         f.nombre = h.getNombre();
         f.descripcion = h.getDescripcion();
+        f.tipoSuelo = h.getTipoSuelo();
+        f.diseno = h.getDiseno();
         return f;
+    }
+
+    public TipoSuelo getTipoSuelo() {
+        return tipoSuelo;
+    }
+
+    public void setTipoSuelo(TipoSuelo tipoSuelo) {
+        this.tipoSuelo = tipoSuelo;
+    }
+
+    public DisenoHuerto getDiseno() {
+        return diseno;
+    }
+
+    public void setDiseno(DisenoHuerto diseno) {
+        this.diseno = diseno;
     }
 
     public String getNombre() {

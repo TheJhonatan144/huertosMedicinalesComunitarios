@@ -6,7 +6,8 @@ import ec.edu.epn.huertos.comunidades.Integrante;
 import ec.edu.epn.huertos.compartido.Fechas;
 import ec.edu.epn.huertos.evidencias.EstadoRevision;
 import ec.edu.epn.huertos.gamificacion.GamificacionServicio;
-import ec.edu.epn.huertos.gamificacion.ProgresoHuerto;
+import ec.edu.epn.huertos.huertos.HuertoVirtual;
+import ec.edu.epn.huertos.huertos.HuertoVirtualServicio;
 import ec.edu.epn.huertos.gamificacion.RecompensaIndividual;
 import ec.edu.epn.huertos.gamificacion.RecompensaIndividualRepository;
 import ec.edu.epn.huertos.gamificacion.ResumenPuntos;
@@ -25,22 +26,25 @@ public class ParticipanteServicio {
     private final ActividadParticipanteRepository participantes;
     private final RecompensaIndividualRepository individuales;
     private final GamificacionServicio gamificacion;
+    private final HuertoVirtualServicio huertoVirtual;
 
     public ParticipanteServicio(ComunidadServicio comunidades, ActividadRepository actividades,
                                 ActividadParticipanteRepository participantes,
-                                RecompensaIndividualRepository individuales, GamificacionServicio gamificacion) {
+                                RecompensaIndividualRepository individuales, GamificacionServicio gamificacion,
+                                HuertoVirtualServicio huertoVirtual) {
         this.comunidades = comunidades;
         this.actividades = actividades;
         this.participantes = participantes;
         this.individuales = individuales;
         this.gamificacion = gamificacion;
+        this.huertoVirtual = huertoVirtual;
     }
 
     public record Participacion(Long actividadId, String tipo, String fecha, EstadoRevision estado, Integer puntos) {
     }
 
     public record Panel(String comunidad, boolean activo, ResumenPuntos puntos, long puntosComunitarios,
-                        ProgresoHuerto progreso, List<Participacion> participaciones) {
+                        HuertoVirtual huertoVirtual, List<Participacion> participaciones) {
     }
 
     @Transactional(readOnly = true)
@@ -55,6 +59,7 @@ public class ParticipanteServicio {
                         a.getEstado(), puntosPorActividad.get(a.getId())))
                 .toList();
         return new Panel(comunidad.getNombre(), yo.isActivo(), gamificacion.resumenIndividual(yo.getId()),
-                gamificacion.puntosComunitarios(comunidad.getId()), gamificacion.progreso(comunidad.getId()), lista);
+                gamificacion.puntosComunitarios(comunidad.getId()),
+                huertoVirtual.paraComunidad(comunidad.getId(), false).orElse(null), lista);
     }
 }

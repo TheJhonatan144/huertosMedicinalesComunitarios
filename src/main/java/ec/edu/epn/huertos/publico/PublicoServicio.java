@@ -10,6 +10,8 @@ import ec.edu.epn.huertos.gamificacion.ProgresoHuerto;
 import ec.edu.epn.huertos.huertos.Huerto;
 import ec.edu.epn.huertos.huertos.HuertoRepository;
 import ec.edu.epn.huertos.huertos.HuertoServicio;
+import ec.edu.epn.huertos.huertos.HuertoVirtual;
+import ec.edu.epn.huertos.huertos.HuertoVirtualServicio;
 import ec.edu.epn.huertos.huertos.Planta;
 import java.util.List;
 import org.springframework.data.domain.Sort;
@@ -25,14 +27,17 @@ public class PublicoServicio {
     private final HuertoRepository huertos;
     private final HuertoServicio huertoServicio;
     private final GamificacionServicio gamificacion;
+    private final HuertoVirtualServicio huertoVirtual;
 
     public PublicoServicio(ComunidadRepository comunidades, ComunidadServicio comunidadServicio,
-                           HuertoRepository huertos, HuertoServicio huertoServicio, GamificacionServicio gamificacion) {
+                           HuertoRepository huertos, HuertoServicio huertoServicio, GamificacionServicio gamificacion,
+                           HuertoVirtualServicio huertoVirtual) {
         this.comunidades = comunidades;
         this.comunidadServicio = comunidadServicio;
         this.huertos = huertos;
         this.huertoServicio = huertoServicio;
         this.gamificacion = gamificacion;
+        this.huertoVirtual = huertoVirtual;
     }
 
     /** Elemento del mapa y de su alternativa en lista. */
@@ -41,7 +46,8 @@ public class PublicoServicio {
     }
 
     public record Ficha(Comunidad comunidad, Huerto huerto, List<Planta> plantas, long integrantesActivos,
-                        long puntosComunitarios, ProgresoHuerto progreso, Integer posicionRanking) {
+                        long puntosComunitarios, ProgresoHuerto progreso, Integer posicionRanking,
+                        HuertoVirtual huertoVirtual) {
     }
 
     @Transactional(readOnly = true)
@@ -65,7 +71,8 @@ public class PublicoServicio {
         Integer posicion = gamificacion.ranking().stream().filter(f -> f.comunidadId().equals(comunidadId))
                 .map(FilaRanking::posicion).findFirst().orElse(null);
         return new Ficha(comunidad, huerto, plantas, comunidadServicio.activos(comunidadId),
-                gamificacion.puntosComunitarios(comunidadId), gamificacion.progreso(comunidadId), posicion);
+                gamificacion.puntosComunitarios(comunidadId), gamificacion.progreso(comunidadId), posicion,
+                huertoVirtual.paraComunidad(comunidadId, false).orElse(null));
     }
 
     @Transactional(readOnly = true)

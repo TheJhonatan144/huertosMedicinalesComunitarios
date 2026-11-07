@@ -108,6 +108,6 @@ docs/                              documentación académica y técnica
 
 [alcance](docs/alcance-prototipo.md) · [arquitectura](docs/arquitectura.md) · [decisiones](docs/decisiones.md) ·
 [pendientes](docs/pendientes.md) · [backlog](docs/backlog.md) · [trazabilidad](docs/trazabilidad.md) ·
-[pruebas](docs/pruebas.md) · [guion](docs/guion-demostracion.md) · [avance](docs/avance.md)
+[huerto virtual 2D](docs/huerto-virtual.md) · [pruebas](docs/pruebas.md) · [guion](docs/guion-demostracion.md) · [avance](docs/avance.md)
 
 Atribución del mapa: © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright), visible en el propio mapa.

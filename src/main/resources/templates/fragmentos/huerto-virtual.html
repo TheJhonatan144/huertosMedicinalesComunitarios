@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Huerto virtual 2D cenital. Uso: <section th:replace="~{fragmentos/huerto-virtual :: parcela(${huertoVirtual})}"></section>
+  Solo muestra ILUSTRACIONES (sprites SVG), nunca las fotos reales del catálogo. Datos: ver HuertoVirtualServicio.
+-->
+<section th:fragment="parcela(hv)" class="huerto-virtual card tarjeta-huerto"
+         th:classappend="'suelo-' + ${hv.claveSuelo()} + ' diseno-' + ${hv.claveDiseno()}">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-2">
+            <h2 class="h5 mb-0">Huerto virtual</h2>
+            <span class="small text-muted" th:text="${hv.nombreHuerto()}">Huerto</span>
+        </div>
+
+        <div class="parcela" role="group" th:attr="aria-label='Parcela del huerto, ' + ${hv.etiquetaSuelo()}">
+            <div class="parcela-viga" aria-hidden="true"></div>
+            <div class="parcela-suelo tierra-textura">
+                <div class="parcela-slots" th:classappend="${hv.plantas().size() == 1} ? 'una-planta'"
+                     th:unless="${hv.plantas().isEmpty()}">
+                    <figure class="planta-slot" th:each="p, estado : ${hv.plantas()}" th:style="'--i:' + ${estado.index}">
+                        <div class="planta-cuerpo">
+                            <div class="planta-sprite" th:switch="${p.sprite()}">
+                                <th:block th:case="'manzanilla'"><th:block th:replace="~{fragmentos/huerto-virtual :: sprite-manzanilla(${p.nombre()})}"></th:block></th:block>
+                                <th:block th:case="'hierbaluisa'"><th:block th:replace="~{fragmentos/huerto-virtual :: sprite-hierbaluisa(${p.nombre()})}"></th:block></th:block>
+                                <th:block th:case="'menta'"><th:block th:replace="~{fragmentos/huerto-virtual :: sprite-menta(${p.nombre()})}"></th:block></th:block>
+                                <th:block th:case="*"><th:block th:replace="~{fragmentos/huerto-virtual :: sprite-generica(${p.nombre()})}"></th:block></th:block>
+                            </div>
+                            <div class="maceta" aria-hidden="true"><span class="tierra tierra-textura"></span></div>
+                        </div>
+                        <figcaption class="etiqueta-madera" th:text="${p.nombre()}">Planta</figcaption>
+                    </figure>
+                </div>
+                <div class="parcela-vacia" th:if="${hv.plantas().isEmpty()}">
+                    <div class="fs-2" aria-hidden="true">🌱</div>
+                    <p class="mb-1 fw-semibold">Tu parcela está lista y esperando plantas.</p>
+                    <p class="mb-0 small" th:if="${hv.puedeRegistrar()}">
+                        Registra tus plantas como plantadas para verlas crecer aquí.
+                        <a th:href="@{/gestor/plantas/nueva}">Registrar una planta</a>
+                    </p>
+                    <p class="mb-0 small" th:unless="${hv.puedeRegistrar()}">Esta comunidad aún no registra plantas plantadas.</p>
+                </div>
+            </div>
+        </div>
+        <p class="small text-muted mt-2 mb-0" th:if="${hv.plantasNoMostradas() > 0}">
+            + <span th:text="${hv.plantasNoMostradas()}">1</span> planta(s) más plantadas; esta primera versión dibuja hasta dos.
+        </p>
+
+        <div class="mt-3">
+            <span class="etiqueta-suelo">
+                <span class="muestra-suelo tierra-textura" aria-hidden="true"></span>
+                <span th:text="${hv.etiquetaSuelo()}">Suelo franco</span>
+            </span>
+            <span class="small text-muted ms-2" th:if="${hv.diseno() != null}" th:text="'Diseño: ' + ${hv.diseno().etiqueta()}">Diseño</span>
+        </div>
+
+        <div class="mt-3">
+            <div class="small fw-semibold mb-1">Progreso del huerto (solo actividades aprobadas)</div>
+            <div th:replace="~{fragmentos/componentes :: progreso(${hv.progreso()})}"></div>
+        </div>
+
+        <div class="aviso-falta small mt-3" th:unless="${hv.camposFaltantes().isEmpty()}" role="note">
+            Falta registrar: <strong th:text="${#strings.listJoin(hv.camposFaltantes(), ' y ')}">tipo de suelo</strong>.
+            Mientras tanto se muestra una apariencia neutra.
+            <a th:if="${hv.puedeRegistrar()}" th:href="@{/gestor/huerto}">Completar datos del huerto</a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Sprites SVG (ilustraciones propias; las clases .hoja y .flor se animan con CSS) ===== -->
+
+<svg th:fragment="sprite-manzanilla(nombre)" class="sprite" viewBox="0 0 120 120" role="img"
+     th:attr="aria-label='Ilustración de ' + ${nombre}">
+    <ellipse cx="60" cy="108" rx="30" ry="6" fill="#000" opacity=".12"/>
+    <g class="hoja" style="--d:0s"><path d="M60 108 C48 90 34 80 20 74 C38 70 54 82 60 108Z" fill="#4f9a45"/></g>
+    <g class="hoja" style="--d:.5s"><path d="M60 108 C72 88 86 78 102 74 C84 68 66 80 60 108Z" fill="#5cab4e"/></g>
+    <g class="hoja" style="--d:1s"><path d="M60 108 C56 84 44 66 30 54 C52 56 62 78 60 108Z" fill="#46893c"/></g>
+    <g class="hoja" style="--d:1.5s"><path d="M60 108 C64 82 78 62 92 52 C70 54 58 78 60 108Z" fill="#58a64a"/></g>
+    <g class="hoja" style="--d:.8s"><path d="M60 108 C58 84 58 60 60 40 C64 62 64 84 60 108Z" fill="#3f7f37"/></g>
+    <g class="flor" style="--d:0s">
+        <g transform="translate(40 50)"><g fill="#fff" stroke="#e7e2d3" stroke-width=".6">
+            <ellipse cx="0" cy="-8" rx="3.4" ry="7"/><ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(60)"/>
+            <ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(120)"/><ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(180)"/>
+            <ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(240)"/><ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(300)"/>
+        </g><circle r="4.6" fill="#f5b81c"/></g>
+    </g>
+    <g class="flor" style="--d:.9s">
+        <g transform="translate(78 42)"><g fill="#fff" stroke="#e7e2d3" stroke-width=".6">
+            <ellipse cx="0" cy="-8" rx="3.4" ry="7"/><ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(60)"/>
+            <ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(120)"/><ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(180)"/>
+            <ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(240)"/><ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(300)"/>
+        </g><circle r="4.6" fill="#f5b81c"/></g>
+    </g>
+    <g class="flor" style="--d:1.8s">
+        <g transform="translate(60 28) scale(.8)"><g fill="#fff" stroke="#e7e2d3" stroke-width=".6">
+            <ellipse cx="0" cy="-8" rx="3.4" ry="7"/><ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(60)"/>
+            <ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(120)"/><ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(180)"/>
+            <ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(240)"/><ellipse cx="0" cy="-8" rx="3.4" ry="7" transform="rotate(300)"/>
+        </g><circle r="4.6" fill="#f5b81c"/></g>
+    </g>
+</svg>
+
+<svg th:fragment="sprite-hierbaluisa(nombre)" class="sprite" viewBox="0 0 120 120" role="img"
+     th:attr="aria-label='Ilustración de ' + ${nombre}">
+    <ellipse cx="60" cy="108" rx="30" ry="6" fill="#000" opacity=".12"/>
+    <g class="hoja" style="--d:0s"><path d="M58 108 C44 78 30 52 12 34 C44 48 64 76 58 108Z" fill="#3f8a3a"/></g>
+    <g class="hoja" style="--d:.6s"><path d="M62 108 C76 78 90 52 108 34 C76 48 56 76 62 108Z" fill="#4c9b45"/></g>
+    <g class="hoja" style="--d:1.2s"><path d="M56 108 C46 70 40 40 38 12 C56 40 64 76 56 108Z" fill="#58a84e"/></g>
+    <g class="hoja" style="--d:1.8s"><path d="M64 108 C74 70 80 40 82 12 C64 40 56 76 64 108Z" fill="#3f8a3a"/></g>
+    <g class="hoja" style="--d:.3s"><path d="M60 108 C54 74 56 40 60 6 C66 40 66 74 60 108Z" fill="#6bb85a"/></g>
+    <g class="hoja" style="--d:.9s"><path d="M54 108 C40 90 24 80 8 78 C28 70 50 84 54 108Z" fill="#4c9b45"/></g>
+    <g class="hoja" style="--d:1.5s"><path d="M66 108 C80 90 96 80 112 78 C92 70 70 84 66 108Z" fill="#58a84e"/></g>
+</svg>
+
+<svg th:fragment="sprite-menta(nombre)" class="sprite" viewBox="0 0 120 120" role="img"
+     th:attr="aria-label='Ilustración de ' + ${nombre}">
+    <ellipse cx="60" cy="108" rx="30" ry="6" fill="#000" opacity=".12"/>
+    <g class="hoja" style="--d:0s"><g transform="rotate(-62 60 100)"><ellipse cx="60" cy="68" rx="15" ry="26" fill="#3f8a3a"/><path d="M60 94 V46" stroke="#2f6e2c" stroke-width="1.6"/></g></g>
+    <g class="hoja" style="--d:.7s"><g transform="rotate(62 60 100)"><ellipse cx="60" cy="68" rx="15" ry="26" fill="#4c9b45"/><path d="M60 94 V46" stroke="#2f6e2c" stroke-width="1.6"/></g></g>
+    <g class="hoja" style="--d:1.3s"><g transform="rotate(-28 60 100)"><ellipse cx="60" cy="62" rx="16" ry="28" fill="#58a84e"/><path d="M60 90 V36" stroke="#2f6e2c" stroke-width="1.6"/></g></g>
+    <g class="hoja" style="--d:.4s"><g transform="rotate(28 60 100)"><ellipse cx="60" cy="62" rx="16" ry="28" fill="#4c9b45"/><path d="M60 90 V36" stroke="#2f6e2c" stroke-width="1.6"/></g></g>
+    <g class="hoja" style="--d:1s"><ellipse cx="60" cy="56" rx="17" ry="30" fill="#6bb85a"/><path d="M60 88 V28" stroke="#2f6e2c" stroke-width="1.6"/></g>
+</svg>
+
+<svg th:fragment="sprite-generica(nombre)" class="sprite" viewBox="0 0 120 120" role="img"
+     th:attr="aria-label='Ilustración de ' + ${nombre}">
+    <ellipse cx="60" cy="108" rx="30" ry="6" fill="#000" opacity=".12"/>
+    <g class="hoja" style="--d:0s"><path d="M60 108 C40 96 28 76 30 54 C50 62 62 84 60 108Z" fill="#4c9b45"/></g>
+    <g class="hoja" style="--d:.7s"><path d="M60 108 C80 96 92 76 90 54 C70 62 58 84 60 108Z" fill="#58a84e"/></g>
+    <g class="hoja" style="--d:1.4s"><path d="M60 108 C50 84 50 56 60 30 C70 56 70 84 60 108Z" fill="#3f8a3a"/></g>
+    <g class="flor" style="--d:.5s"><circle cx="60" cy="26" r="5" fill="#f2c94c"/></g>
+</svg>
+</body>
+</html>

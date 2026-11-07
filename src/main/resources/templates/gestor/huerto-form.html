@@ -15,6 +15,23 @@
             <textarea id="descripcion" class="form-control" rows="4" th:field="*{descripcion}" th:errorclass="is-invalid" maxlength="2000" required></textarea>
             <div class="invalid-feedback" th:errors="*{descripcion}"></div>
         </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label for="tipoSuelo" class="form-label">Tipo de suelo (opcional)</label>
+                <select id="tipoSuelo" class="form-select" th:field="*{tipoSuelo}">
+                    <option value="">Sin registrar</option>
+                    <option th:each="s : ${T(ec.edu.epn.huertos.huertos.TipoSuelo).values()}" th:value="${s}" th:text="${s.etiqueta()}">Suelo franco</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="diseno" class="form-label">Diseño del huerto (opcional)</label>
+                <select id="diseno" class="form-select" th:field="*{diseno}">
+                    <option value="">Sin registrar</option>
+                    <option th:each="d : ${T(ec.edu.epn.huertos.huertos.DisenoHuerto).values()}" th:value="${d}" th:text="${d.etiqueta()}">En tierra</option>
+                </select>
+            </div>
+            <div class="col-12 form-text">Estos datos cambian la apariencia del huerto virtual. Si los dejas sin registrar, se muestra una apariencia neutra.</div>
+        </div>
         <button class="btn btn-huerto" type="submit">Guardar</button>
         <a class="btn btn-link" th:href="@{/gestor}">Cancelar</a>
     </form>

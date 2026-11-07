@@ -30,8 +30,7 @@
         </div></div></div>
     </div>
 
-    <h2 class="h5">Progreso del huerto virtual</h2>
-    <div th:replace="~{fragmentos/componentes :: progreso(${progreso})}"></div>
+    <th:block th:if="${huertoVirtual != null}"><div th:replace="~{fragmentos/huerto-virtual :: parcela(${huertoVirtual})}"></div></th:block>
 
     <div class="mt-4 d-flex flex-wrap gap-2">
         <a class="btn btn-huerto" th:href="@{/gestor/actividades/nueva}">Registrar actividad</a>

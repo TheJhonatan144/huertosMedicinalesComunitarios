@@ -8,6 +8,7 @@ import ec.edu.epn.huertos.evidencias.EstadoRevision;
 import ec.edu.epn.huertos.gamificacion.GamificacionServicio;
 import ec.edu.epn.huertos.huertos.Huerto;
 import ec.edu.epn.huertos.huertos.HuertoServicio;
+import ec.edu.epn.huertos.huertos.HuertoVirtualServicio;
 import java.util.List;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -25,13 +26,15 @@ public class GestorPanelController {
     private final HuertoServicio huertos;
     private final ActividadServicio actividades;
     private final GamificacionServicio gamificacion;
+    private final HuertoVirtualServicio huertoVirtual;
 
     public GestorPanelController(ComunidadServicio comunidades, HuertoServicio huertos, ActividadServicio actividades,
-                                 GamificacionServicio gamificacion) {
+                                 GamificacionServicio gamificacion, HuertoVirtualServicio huertoVirtual) {
         this.comunidades = comunidades;
         this.huertos = huertos;
         this.actividades = actividades;
         this.gamificacion = gamificacion;
+        this.huertoVirtual = huertoVirtual;
     }
 
     @GetMapping("/gestor")
@@ -45,7 +48,7 @@ public class GestorPanelController {
         model.addAttribute("activos", comunidades.activos(comunidad.getId()));
         model.addAttribute("cupo", comunidades.cupoMaximo());
         model.addAttribute("puntosComunitarios", gamificacion.puntosComunitarios(comunidad.getId()));
-        model.addAttribute("progreso", gamificacion.progreso(comunidad.getId()));
+        model.addAttribute("huertoVirtual", huertoVirtual.paraComunidad(comunidad.getId(), true).orElse(null));
         model.addAttribute("misPuntos", gamificacion.resumenIndividual(gestor.getId()));
         model.addAttribute("pendientes", lista.stream().filter(a -> a.estado() == EstadoRevision.PENDIENTE).count());
         model.addAttribute("rechazadas", lista.stream().filter(a -> a.estado() == EstadoRevision.RECHAZADA).count());

@@ -1,0 +1,202 @@
+/* Huerto virtual 2D cenital. Solo CSS/SVG, sin librerías. Paleta compartida: verdes, crema y tonos tierra. */
+
+.huerto-virtual {
+    --madera: #a8743f;
+    --madera-osc: #7a4f26;
+    --crema: #f6ecd6;
+    --pasto: #a7d27f;
+    /* Suelo neutro (tipo de suelo sin registrar) */
+    --suelo-a: #a39a8c;
+    --suelo-b: #b3ab9e;
+    --suelo-c: #8b8376;
+    --textura-a: 22px 22px;
+    --textura-b: 31px 31px;
+}
+
+/* ---- Tipos de suelo: color y textura ---- */
+.huerto-virtual.suelo-franco    { --suelo-a: #6a4a2e; --suelo-b: #84603d; --suelo-c: #4c3320; }
+.huerto-virtual.suelo-arcilloso { --suelo-a: #a65a3c; --suelo-b: #bd7050; --suelo-c: #7c412a; }
+.huerto-virtual.suelo-arenoso   { --suelo-a: #dcc088; --suelo-b: #ead3a4; --suelo-c: #bf9f62; --textura-a: 9px 9px; --textura-b: 14px 14px; }
+.huerto-virtual.suelo-limoso    { --suelo-a: #7b6d59; --suelo-b: #8d7e69; --suelo-c: #5e5242; --textura-a: 40px 40px; --textura-b: 55px 55px; }
+.huerto-virtual.suelo-humifero  { --suelo-a: #3a2a21; --suelo-b: #50392b; --suelo-c: #21170f; --textura-a: 28px 28px; --textura-b: 41px 41px; }
+
+.tierra-textura {
+    background-color: var(--suelo-a);
+    background-image:
+        radial-gradient(var(--suelo-c) 1.6px, transparent 2.2px),
+        radial-gradient(var(--suelo-b) 2.2px, transparent 3.2px);
+    background-size: var(--textura-a), var(--textura-b);
+    background-position: 0 0, 11px 9px;
+}
+/* Las grietas del suelo arcilloso */
+.suelo-arcilloso .tierra-textura {
+    background-image:
+        linear-gradient(115deg, transparent 47%, var(--suelo-c) 48% 49%, transparent 50%),
+        linear-gradient(25deg, transparent 62%, var(--suelo-c) 63% 64%, transparent 65%),
+        radial-gradient(var(--suelo-b) 2.2px, transparent 3.2px);
+    background-size: 90px 90px, 70px 70px, var(--textura-b);
+}
+
+/* ---- Parcela base (en tierra y diseño sin registrar): hierba + marco de troncos ---- */
+.huerto-virtual .parcela {
+    position: relative;
+    border-radius: 22px;
+    padding: 16px;
+    background-color: var(--pasto);
+    background-image: radial-gradient(rgba(255, 255, 255, .18) 2px, transparent 3px);
+    background-size: 26px 26px;
+}
+.huerto-virtual .parcela-viga { display: none; }
+.huerto-virtual .parcela-suelo {
+    border: 12px solid var(--madera);
+    border-radius: 18px;
+    box-shadow: inset 0 0 0 3px var(--madera-osc), 0 5px 0 rgba(0, 0, 0, .18);
+    padding: 20px 10px 14px;
+}
+.huerto-virtual .maceta { display: none; }
+
+.parcela-slots {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    justify-items: center;
+    align-items: end;
+    min-height: 190px;
+}
+.parcela-slots.una-planta { grid-template-columns: minmax(0, 1fr); }
+
+.planta-slot { margin: 0; position: relative; display: flex; flex-direction: column; align-items: center; }
+.planta-sprite { width: min(130px, 32vw); aspect-ratio: 1; position: relative; z-index: 1; }
+.planta-sprite .sprite { width: 100%; height: 100%; overflow: visible; display: block; }
+
+.etiqueta-madera {
+    margin-top: .4rem;
+    padding: .15rem .8rem;
+    background: #ecc890;
+    color: #4a2f14;
+    border: 2px solid var(--madera-osc);
+    border-radius: 8px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, .22);
+    font-weight: 600;
+    font-size: .88rem;
+    text-align: center;
+}
+
+.parcela-vacia {
+    text-align: center;
+    padding: 1.4rem 1rem;
+    margin: 0 .4rem;
+    background: rgba(255, 250, 235, .94);
+    color: #4a2f14;
+    border-radius: 14px;
+}
+
+.etiqueta-suelo {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .3rem .8rem .3rem .4rem;
+    background: #f2e3c3;
+    border: 2px solid var(--madera);
+    border-radius: 12px;
+    font-weight: 600;
+    color: #4a2f14;
+}
+.muestra-suelo { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--madera-osc); }
+
+.aviso-falta {
+    background: #fff6dc;
+    border: 1px dashed var(--madera);
+    border-radius: 10px;
+    padding: .5rem .75rem;
+    color: #5b3d17;
+}
+
+/* ---- Diseño: en piso (macetas sobre baldosas) ---- */
+.diseno-piso .parcela {
+    background-color: #e4cba6;
+    background-image:
+        repeating-linear-gradient(0deg, transparent 0 63px, rgba(90, 60, 30, .16) 63px 65px),
+        repeating-linear-gradient(90deg, transparent 0 63px, rgba(90, 60, 30, .16) 63px 65px);
+    background-size: auto;
+}
+.diseno-piso .parcela-suelo { border: 0; box-shadow: none; background: none; padding: 20px 6px 10px; }
+
+.diseno-piso .maceta,
+.diseno-vertical .maceta,
+.diseno-colgante .maceta { display: block; position: relative; margin: -30px auto 0; z-index: 2; }
+.diseno-piso .maceta {
+    width: 100px; height: 44px;
+    background: linear-gradient(#c8693f, #a9532f);
+    border-radius: 6px 6px 22px 22px;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, .18);
+}
+.maceta .tierra { position: absolute; top: -9px; left: 5px; right: 5px; height: 20px; border-radius: 50%; border: 2px solid rgba(0, 0, 0, .18); }
+
+/* ---- Diseño: vertical (panel de madera con bolsillos de tela) ---- */
+.diseno-vertical .parcela {
+    background-color: #b98a55;
+    background-image: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 46px, rgba(70, 40, 15, .28) 46px 48px);
+    background-size: auto;
+}
+.diseno-vertical .parcela-suelo { border-color: var(--madera-osc); box-shadow: inset 0 0 0 3px #5e3b1a, 0 5px 0 rgba(0, 0, 0, .22); background: none; padding-top: 24px; }
+.diseno-vertical .maceta {
+    width: 108px; height: 46px;
+    background: linear-gradient(#5f8c4f, #4a7340);
+    border-radius: 8px 8px 16px 16px;
+    border: 2px solid #3a5a32;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, .2);
+}
+
+/* ---- Diseño: colgante (viga superior, cuerdas y macetas que se mecen) ---- */
+.diseno-colgante .parcela { background: linear-gradient(#f6eed9, #efe3c6); background-image: none; padding-top: 10px; }
+.diseno-colgante .parcela-viga {
+    display: block; height: 16px; margin: 0 -4px;
+    background: linear-gradient(var(--madera), var(--madera-osc));
+    border-radius: 8px;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, .2);
+}
+.diseno-colgante .parcela-suelo { border: 0; box-shadow: none; background: none; padding: 30px 6px 10px; }
+.diseno-colgante .planta-slot { transform-origin: 50% -30px; animation: hv-columpio 6s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -1.8s); }
+.diseno-colgante .planta-slot::before {
+    content: ""; position: absolute; left: 50%; top: -46px; width: 3px; height: 62px;
+    background: repeating-linear-gradient(#c9a26a 0 5px, #a8814a 5px 8px);
+    transform: translateX(-50%);
+}
+.diseno-colgante .maceta {
+    width: 100px; height: 46px;
+    background: linear-gradient(#b8854f, #94643a);
+    border-radius: 6px 6px 26px 26px;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, .18);
+}
+
+/* ---- Animaciones suaves ---- */
+.sprite .hoja {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: hv-balanceo 4.8s ease-in-out infinite;
+    animation-delay: var(--d, 0s);
+}
+.sprite .flor {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: hv-flor 3.8s ease-in-out infinite;
+    animation-delay: var(--d, 0s);
+}
+@keyframes hv-balanceo { 0%, 100% { transform: rotate(-2.6deg); } 50% { transform: rotate(2.6deg); } }
+@keyframes hv-flor     { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.07) rotate(5deg); } }
+@keyframes hv-columpio { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .sprite .hoja, .sprite .flor, .diseno-colgante .planta-slot { animation: none !important; }
+}
+
+/* ---- Celular ---- */
+@media (max-width: 575.98px) {
+    .huerto-virtual .parcela { padding: 10px; }
+    .huerto-virtual .parcela-suelo { border-width: 9px; padding: 16px 4px 10px; }
+    .parcela-slots { gap: .5rem; min-height: 160px; }
+    .planta-sprite { width: min(110px, 36vw); }
+    .etiqueta-madera { font-size: .78rem; padding: .1rem .5rem; }
+    .diseno-piso .maceta, .diseno-vertical .maceta, .diseno-colgante .maceta { width: 84px; height: 38px; margin-top: -24px; }
+}

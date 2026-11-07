@@ -30,7 +30,8 @@ public class HuertoServicio {
 
     @Transactional
     public void actualizarHuerto(Long gestorUsuarioId, FormularioHuerto form) {
-        huertoDeGestor(gestorUsuarioId).actualizar(form.getNombre().trim(), form.getDescripcion().trim());
+        huertoDeGestor(gestorUsuarioId).actualizar(form.getNombre().trim(), form.getDescripcion().trim(),
+                form.getTipoSuelo(), form.getDiseno());
     }
 
     @Transactional(readOnly = true)
