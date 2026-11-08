@@ -10,6 +10,7 @@ import ec.edu.epn.huertos.evidencias.EstadoRevision;
 import ec.edu.epn.huertos.gamificacion.GamificacionServicio;
 import ec.edu.epn.huertos.huertos.Huerto;
 import ec.edu.epn.huertos.huertos.HuertoServicio;
+import ec.edu.epn.huertos.huertos.HuertoVirtualServicio;
 import java.util.List;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -35,14 +36,17 @@ public class GestorPanelController {
     private final ActividadServicio actividades;
     private final GamificacionServicio gamificacion;
     private final UsuarioRepository usuarios;
+    private final HuertoVirtualServicio huertoVirtual;
 
     public GestorPanelController(ComunidadServicio comunidades, HuertoServicio huertos, ActividadServicio actividades,
-                                 GamificacionServicio gamificacion, UsuarioRepository usuarios) {
+                                 GamificacionServicio gamificacion, UsuarioRepository usuarios,
+                                 HuertoVirtualServicio huertoVirtual) {
         this.comunidades = comunidades;
         this.huertos = huertos;
         this.actividades = actividades;
         this.gamificacion = gamificacion;
         this.usuarios = usuarios;
+        this.huertoVirtual = huertoVirtual;
     }
 
     @GetMapping("/gestor")
@@ -60,6 +64,7 @@ public class GestorPanelController {
         model.addAttribute("cuposDisponibles", comunidades.cuposDisponibles(comunidad.getId()));
         model.addAttribute("puntosComunitarios", gamificacion.puntosComunitarios(comunidad.getId()));
         model.addAttribute("progreso", gamificacion.progreso(comunidad.getId()));
+        model.addAttribute("huertoVirtual", huertoVirtual.paraGestor(usuario.getId()));
         model.addAttribute("misPuntos", gamificacion.resumenIndividual(gestor.getId()));
         model.addAttribute("pendientes", lista.stream().filter(a -> a.estado() == EstadoRevision.PENDIENTE).count());
         model.addAttribute("rechazadas", lista.stream().filter(a -> a.estado() == EstadoRevision.RECHAZADA).count());

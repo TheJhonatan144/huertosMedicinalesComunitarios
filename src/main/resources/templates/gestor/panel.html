@@ -37,18 +37,7 @@
     <h2 class="h5">Progreso del huerto virtual</h2>
     <div th:replace="~{fragmentos/componentes :: progreso(${progreso})}"></div>
 
-    <h2 class="h5 mt-4">Representación del huerto</h2>
-    <div class="huerto-virtual p-3 rounded-3" th:classappend="| suelo-${#strings.toLowerCase(huerto.tipoSuelo)}|">
-        <div class="d-flex flex-wrap gap-3 align-items-start justify-content-between">
-            <div><strong th:text="${#strings.capitalize(#strings.toLowerCase(huerto.tipoSuelo))}">Limoso</strong><span> · suelo seleccionado</span><br>
-                <span class="small" th:text="${huerto.areaM2} + ' m² · ' + ${huerto.diseno}">1 m² · TIERRA_SURCOS</span></div>
-            <img class="huerto-virtual-suelo" th:src="@{/img/huerto/suelo.svg}" alt="Capas ilustrativas del tipo de suelo seleccionado">
-        </div>
-        <div class="d-flex flex-wrap gap-2 mt-3" th:if="${!plantasPlantadas.isEmpty()}">
-            <div class="planta-virtual" th:each="planta : ${plantasPlantadas}" th:text="'🌱 ' + ${planta.nombreComun}">🌱 Planta</div>
-        </div>
-        <p class="small mb-0 mt-3" th:if="${plantasPlantadas.isEmpty()}">Aún no hay plantas marcadas como plantadas. Máximo dos plantas aparecen aquí.</p>
-    </div>
+    <div class="mt-4" th:replace="~{fragmentos/huerto-virtual :: parcela(${huertoVirtual}, false)}"></div>
 
     <div class="mt-4 d-flex flex-wrap gap-2" th:if="${!eliminacionPendiente}">
         <a class="btn btn-huerto" th:href="@{/gestor/actividades/nueva}">Registrar actividad</a>
