@@ -39,6 +39,11 @@
 
     <div class="mt-4" th:replace="~{fragmentos/huerto-virtual :: parcela(${huertoVirtual}, false)}"></div>
 
+    <!-- Espacios del huerto (modelo de Mayerli: varios diseños por huerto). El suelo y las plantas ya los muestra el huerto virtual. -->
+    <h2 class="h5 mt-4">Espacios del huerto</h2>
+    <p class="small mb-1" th:text="${huerto.areaM2} + ' m² · área total'">1 m² · área total</p>
+    <ul class="small mb-0"><li th:each="espacio : ${espaciosHuerto}" th:text="${espacio.nombre} + ' · ' + ${espacio.areaM2} + ' m²'"></li></ul>
+
     <div class="mt-4 d-flex flex-wrap gap-2" th:if="${!eliminacionPendiente}">
         <a class="btn btn-huerto" th:href="@{/gestor/actividades/nueva}">Registrar actividad</a>
         <a class="btn btn-outline-success" th:href="@{/gestor/actividades}">Ver actividades</a>

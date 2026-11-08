@@ -18,8 +18,8 @@ spring:
   servlet:
     multipart:
       # Margen sobre el límite de la aplicación para que el rechazo lo haga el validador propio (mensaje claro).
-      max-file-size: 8MB
-      max-request-size: 9MB
+      max-file-size: 55MB
+      max-request-size: 56MB
   thymeleaf:
     cache: true
 
@@ -50,6 +50,8 @@ app:
     directorio: ${EVIDENCIAS_DIR:./datos/evidencias}
     # Límites provisionales pendientes de aprobación del equipo.
     tamano-maximo-bytes: 5242880        # 5 MiB
+    video-tamano-maximo-bytes: 52428800 # 50 MiB
+    video-duracion-maxima-segundos: 120
     lado-maximo-px: 8000
     pixeles-maximos: 25000000           # 25 MP
   comunidades:
@@ -69,3 +71,7 @@ app:
       - { nombre: Huerto floreciente, desde: 60 }
   demo:
     habilitado: false
+  admin-tecnico:
+    usuario: ${ADMIN_TECNICO_USUARIO:}
+    nombre: ${ADMIN_TECNICO_NOMBRE:}
+    clave: ${ADMIN_TECNICO_CLAVE:}

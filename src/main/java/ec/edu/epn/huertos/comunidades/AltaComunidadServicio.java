@@ -6,6 +6,8 @@ import ec.edu.epn.huertos.autenticacion.UsuarioRepository;
 import ec.edu.epn.huertos.compartido.ConflictoException;
 import ec.edu.epn.huertos.huertos.Huerto;
 import ec.edu.epn.huertos.huertos.HuertoRepository;
+import ec.edu.epn.huertos.huertos.EspacioHuertoServicio;
+import ec.edu.epn.huertos.huertos.HuertoCerramientoServicio;
 import java.util.List;
 import java.util.stream.Collectors;
 import jakarta.validation.Validator;
@@ -20,12 +22,16 @@ public class AltaComunidadServicio {
     private final HuertoRepository huertos;
     private final Validator validador;
     private final AsignacionRevisorServicio asignaciones;
+    private final EspacioHuertoServicio espacios;
+    private final HuertoCerramientoServicio cerramientos;
 
     public AltaComunidadServicio(ComunidadRepository comunidades, UsuarioRepository usuarios,
             IntegranteRepository integrantes, HuertoRepository huertos, Validator validador,
-            AsignacionRevisorServicio asignaciones) {
+            AsignacionRevisorServicio asignaciones, EspacioHuertoServicio espacios,
+            HuertoCerramientoServicio cerramientos) {
         this.comunidades = comunidades; this.usuarios = usuarios; this.integrantes = integrantes;
         this.huertos = huertos; this.validador = validador; this.asignaciones = asignaciones;
+        this.espacios = espacios; this.cerramientos = cerramientos;
     }
 
     @Transactional
@@ -45,9 +51,11 @@ public class AltaComunidadServicio {
                 f.getLatitud(), f.getLongitud()));
         integrantes.save(new Integrante(comunidad.getId(), usuarioId, true, usuario.getFechaNacimiento(),
                 usuario.getGenero(), usuario.getTalentosCertificados(), usuario.getNivelExperiencia()));
-        huertos.save(new Huerto(comunidad.getId(), f.getNombre().trim(), f.getDescripcion().trim(), f.getProvincia().trim(),
+        Huerto huerto = huertos.save(new Huerto(comunidad.getId(), f.getNombre().trim(), f.getDescripcion().trim(), f.getProvincia().trim(),
                 f.getParroquia().trim(), f.getDireccion().trim(), f.getAreaM2(), f.getDiseno(), f.getTipoSuelo(),
                 f.getFuenteAgua().trim(), f.getAbonoNatural().trim(), f.getCerramiento(), f.getLatitud(), f.getLongitud()));
+        espacios.sincronizar(huerto.getId(), f.getAreaM2(), f.getDisenos());
+        cerramientos.sincronizar(huerto.getId(), f.getGruposCerramiento());
         asignaciones.asignarAutomaticamente(comunidad.getId());
         usuario.cambiarRol(Rol.GESTOR_HUERTO);
     }
@@ -60,14 +68,16 @@ public class AltaComunidadServicio {
     }
 
     private void validarOpciones(FormularioAltaComunidad f) {
-        if (!List.of("TIERRA_SURCOS", "TIERRA_CAMADAS", "TIERRA_CAMELLONES", "TIERRA_TERRAZAS", "VERTICAL_PAREDES", "COLGANTE_TECHOS", "PISO_MACETAS", "PISO_BOTELLAS_PATIO", "PISO_LLANTAS_PATIO", "PISO_TERRAZA", "PISO_GRADAS", "PISO_BALCONES", "PISO_FILOS_VENTANA").contains(f.getDiseno()))
-            throw new IllegalArgumentException("Selecciona un diseño válido.");
+        List<String> disenos = f.getDisenos() == null || f.getDisenos().isEmpty() ? List.of(f.getDiseno()) : f.getDisenos();
+        if (disenos.isEmpty() || disenos.stream().anyMatch(d -> !List.of("TIERRA_SURCOS", "TIERRA_CAMADAS", "TIERRA_CAMELLONES", "TIERRA_TERRAZAS", "VERTICAL_PAREDES", "COLGANTE_TECHOS", "PISO_MACETAS", "PISO_BOTELLAS_PATIO", "PISO_LLANTAS_PATIO", "PISO_TERRAZA", "PISO_GRADAS", "PISO_BALCONES", "PISO_FILOS_VENTANA").contains(d)))
+            throw new IllegalArgumentException("Selecciona uno o más diseños válidos.");
         if (!List.of("ARCILLOSO", "LIMOSO", "ARENOSO", "MARGOSO", "GREDOSO", "PANTANOSO").contains(f.getTipoSuelo()))
             throw new IllegalArgumentException("Selecciona un tipo de suelo válido.");
         if (!List.of("BARBECHO", "RESTOS_VEGETALES", "HOJA", "COMPOST").contains(f.getAbonoNatural()))
             throw new IllegalArgumentException("Selecciona un abono natural válido.");
-        if (!List.of("VIVO_HIGUERILLA", "VIVO_FLORIPONDIO", "VIVO_AGAVE", "VIVO_LAVANDA", "VIVO_NARANJOS", "VIVO_CAPULIES", "VIVO_TOCTE", "VIVO_GUABO", "NATURAL_CANA_GUADUA", "NATURAL_BAHAREQUE", "NATURAL_TAPIAL", "RECICLADO_TABLAS", "RECICLADO_BOTELLAS", "RECICLADO_NEUMATICOS", "METALICO_ALAMBRE_PUAS", "CONVENCIONAL_PIEDRA", "CONVENCIONAL_LADRILLO", "CONVENCIONAL_BLOQUE").contains(f.getCerramiento()))
-            throw new IllegalArgumentException("Selecciona un tipo de cerramiento válido.");
+        List<String> gruposCerramiento = f.getGruposCerramiento() == null ? List.of() : f.getGruposCerramiento();
+        if (!HuertoCerramientoServicio.GRUPOS.containsAll(gruposCerramiento))
+            throw new IllegalArgumentException("Selecciona grupos de cerramiento válidos.");
         if (!List.of("PERSONA", "FAMILIA", "CONDOMINIO", "BARRIO").contains(f.getTipoComunidad()))
             throw new IllegalArgumentException("Selecciona un tipo de comunidad válido.");
     }

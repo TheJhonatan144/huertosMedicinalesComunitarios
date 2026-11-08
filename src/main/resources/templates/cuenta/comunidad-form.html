@@ -36,19 +36,19 @@
             </div>
         </fieldset>
 
-        <fieldset class="col-12"><legend class="h5">Diseño</legend><div class="row g-3">
-            <div class="col-6 col-md-4 col-lg-3" th:each="op : ${disenos}"><input class="btn-check" type="radio" th:id="|diseno-${op[0]}|" th:field="*{diseno}" th:value="${op[0]}" required><label class="card h-100 huerto-opcion" th:for="|diseno-${op[0]}|"><img class="card-img-top ilustracion-opcion" th:src="@{/img/huerto/diseno.svg}" alt="Ilustración referencial de diseño de huerto"><span class="card-body py-2" th:text="${op[1]}">Surcos</span></label></div>
+        <fieldset class="col-12"><legend class="h5">Espacios y diseños del huerto</legend><p class="small text-muted">Selecciona uno o varios. El área total se distribuirá entre los espacios; podrás editarla después.</p><div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-3" th:each="op : ${disenos}"><input class="btn-check" type="checkbox" th:field="*{disenos}" th:value="${op[0]}"><label class="card h-100 huerto-opcion" th:for="${#ids.prev('disenos')}"><img class="card-img-top ilustracion-opcion" th:src="@{|/img/huerto/disenos/${op[2]}|}" th:alt="${op[1]}"><span class="opcion-seleccionada">✓ Seleccionado</span><span class="card-body py-2" th:text="${op[1]}">Surcos</span></label></div>
         </div></fieldset>
 
         <fieldset class="col-12"><legend class="h5">Tipo de suelo</legend><div class="row g-3">
-            <div class="col-6 col-md-4 col-lg-2" th:each="op : ${suelos}"><input class="btn-check" type="radio" th:id="|suelo-${op[0]}|" th:field="*{tipoSuelo}" th:value="${op[0]}" required><label class="card h-100 huerto-opcion" th:for="|suelo-${op[0]}|"><img class="card-img-top ilustracion-opcion" th:src="@{/img/huerto/suelo.svg}" alt="Ilustración referencial de capas del suelo"><span class="card-body py-2" th:text="${op[1]}">Limoso</span></label></div>
+            <div class="col-6 col-md-4 col-lg-2" th:each="op : ${suelos}"><input class="btn-check" type="radio" th:id="|suelo-${op[0]}|" th:field="*{tipoSuelo}" th:value="${op[0]}" required><label class="card h-100 huerto-opcion" th:for="|suelo-${op[0]}|"><img class="card-img-top ilustracion-opcion" th:src="@{|/img/huerto/suelos/${op[2]}|}" th:alt="|Suelo ${op[1]}|"><span class="card-body py-2" th:text="${op[1]}">Limoso</span></label></div>
         </div></fieldset>
 
         <div class="col-md-6"><label class="form-label" for="fuenteAgua">Fuente de agua</label><input class="form-control" id="fuenteAgua" th:field="*{fuenteAgua}" maxlength="120" placeholder="Red pública, lluvia, río, pozo…" required></div>
         <div class="col-md-6"><label class="form-label" for="abonoNatural">Abono natural utilizado</label><select class="form-select" id="abonoNatural" th:field="*{abonoNatural}" required><option value="">Selecciona una opción</option><option th:each="op : ${abonos}" th:value="${op[0]}" th:text="${op[1]}"></option></select></div>
 
-        <fieldset class="col-12"><legend class="h5">Cerramiento</legend><div class="row g-3">
-            <div class="col-6 col-md-4 col-lg-2" th:each="op : ${cerramientos}"><input class="btn-check" type="radio" th:id="|cerramiento-${op[0]}|" th:field="*{cerramiento}" th:value="${op[0]}" required><label class="card h-100 huerto-opcion" th:for="|cerramiento-${op[0]}|"><img class="card-img-top ilustracion-opcion" th:src="@{/img/huerto/cerramiento.svg}" alt="Ilustración referencial de cerramiento"><span class="card-body py-2" th:text="${op[1]}">Vivo</span></label></div>
+        <fieldset class="col-12"><legend class="h5">Tipo de cerca de seguridad</legend><p class="small text-muted">Selecciona uno o varios tipos si la cerca combina materiales. Si ninguno corresponde, déjalos sin marcar.</p><div class="row g-3">
+            <div class="col-12 col-md-4" th:each="op : ${cerramientos}"><input class="btn-check" type="checkbox" th:field="*{gruposCerramiento}" th:value="${op[0]}"><label class="card h-100 huerto-opcion" th:for="${#ids.prev('gruposCerramiento')}"><img class="card-img-top ilustracion-opcion" th:src="@{|/img/huerto/cerramientos/${op[3]}|}" th:alt="${op[1]}"><span class="opcion-seleccionada">✓ Seleccionado</span><span class="card-body py-2"><strong th:text="${op[1]}">Natural</strong><span class="d-block small text-muted" th:text="${op[2]}">Tipos representativos</span></span></label></div>
         </div></fieldset>
         <div class="col-12"><button class="btn btn-huerto" type="submit">Crear comunidad y huerta</button> <a class="btn btn-link" th:href="@{/cuenta}">Cancelar</a></div>
     </form>

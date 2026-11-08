@@ -50,7 +50,7 @@ public class Huerto {
     @Column(name = "abono_natural", nullable = false, length = 120)
     private String abonoNatural;
 
-    @Column(nullable = false, length = 40)
+    @Column(length = 40)
     private String cerramiento;
 
     @Column(nullable = false)
@@ -92,7 +92,7 @@ public class Huerto {
 
     public void actualizar(String nombre, String descripcion, String provincia, String parroquia, String direccion,
                            BigDecimal areaM2, String diseno, String tipoSuelo, String fuenteAgua,
-                           String abonoNatural, String cerramiento, double latitud, double longitud) {
+                           String abonoNatural, double latitud, double longitud) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.provincia = provincia;
@@ -103,7 +103,6 @@ public class Huerto {
         this.tipoSuelo = tipoSuelo;
         this.fuenteAgua = fuenteAgua;
         this.abonoNatural = abonoNatural;
-        this.cerramiento = cerramiento;
         this.latitud = latitud;
         this.longitud = longitud;
     }

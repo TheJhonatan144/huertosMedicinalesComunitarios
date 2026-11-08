@@ -58,6 +58,7 @@ public class GestorPanelController {
         model.addAttribute("comunidad", comunidad);
         model.addAttribute("eliminacionPendiente", comunidad.isEliminacionPendiente());
         model.addAttribute("huerto", huerto);
+        model.addAttribute("espaciosHuerto", huertos.espaciosDeGestor(usuario.getId()));
         model.addAttribute("plantasPlantadas", huertos.plantasPlantadasDeGestor(usuario.getId()));
         model.addAttribute("activos", comunidades.activos(comunidad.getId()));
         model.addAttribute("cupo", comunidades.cupoMaximo(comunidad));
@@ -77,7 +78,9 @@ public class GestorPanelController {
         Integrante gestor = comunidades.gestorDe(usuario.getId());
         model.addAttribute("comunidad", comunidades.comunidad(gestor.getComunidadId()));
         model.addAttribute("eliminacionPendiente", comunidades.comunidad(gestor.getComunidadId()).isEliminacionPendiente());
-        model.addAttribute("integrantes", comunidades.integrantesDeMiComunidad(usuario.getId()));
+        var integrantes = comunidades.integrantesDeMiComunidad(usuario.getId());
+        model.addAttribute("integrantesActivos", integrantes.stream().filter(IntegranteVista::activo).toList());
+        model.addAttribute("integrantesHistorial", integrantes.stream().filter(i -> !i.activo()).toList());
         model.addAttribute("activos", comunidades.activos(gestor.getComunidadId()));
         model.addAttribute("cupo", comunidades.cupoMaximo(gestor.getComunidadId()));
         model.addAttribute("cuposDisponibles", comunidades.cuposDisponibles(gestor.getComunidadId()));

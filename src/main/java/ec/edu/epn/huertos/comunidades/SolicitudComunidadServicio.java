@@ -135,7 +135,8 @@ public class SolicitudComunidadServicio {
                 + "\nHuerto: " + f.getNombre() + " — " + f.getDescripcion()
                 + "\nDirección del huerto: " + f.getDireccion() + ", " + f.getParroquia() + ", " + f.getProvincia()
                 + "\nÁrea: " + f.getAreaM2() + " m² · Diseño: " + f.getDiseno() + " · Suelo: " + f.getTipoSuelo()
-                + "\nAgua: " + f.getFuenteAgua() + " · Abono: " + f.getAbonoNatural() + " · Cerramiento: " + f.getCerramiento();
+                + "\nAgua: " + f.getFuenteAgua() + " · Abono: " + f.getAbonoNatural() + " · Cerramiento: "
+                + (f.getGruposCerramiento().isEmpty() ? "No especificado" : String.join(", ", f.getGruposCerramiento()));
     }
 
     private String serializar(FormularioAltaComunidad f) {
@@ -147,7 +148,10 @@ public class SolicitudComunidadServicio {
         p.setProperty("parroquia", f.getParroquia()); p.setProperty("direccion", f.getDireccion());
         p.setProperty("areaM2", f.getAreaM2().toPlainString()); p.setProperty("diseno", f.getDiseno());
         p.setProperty("tipoSuelo", f.getTipoSuelo()); p.setProperty("fuenteAgua", f.getFuenteAgua());
-        p.setProperty("abonoNatural", f.getAbonoNatural()); p.setProperty("cerramiento", f.getCerramiento());
+        p.setProperty("abonoNatural", f.getAbonoNatural());
+        if (f.getCerramiento() != null) p.setProperty("cerramiento", f.getCerramiento());
+        p.setProperty("gruposCerramiento", String.join(",", f.getGruposCerramiento()));
+        p.setProperty("disenos", String.join(",", f.getDisenos()));
         p.setProperty("latitud", Double.toString(f.getLatitud())); p.setProperty("longitud", Double.toString(f.getLongitud()));
         try { StringWriter writer = new StringWriter(); p.store(writer, null); return writer.toString(); }
         catch (IOException e) { throw new IllegalStateException("No se pudo guardar la solicitud de creación.", e); }
@@ -164,7 +168,18 @@ public class SolicitudComunidadServicio {
             f.setParroquia(p.getProperty("parroquia")); f.setDireccion(p.getProperty("direccion"));
             f.setAreaM2(new java.math.BigDecimal(requerida(p, "areaM2"))); f.setDiseno(requerida(p, "diseno"));
             f.setTipoSuelo(requerida(p, "tipoSuelo")); f.setFuenteAgua(requerida(p, "fuenteAgua"));
-            f.setAbonoNatural(requerida(p, "abonoNatural")); f.setCerramiento(requerida(p, "cerramiento"));
+            f.setAbonoNatural(requerida(p, "abonoNatural"));
+            String cerramientoAnterior = p.getProperty("cerramiento");
+            f.setCerramiento(cerramientoAnterior);
+            String gruposCerramiento = p.getProperty("gruposCerramiento");
+            if (gruposCerramiento != null && !gruposCerramiento.isBlank())
+                f.setGruposCerramiento(List.of(gruposCerramiento.split(",")));
+            else if (cerramientoAnterior != null) {
+                String grupoAnterior = grupoCerramientoAnterior(cerramientoAnterior);
+                if (grupoAnterior != null) f.setGruposCerramiento(List.of(grupoAnterior));
+            }
+            String listaDisenos = p.getProperty("disenos");
+            if (listaDisenos != null && !listaDisenos.isBlank()) f.setDisenos(List.of(listaDisenos.split(",")));
             f.setLatitud(Double.parseDouble(requerida(p, "latitud"))); f.setLongitud(Double.parseDouble(requerida(p, "longitud")));
             altas.validarFormulario(f);
             return f;
@@ -177,5 +192,16 @@ public class SolicitudComunidadServicio {
         String valor = p.getProperty(clave);
         if (valor == null) throw new IllegalStateException("Falta el campo " + clave);
         return valor;
+    }
+
+    private String grupoCerramientoAnterior(String codigo) {
+        if (codigo.equals("VIVO") || codigo.startsWith("VIVO_")) return "VIVA";
+        if (codigo.equals("NATURAL") || codigo.startsWith("NATURAL_")) return "NATURAL";
+        if (codigo.equals("RECICLADO") || codigo.startsWith("RECICLADO_")) return "RECICLADO";
+        if (codigo.equals("METALICO") || codigo.startsWith("METALICO_")) return "METALICO";
+        if (codigo.equals("CONVENCIONAL") || codigo.startsWith("CONVENCIONAL_")) return "CONVENCIONAL";
+        if (codigo.equals("REUTILIZADO")) return "RECICLADO";
+        if (codigo.equals("CONSTRUIDO")) return "CONVENCIONAL";
+        return null;
     }
 }

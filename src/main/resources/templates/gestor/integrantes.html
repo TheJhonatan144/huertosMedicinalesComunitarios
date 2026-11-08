@@ -12,24 +12,43 @@
     <div class="alert alert-info" th:if="${cuposDisponibles == 0 and !eliminacionPendiente}">
         La comunidad alcanzó su capacidad. Puedes cambiar “¿A quién representa?” en <a th:href="@{/gestor/huerto}">Datos de la comunidad</a> para ampliar los cupos; los integrantes actuales se conservarán.
     </div>
-    <div class="table-responsive">
+    <h2 class="h5 mt-4">Integrantes activos <span class="badge text-bg-success" th:text="${integrantesActivos.size()}">1</span></h2>
+    <p class="small text-muted">Solo estas personas pueden participar en nuevas actividades y ocupan cupo de la comunidad.</p>
+    <div class="alert alert-light border" th:if="${integrantesActivos.isEmpty()}">No hay integrantes activos registrados.</div>
+    <div class="table-responsive" th:if="${!integrantesActivos.isEmpty()}">
         <table class="table align-middle">
-            <caption class="visually-hidden">Integrantes de la comunidad</caption>
-            <thead><tr><th scope="col">Nombre</th><th scope="col">Usuario</th><th scope="col">Rol en la comunidad</th><th scope="col">Estado</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+            <caption class="visually-hidden">Integrantes activos de la comunidad</caption>
+            <thead><tr><th scope="col">Nombre</th><th scope="col">Usuario</th><th scope="col">Rol en la comunidad</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
             <tbody>
-            <tr th:each="i : ${integrantes}">
+            <tr th:each="i : ${integrantesActivos}">
                 <td th:text="${i.nombre()}">Nombre</td>
                 <td th:text="${i.usuario()}">usuario</td>
                 <td th:text="${i.gestor()} ? 'Gestor' : 'Participante'">Participante</td>
-                <td><span class="badge" th:classappend="${i.activo()} ? 'text-bg-success' : 'text-bg-secondary'" th:text="${i.activo()} ? 'Activo' : 'De baja'">Activo</span></td>
                 <td class="text-end">
-                    <div th:if="${!eliminacionPendiente and i.activo() and !i.gestor()}" class="d-flex gap-1 justify-content-end">
+                    <div th:if="${!eliminacionPendiente and !i.gestor()}" class="d-flex gap-1 justify-content-end">
                         <form th:action="@{/gestor/integrantes/{id}/transferir(id=${i.id()})}" method="post"><button class="btn btn-sm btn-outline-success" type="submit" data-confirmar="¿Proponer a esta persona como nueva gestora? Tu salida se completará cuando acepte.">Proponer como gestor</button></form>
                         <form th:action="@{/gestor/integrantes/{id}/baja(id=${i.id()})}" method="post" data-una-vez>
                             <button class="btn btn-sm btn-outline-danger" type="submit" data-confirmar="¿Dar de baja a este integrante?">Dar de baja</button>
                         </form>
                     </div>
                 </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <h2 class="h5 mt-4">Historial de integrantes dados de baja <span class="badge text-bg-secondary" th:text="${integrantesHistorial.size()}">0</span></h2>
+    <p class="small text-muted">Se conservan como historial. No ocupan cupo ni vuelven a estar activos cuando se desarchiva la comunidad; para regresar, deben aceptar una nueva invitación.</p>
+    <div class="alert alert-light border" th:if="${integrantesHistorial.isEmpty()}">Aún no hay integrantes dados de baja.</div>
+    <div class="table-responsive" th:if="${!integrantesHistorial.isEmpty()}">
+        <table class="table align-middle">
+            <caption class="visually-hidden">Historial de integrantes dados de baja</caption>
+            <thead><tr><th scope="col">Nombre</th><th scope="col">Usuario</th><th scope="col">Rol en la comunidad</th><th scope="col">Estado</th></tr></thead>
+            <tbody>
+            <tr th:each="i : ${integrantesHistorial}">
+                <td th:text="${i.nombre()}">Nombre</td>
+                <td th:text="${i.usuario()}">usuario</td>
+                <td th:text="${i.gestor()} ? 'Gestor' : 'Participante'">Participante</td>
+                <td><span class="badge text-bg-secondary">De baja</span></td>
             </tr>
             </tbody>
         </table>

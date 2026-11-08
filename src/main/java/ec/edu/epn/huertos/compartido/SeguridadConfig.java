@@ -27,6 +27,7 @@ public class SeguridadConfig {
                         .requestMatchers("/gestor/**").hasRole("GESTOR_HUERTO")
                         .requestMatchers("/participante/**").hasRole("PARTICIPANTE")
                         .requestMatchers("/revision/**").hasRole("ADMIN_MINISTERIO_SALUD")
+                        .requestMatchers("/admin-tecnico/**").hasRole("ADMIN_TECNICO")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")

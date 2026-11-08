@@ -18,26 +18,29 @@ public class AltaComunidadController {
     private final AltaComunidadServicio altas;
     private final SolicitudComunidadServicio solicitudes;
     private static final List<List<String>> DISENOS = List.of(
-            List.of("TIERRA_SURCOS", "En tierra · surcos"), List.of("TIERRA_CAMADAS", "En tierra · camadas"),
-            List.of("TIERRA_CAMELLONES", "En tierra · camellones"), List.of("TIERRA_TERRAZAS", "En tierra · terrazas"),
-            List.of("VERTICAL_PAREDES", "Vertical · paredes"), List.of("COLGANTE_TECHOS", "Colgante · techos"),
-            List.of("PISO_MACETAS", "En piso · macetas"), List.of("PISO_BOTELLAS_PATIO", "En piso · botellas en patio"),
-            List.of("PISO_LLANTAS_PATIO", "En piso · llantas en patio"), List.of("PISO_TERRAZA", "En piso · terraza"),
-            List.of("PISO_GRADAS", "En piso · gradas"), List.of("PISO_BALCONES", "En piso · balcones"),
-            List.of("PISO_FILOS_VENTANA", "En piso · filos de ventanas"));
+            List.of("TIERRA_SURCOS", "En tierra · surcos", "TIERRA_SURCOS.jpg"),
+            List.of("TIERRA_CAMADAS", "En tierra · camadas", "TIERRA_CAMADAS.jpg"),
+            List.of("TIERRA_CAMELLONES", "En tierra · camellones", "TIERRA_CAMELLONES.jpg"),
+            List.of("TIERRA_TERRAZAS", "En tierra · terrazas", "TIERRA_TERRAZAS.jpg"),
+            List.of("VERTICAL_PAREDES", "Vertical · paredes", "VERTICAL_PAREDES.jpg"),
+            List.of("COLGANTE_TECHOS", "Colgante · techos", "COLGANTE_TECHOS.jpg"),
+            List.of("PISO_MACETAS", "En piso · macetas", "PISO_MACETAS.jpg"),
+            List.of("PISO_BOTELLAS_PATIO", "En piso · botellas en patio", "PISO_BOTELLAS_PATIO.jpg"),
+            List.of("PISO_LLANTAS_PATIO", "En piso · llantas en patio", "PISO_LLANTAS_PATIO.jpg"),
+            List.of("PISO_TERRAZA", "En piso · terraza", "PISO_TERRAZA.jpg"),
+            List.of("PISO_GRADAS", "En piso · gradas", "PISO_GRADAS.jpg"),
+            List.of("PISO_BALCONES", "En piso · balcones", "PISO_BALCONES.jpg"),
+            List.of("PISO_FILOS_VENTANA", "En piso · filos de ventanas", "PISO_FILOS_VENTANA.jpg"));
     private static final List<List<String>> SUELOS = List.of(
-            List.of("ARCILLOSO", "Arcilloso"), List.of("LIMOSO", "Limoso"), List.of("ARENOSO", "Arenoso"),
-            List.of("MARGOSO", "Margoso"), List.of("GREDOSO", "Gredoso"), List.of("PANTANOSO", "Pantanoso"));
+            List.of("ARCILLOSO", "Arcilloso", "ARCILLOSO.jpg"), List.of("LIMOSO", "Limoso", "LIMOSO.jpg"),
+            List.of("ARENOSO", "Arenoso", "ARENOSO.jpg"), List.of("MARGOSO", "Margoso", "MARGOSO.jpg"),
+            List.of("GREDOSO", "Gredoso", "GREDOSO.jpg"), List.of("PANTANOSO", "Pantanoso", "PANTANOSO.jpg"));
     private static final List<List<String>> CERRAMIENTOS = List.of(
-            List.of("VIVO_HIGUERILLA", "Vivo · higuerilla"), List.of("VIVO_FLORIPONDIO", "Vivo · floripondio"),
-            List.of("VIVO_AGAVE", "Vivo · agave"), List.of("VIVO_LAVANDA", "Vivo · lavanda"),
-            List.of("VIVO_NARANJOS", "Árbol frutal · naranjos"), List.of("VIVO_CAPULIES", "Árbol frutal · capulíes"),
-            List.of("VIVO_TOCTE", "Árbol frutal · tocte"), List.of("VIVO_GUABO", "Árbol frutal · guabo"),
-            List.of("NATURAL_CANA_GUADUA", "Natural · caña guadua"), List.of("NATURAL_BAHAREQUE", "Natural · bahareque"),
-            List.of("NATURAL_TAPIAL", "Natural · tapial"), List.of("RECICLADO_TABLAS", "Reciclado · tablas"),
-            List.of("RECICLADO_BOTELLAS", "Reciclado · botellas plásticas"), List.of("RECICLADO_NEUMATICOS", "Reciclado · llantas"),
-            List.of("METALICO_ALAMBRE_PUAS", "Metálico · alambre de púas"), List.of("CONVENCIONAL_PIEDRA", "Convencional · piedra"),
-            List.of("CONVENCIONAL_LADRILLO", "Convencional · ladrillo"), List.of("CONVENCIONAL_BLOQUE", "Convencional · bloque"));
+            List.of("VIVA", "Cerca viva", "Higuerilla, floripondio, agave, lavanda, naranjos, capulí, tocte o guabo", "VIVA.jpg"),
+            List.of("NATURAL", "Material natural", "Caña guadua, bahareque o tapial", "NATURAL.jpg"),
+            List.of("RECICLADO", "Material reciclado", "Tablas, botellas plásticas o neumáticos", "RECICLADO.jpg"),
+            List.of("METALICO", "Material metálico", "Alambre de púas", "METALICO.jpg"),
+            List.of("CONVENCIONAL", "Material convencional", "Piedra, ladrillo o bloque", "CONVENCIONAL.jpg"));
     private static final List<List<String>> ABONOS = List.of(List.of("BARBECHO", "Barbecho"),
             List.of("RESTOS_VEGETALES", "Restos vegetales"), List.of("HOJA", "Hoja"), List.of("COMPOST", "Compost"));
     private static final List<List<String>> TIPOS_COMUNIDAD = List.of(List.of("PERSONA", "Solo yo · máximo 1 integrante"),

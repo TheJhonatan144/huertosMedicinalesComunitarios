@@ -54,6 +54,7 @@ public class EvidenciaServicio {
                     && !actividad.getRegistradaPor().equals(usuarioId);
             case PARTICIPANTE -> false;
             case SIN_ASIGNAR -> false;
+            case ADMIN_TECNICO -> false;
         };
         if (!permitido) {
             throw new AccessDeniedException("Sin acceso a esta evidencia");

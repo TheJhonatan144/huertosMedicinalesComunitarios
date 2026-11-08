@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" role="img" aria-label="Ilustración de canteros y plantas">
-  <rect width="320" height="150" rx="14" fill="#edf5e8"/><path d="M32 112h256" stroke="#805b39" stroke-width="8" stroke-linecap="round"/>
-  <path d="M62 105V65m0 22c-18 0-24-12-24-23 15 0 24 8 24 23Zm0-9c16 0 24-12 24-23-15 0-24 8-24 23Z" fill="#4c8d58"/>
-  <path d="M142 105V48m0 34c-20 0-28-15-28-28 16 0 28 10 28 28Zm0-15c17 0 27-14 27-27-16 0-27 10-27 27Z" fill="#347b4a"/>
-  <path d="M224 105V67m0 19c-16 0-23-11-23-22 14 0 23 8 23 22Zm0-9c15 0 22-11 22-22-14 0-22 8-22 22Z" fill="#5b9b5f"/>
-  <circle cx="270" cy="36" r="16" fill="#f1c85b"/><path d="M0 120q80-20 160 0t160 0v30H0Z" fill="#cfe1c1"/>
-</svg>

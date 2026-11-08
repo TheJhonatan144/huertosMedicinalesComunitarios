@@ -19,6 +19,7 @@ public class AutenticacionController {
             case GESTOR_HUERTO -> "redirect:/gestor";
             case PARTICIPANTE -> "redirect:/participante";
             case ADMIN_MINISTERIO_SALUD -> "redirect:/revision";
+            case ADMIN_TECNICO -> "redirect:/admin-tecnico";
             case SIN_ASIGNAR -> "redirect:/cuenta";
         };
     }

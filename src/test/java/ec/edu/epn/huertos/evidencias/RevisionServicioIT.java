@@ -10,10 +10,6 @@ import ec.edu.epn.huertos.actividades.ActividadRepository;
 import ec.edu.epn.huertos.actividades.ActividadServicio;
 import ec.edu.epn.huertos.actividades.FormularioActividad;
 import ec.edu.epn.huertos.actividades.TipoActividad;
-import ec.edu.epn.huertos.autenticacion.Rol;
-import ec.edu.epn.huertos.autenticacion.Usuario;
-import ec.edu.epn.huertos.comunidades.AsignacionRevisor;
-import ec.edu.epn.huertos.comunidades.AsignacionRevisorRepository;
 import ec.edu.epn.huertos.comunidades.Integrante;
 import ec.edu.epn.huertos.compartido.ConflictoException;
 import ec.edu.epn.huertos.compartido.Fechas;
@@ -49,7 +45,6 @@ class RevisionServicioIT extends PruebaIntegracion {
     @Autowired RecompensaIndividualRepository individuales;
     @Autowired RecompensaComunitariaRepository comunitarias;
     @Autowired GamificacionServicio gamificacion;
-    @Autowired AsignacionRevisorRepository asignaciones;
     @Autowired JdbcTemplate jdbc;
 
     private Long envioPendiente(Long actividadId) {
@@ -150,20 +145,17 @@ class RevisionServicioIT extends PruebaIntegracion {
     }
 
     @Test
-    void aprobacionesConcurrentesDeVariosRevisoresGeneranUnaSolaRecompensa() throws Exception {
+    void aprobacionesConcurrentesDelRevisorAsignadoGeneranUnaSolaRecompensa() throws Exception {
         Escenario e = fabrica.escenario(3);
-        Usuario segundo = fabrica.usuario("segundo-revisor-" + e.comunidad().getId(), Rol.ADMIN_MINISTERIO_SALUD);
-        asignaciones.save(new AsignacionRevisor(segundo.getId(), e.comunidad().getId()));
         Long actividad = fabrica.registrarActividad(e, e.participantes());
         Long envio = envioPendiente(actividad);
 
         int hilos = 8;
         List<Callable<Boolean>> tareas = new ArrayList<>();
         for (int i = 0; i < hilos; i++) {
-            Long revisor = i % 2 == 0 ? e.revisor().getId() : segundo.getId();
             tareas.add(() -> {
                 try {
-                    revision.decidir(revisor, envio, EstadoRevision.APROBADA, null);
+                    revision.decidir(e.revisor().getId(), envio, EstadoRevision.APROBADA, null);
                     return true;
                 } catch (ConflictoException yaRevisado) {
                     return false;

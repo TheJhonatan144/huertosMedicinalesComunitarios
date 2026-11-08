@@ -39,6 +39,9 @@ public class EnvioEvidencia {
     @Column(name = "tamano_bytes", nullable = false, updatable = false)
     private long tamanoBytes;
 
+    @Column(name = "duracion_segundos", updatable = false)
+    private Integer duracionSegundos;
+
     @Column(nullable = false, updatable = false, length = 64)
     private String sha256;
 
@@ -66,6 +69,18 @@ public class EnvioEvidencia {
         this.tipoContenido = imagen.tipoContenido();
         this.tamanoBytes = imagen.tamano();
         this.sha256 = imagen.sha256();
+        this.comentario = comentario == null || comentario.isBlank() ? null : comentario.trim();
+    }
+
+    public EnvioEvidencia(Long actividadId, int numero, String claveAlmacenamiento, VideoValidado video, String comentario) {
+        this.actividadId = actividadId;
+        this.numero = numero;
+        this.claveAlmacenamiento = claveAlmacenamiento;
+        this.nombreOriginal = video.nombreOriginal();
+        this.tipoContenido = "video/mp4";
+        this.tamanoBytes = video.tamano();
+        this.sha256 = video.sha256();
+        this.duracionSegundos = video.duracionSegundos();
         this.comentario = comentario == null || comentario.isBlank() ? null : comentario.trim();
     }
 
@@ -99,6 +114,7 @@ public class EnvioEvidencia {
     public String getTipoContenido() {
         return tipoContenido;
     }
+    public Integer getDuracionSegundos() { return duracionSegundos; }
 
     public String getComentario() {
         return comentario;

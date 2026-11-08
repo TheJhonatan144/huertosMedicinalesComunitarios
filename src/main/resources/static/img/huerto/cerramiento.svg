@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" role="img" aria-label="Ilustración de cerca alrededor de un huerto">
-  <rect width="320" height="150" rx="14" fill="#edf5e8"/><path d="M38 118h244" stroke="#6c5034" stroke-width="8" stroke-linecap="round"/>
-  <path d="M54 116V48m54 68V48m54 68V48m54 68V48m54 68V48" stroke="#9a6e45" stroke-width="9" stroke-linecap="round"/>
-  <path d="M44 72h232M44 96h232" stroke="#9a6e45" stroke-width="6"/>
-  <path d="M135 116V76m0 20c-16 0-22-10-22-21 13 0 22 8 22 21Zm0-9c14 0 21-10 21-21-13 0-21 8-21 21Z" fill="#478751"/>
-  <circle cx="250" cy="30" r="13" fill="#f1c85b"/><path d="M0 126q80-16 160 0t160 0v24H0Z" fill="#cfe1c1"/>
-</svg>

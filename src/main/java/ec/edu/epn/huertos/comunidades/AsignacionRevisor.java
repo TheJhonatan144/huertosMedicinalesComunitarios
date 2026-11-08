@@ -39,6 +39,8 @@ public class AsignacionRevisor {
         return usuarioId;
     }
 
+    public void cambiarResponsable(Long usuarioId) { this.usuarioId = usuarioId; this.asignadaEn = Instant.now(); }
+
     public Long getComunidadId() {
         return comunidadId;
     }
