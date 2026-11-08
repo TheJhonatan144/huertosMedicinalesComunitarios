@@ -1,5 +1,6 @@
 package ec.edu.epn.huertos.huertos;
 import ec.edu.epn.huertos.autenticacion.UsuarioAutenticado;
+import ec.edu.epn.huertos.autenticacion.Rol;
 import ec.edu.epn.huertos.compartido.ReglaNegocioException;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,13 +19,20 @@ public class CatalogoController {
  private final HuertoServicio huertos;
  public CatalogoController(CatalogoServicio catalogo, HuertoServicio huertos) { this.catalogo = catalogo; this.huertos = huertos; }
  @ModelAttribute("regiones") RegionPlanta[] regiones() { return RegionPlanta.values(); }
+ @ModelAttribute("editorCatalogo")
+ boolean editorCatalogo(@AuthenticationPrincipal UsuarioAutenticado usuario) {
+  return usuario != null && usuario.getRol() == Rol.ADMIN_MINISTERIO_SALUD;
+ }
  @GetMapping("/gestor/plantas/catalogo")
  String catalogo(@AuthenticationPrincipal UsuarioAutenticado usuario, @RequestParam(defaultValue = "") String q,
        @RequestParam(required = false) RegionPlanta region, @RequestParam(defaultValue = "") String provincia,
-       @RequestParam(required = false) Integer altitud, Model model) {
+       @RequestParam(required = false) Integer altitud,
+       @RequestParam(defaultValue = "cuadricula") String vista, Model model) {
   model.addAttribute("especies", catalogo.listar(usuario.getId(), q, region, provincia, altitud));
   model.addAttribute("q", q); model.addAttribute("region", region); model.addAttribute("provincia", provincia); model.addAttribute("altitud", altitud);
-  model.addAttribute("seleccionadas", huertos.plantasDeGestor(usuario.getId()).stream().map(p -> p.getEspecie().getId()).toList());
+  model.addAttribute("vista", "lista".equals(vista) ? "lista" : "cuadricula");
+  model.addAttribute("seleccionadas", editorCatalogo(usuario) ? java.util.List.of()
+      : huertos.plantasDeGestor(usuario.getId()).stream().map(p -> p.getEspecie().getId()).toList());
   return "gestor/catalogo";
  }
  @GetMapping("/gestor/plantas/catalogo/nueva")
@@ -32,7 +40,10 @@ public class CatalogoController {
  @GetMapping("/gestor/plantas/catalogo/{id}")
  String ficha(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario, Model model) {
   model.addAttribute("especie", catalogo.obtener(usuario.getId(), id)); model.addAttribute("form", new SiembraPlanta());
-  model.addAttribute("registrada", huertos.plantasDeGestor(usuario.getId()).stream().filter(p -> p.getEspecie().getId().equals(id)).findFirst().orElse(null));
+  if (!editorCatalogo(usuario)) {
+   model.addAttribute("registrada", huertos.plantasDeGestor(usuario.getId()).stream()
+       .filter(p -> p.getEspecie().getId().equals(id)).findFirst().orElse(null));
+  }
   return "gestor/especie-detalle";
  }
  @GetMapping("/gestor/plantas/catalogo/{id}/editar")

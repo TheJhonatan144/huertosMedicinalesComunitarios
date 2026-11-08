@@ -2,9 +2,7 @@
 
 ## Alcance de esta entrega
 
-Implementación limitada al catálogo y registro de plantas y a la bodega mínima. No cambia actividades, revisión de evidencias, puntos, ranking ni el dibujo del huerto virtual. No altera la navegación global: se entra por **Plantas** y desde allí al catálogo y a bodega.
-
-Decisiones confirmadas: catálogo común a todas las comunidades; solo gestores administran; cantidad y siembra pertenecen a cada comunidad. Un gestor que edita una ficha de especie modifica el catálogo compartido, tal como se informa en el formulario.
+El gestor entra por **Plantas** para consultar el catálogo y administrar la siembra y la bodega de su propio huerto. El administrador del Ministerio de Salud entra por **Catálogo de plantas** para crear y editar las fichas compartidas, incluidas sus fotos y fuentes.
 
 ## Datos y migración
 
@@ -21,9 +19,9 @@ No se reescriben migraciones V1–V3. La actualización se aplica al siguiente a
 
 - `/gestor/plantas`: lista de la comunidad y activación de ficha.
 - `/gestor/plantas/catalogo`: tarjetas y filtros por nombre, región, provincia y altitud.
-- `/gestor/plantas/catalogo/nueva`: registrar especie común.
+- `/gestor/plantas/catalogo/nueva`: registrar especie común como administrador del Ministerio de Salud.
 - `/gestor/plantas/catalogo/{id}`: consultar ficha y agregarla al huerto.
-- `/gestor/plantas/catalogo/{id}/editar`: actualizar ficha común, conservando la foto cuando no se adjunta otra.
+- `/gestor/plantas/catalogo/{id}/editar`: actualizar ficha común como administrador del Ministerio de Salud. La foto se conserva si el formulario se guarda sin adjuntar otra.
 - `/gestor/plantas/{id}/siembra`: editar únicamente cantidad y estado plantada de la comunidad.
 - `/gestor/bodega`: consulta, registro, edición y eliminación de artículos básicos.
 

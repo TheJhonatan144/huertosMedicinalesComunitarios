@@ -34,7 +34,7 @@ class SiembraYBodegaComunidadIT extends PruebaIntegracion {
         FichaEspecie f = new FichaEspecie();
         f.setNombreComun(nombre);
         f.setNombreCientifico("Identificación sintética");
-        return catalogo.guardar(e.gestorUsuario().getId(), null, f, null).getId();
+        return catalogo.guardar(e.revisor().getId(), null, f, null).getId();
     }
 
     private static SiembraPlanta siembra(int cantidad, boolean plantada) {

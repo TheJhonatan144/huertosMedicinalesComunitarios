@@ -1,8 +1,47 @@
-<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina('Catálogo común de especies', ~{::section})}"><body><section>
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina(titulo='Catálogo común de especies', contenido=~{::section}, avisosPlantas=true)}"><body><section>
 <link rel="stylesheet" th:href="@{/css/plantas.css}">
-<header class="plantas-heroe mb-4"><div><p class="plantas-ceja">Conocimiento compartido</p><h1 class="h2">Catálogo de plantas</h1><p class="mb-0 text-muted">Explora las especies y selecciona cuáles forman parte de tu huerto.</p></div><a class="btn btn-huerto" th:href="@{/gestor/plantas/catalogo/nueva}">+ Registrar especie</a></header><nav class="d-flex flex-wrap gap-2 mb-4" aria-label="Plantas y bodega"><a class="btn btn-outline-success" th:href="@{/gestor/plantas}">Mis plantas</a><a class="btn btn-outline-success" th:href="@{/gestor/plantas/catalogo}">Catálogo común</a><a class="btn btn-outline-success" th:href="@{/gestor/bodega}">Bodega</a></nav>
-<form class="plantas-panel mb-4" method="get" th:action="@{/gestor/plantas/catalogo}"><div class="row g-3"><div class="col-lg-4"><label for="q" class="form-label">Buscar especie</label><input id="q" name="q" class="form-control" th:value="${q}" placeholder="Nombre común, científico u otro nombre"></div><div class="col-sm-6 col-lg-2"><label for="region" class="form-label">Región</label><select id="region" name="region" class="form-select"><option value="">Todas</option><option th:each="r : ${regiones}" th:value="${r}" th:text="${r.etiqueta()}" th:selected="${r == region}"></option></select></div><div class="col-sm-6 col-lg-3"><label for="provincia" class="form-label">Provincia</label><input id="provincia" name="provincia" class="form-control" th:value="${provincia}" placeholder="Ej. Imbabura"></div><div class="col-sm-6 col-lg-3"><label for="altitud" class="form-label">Altitud (m s. n. m.)</label><input id="altitud" name="altitud" class="form-control" type="number" min="0" max="6500" th:value="${altitud}"></div></div><div class="d-flex gap-2 mt-3"><button class="btn btn-huerto" type="submit">Filtrar catálogo</button><a class="btn btn-link" th:href="@{/gestor/plantas/catalogo}">Limpiar</a></div></form>
+<th:block th:unless="${editorCatalogo}"><nav th:replace="~{fragmentos/plantas :: pestanas('catalogo')}"></nav></th:block>
+<header class="plantas-heroe mb-4"><div><p class="plantas-ceja">Conocimiento compartido</p><h1 class="h2">Catálogo de plantas</h1><p class="mb-0 text-muted" th:text="${editorCatalogo ? 'Administra las fichas compartidas con todas las comunidades.' : 'Explora las especies y selecciona cuáles forman parte de tu huerto.'}"></p></div><a class="btn btn-huerto" th:if="${editorCatalogo}" th:href="@{/gestor/plantas/catalogo/nueva}">+ Registrar especie</a></header><form class="plantas-panel mb-4" method="get" th:action="@{/gestor/plantas/catalogo}"><input type="hidden" name="vista" th:value="${vista}"><div class="row g-3"><div class="col-lg-4"><label for="q" class="form-label">Buscar especie</label><input id="q" name="q" class="form-control" th:value="${q}" placeholder="Nombre común, científico u otro nombre"></div><div class="col-sm-6 col-lg-2"><label for="region" class="form-label">Región</label><select id="region" name="region" class="form-select"><option value="">Todas</option><option th:each="r : ${regiones}" th:value="${r}" th:text="${r.etiqueta()}" th:selected="${r == region}"></option></select></div><div class="col-sm-6 col-lg-3"><label for="provincia" class="form-label">Provincia</label><input id="provincia" name="provincia" class="form-control" th:value="${provincia}" placeholder="Ej. Imbabura"></div><div class="col-sm-6 col-lg-3"><label for="altitud" class="form-label">Altitud (m s. n. m.)</label><input id="altitud" name="altitud" class="form-control" type="number" min="0" max="6500" th:value="${altitud}"></div></div><div class="d-flex gap-2 mt-3"><button class="btn btn-huerto" type="submit">Filtrar catálogo</button><a class="btn btn-link" th:href="@{/gestor/plantas/catalogo(vista=${vista})}">Limpiar</a></div></form>
 <p class="small text-muted">Una especie puede estar documentada en varias regiones. Los filtros orientan la consulta; no garantizan su adaptación. Al filtrar por altitud solo se muestran fichas con un intervalo documentado.</p>
+<div class="catalogo-barra">
+  <p class="small text-muted mb-0" role="status"
+     th:text="${especies.size() == 1 ? '1 ficha encontrada' : especies.size() + ' fichas encontradas'}"></p>
+  <nav class="catalogo-selector" aria-label="Vista del catálogo">
+    <a class="btn btn-sm btn-outline-success"
+       th:classappend="${vista == 'cuadricula' ? 'active' : ''}"
+       th:attr="aria-current=${vista == 'cuadricula' ? 'true' : null}"
+       th:href="@{/gestor/plantas/catalogo(q=${q},region=${region},provincia=${provincia},altitud=${altitud},vista='cuadricula')}">Cuadrícula</a>
+    <a class="btn btn-sm btn-outline-success"
+       th:classappend="${vista == 'lista' ? 'active' : ''}"
+       th:attr="aria-current=${vista == 'lista' ? 'true' : null}"
+       th:href="@{/gestor/plantas/catalogo(q=${q},region=${region},provincia=${provincia},altitud=${altitud},vista='lista')}">Lista</a>
+  </nav>
+</div>
 <p class="plantas-panel text-muted" th:if="${especies.isEmpty()}">No hay especies para esta búsqueda. Puedes limpiar los filtros o registrar una ficha con información documentada.</p>
-<p class="small text-muted" role="status" th:text="${#lists.size(especies)} + ' fichas encontradas'"></p><div class="row g-4"><article class="col-sm-6 col-lg-4" th:each="e : ${especies}"><div class="card planta-tarjeta h-100"><img class="planta-imagen" loading="lazy" decoding="async" width="640" height="420" th:src="${e.fotoClave != null} ? @{/gestor/plantas/catalogo/{id}/foto(id=${e.id})} : @{/img/planta-referencia.svg}" th:alt="${e.fotoClave != null} ? 'Fotografía de ' + ${e.nombreComun} : 'Ilustración genérica; fotografía pendiente'"><div class="card-body d-flex flex-column"><div class="d-flex flex-wrap gap-1 mb-2"><span class="badge text-bg-light" th:each="r : ${e.regiones}" th:text="${r.etiqueta()}"></span><span class="badge text-bg-light" th:if="${e.regiones.isEmpty()}">Región pendiente</span></div><h2 class="h5" th:text="${e.nombreComun}"></h2><p class="text-muted fst-italic" th:text="${e.nombreCientifico ?: 'Identificación científica pendiente'}"></p><p class="small" th:text="${e.familiaBotanica ?: 'Familia botánica pendiente'}"></p><a class="btn btn-outline-success mt-auto" th:href="@{/gestor/plantas/catalogo/{id}(id=${e.id})}" th:text="${seleccionadas.contains(e.id)} ? 'Ver ficha · ya en mi lista' : 'Ver ficha y seleccionar'"></a></div></div></article></div>
+<div class="row g-3 catalogo-resultados" th:unless="${especies.isEmpty()}"
+     th:classappend="${vista == 'lista' ? 'catalogo-lista' : ''}">
+  <article th:class="${vista == 'lista' ? 'col-12' : 'col-sm-6 col-lg-3'}"
+           th:each="e : ${especies}" th:with="enHuerto=${seleccionadas.contains(e.id)}">
+    <div class="card planta-tarjeta h-100">
+      <img class="planta-imagen" loading="lazy" decoding="async" width="640" height="420"
+           th:src="${e.fotoClave != null} ? @{/gestor/plantas/catalogo/{id}/foto(id=${e.id})} : @{/img/planta-referencia.svg}"
+           th:alt="${e.fotoClave != null} ? 'Fotografía de ' + ${e.nombreComun} : 'Ilustración genérica; fotografía pendiente'">
+      <div class="card-body catalogo-ficha">
+        <div class="catalogo-identidad">
+          <h2 class="h5 mb-1">
+            <a class="catalogo-nombre stretched-link" th:href="@{/gestor/plantas/catalogo/{id}(id=${e.id})}" th:text="${e.nombreComun}"></a>
+          </h2>
+          <p class="text-muted fst-italic mb-0" th:text="${e.nombreCientifico ?: 'Identificación científica pendiente'}"></p>
+        </div>
+        <div class="catalogo-accion">
+          <span class="catalogo-estado" th:if="${enHuerto}"><span aria-hidden="true">✓</span> En mi huerto</span>
+          <div class="catalogo-regiones" th:unless="${e.regiones.isEmpty()}">
+            <span class="catalogo-region" th:each="r : ${e.regiones}" th:text="${r.etiqueta()}"></span>
+          </div>
+          <span class="catalogo-ver" aria-hidden="true">Ver ficha <span>→</span></span>
+        </div>
+      </div>
+    </div>
+  </article>
+</div>
 </section></body></html>

@@ -92,18 +92,6 @@ public class GestorHuertoController {
         return "redirect:/gestor/plantas/catalogo";
     }
 
-    @PostMapping("/gestor/plantas")
-    String crear(@Valid @ModelAttribute("form") FormularioPlanta form, BindingResult resultado,
-                 @AuthenticationPrincipal UsuarioAutenticado usuario, Model model, RedirectAttributes flash) {
-        if (resultado.hasErrors()) {
-            model.addAttribute("accion", "/gestor/plantas");
-            return "gestor/planta-form";
-        }
-        huertos.crearPlanta(usuario.getId(), form);
-        flash.addFlashAttribute("mensaje", "Planta registrada.");
-        return "redirect:/gestor/plantas";
-    }
-
     @GetMapping("/gestor/plantas/{id}/editar")
     String editar(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario, Model model) {
         huertos.plantaDeGestor(usuario.getId(), id);
@@ -140,6 +128,14 @@ public class GestorHuertoController {
         } catch (ec.edu.epn.huertos.compartido.ReglaNegocioException e) {
             flash.addFlashAttribute("error", e.getMessage());
         }
+        return "redirect:/gestor/plantas";
+    }
+
+    @PostMapping("/gestor/plantas/{id}/eliminar")
+    String eliminar(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario,
+                    RedirectAttributes flash) {
+        huertos.eliminarPlanta(usuario.getId(), id);
+        flash.addFlashAttribute("mensaje", "Planta eliminada de tu huerto.");
         return "redirect:/gestor/plantas";
     }
 }

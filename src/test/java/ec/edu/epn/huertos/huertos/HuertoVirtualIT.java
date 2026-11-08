@@ -237,7 +237,7 @@ class HuertoVirtualIT extends PruebaIntegracion {
         Long especieId = huertos.plantaDeGestor(gestor, ruda).getEspecie().getId();
         FichaEspecie ficha = FichaEspecie.de(catalogo.obtener(gestor, especieId));
         ficha.setNombreComun("Anís");
-        catalogo.guardar(gestor, especieId, ficha, null);
+        catalogo.guardar(e.revisor().getId(), especieId, ficha, null);
 
         HuertoVirtual v = virtual.paraGestor(gestor);
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Anís");

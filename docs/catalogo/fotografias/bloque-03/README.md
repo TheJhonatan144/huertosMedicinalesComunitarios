@@ -16,4 +16,4 @@ No se retocaron las fotografías. Se conservan miniaturas suministradas por Wiki
 | Manihot esculenta Crantz | [yuca.jpg](https://commons.wikimedia.org/wiki/File:20120912_ENMAXConservatory_ManihotEsculenta-Cassava_CutlerP1320055.jpg) | wlcutler | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0) |
 | Uncaria tomentosa (Willd. ex Schult.) DC. | [una-de-gato.jpg](https://commons.wikimedia.org/wiki/File:Uncaria_tomentosa.jpg) | Vangeliq.petrova | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
 
-Carga mediante `scripts/cargar-fotos-catalogo.ps1 -Bloque 03 -Aplicar`. Requiere la aplicación local, una cuenta de gestor y las fichas del bloque ya incorporadas. Conserva fotos existentes y verifica cada archivo recuperado por HTTP.
+Carga mediante `scripts/cargar-fotos-catalogo.ps1 -Bloque 03 -Aplicar`. Requiere la aplicación local, una cuenta del Ministerio de Salud y las fichas del bloque ya incorporadas. Conserva fotos existentes y verifica cada archivo recuperado por HTTP.
