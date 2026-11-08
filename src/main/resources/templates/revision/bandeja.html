@@ -2,7 +2,8 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{fragmentos/base :: pagina('Bandeja de revisión', ~{::section})}">
 <body>
-<section>
+<section class="revision">
+   <link rel="stylesheet" th:href="@{/css/revision.css}">
     <h1 class="h3">Bandeja de revisión</h1>
     <p class="text-muted">Evidencias pendientes de las comunidades que tienes asignadas.</p>
     <p class="text-muted" th:if="${items.isEmpty()}">No tienes evidencias pendientes. ¡Todo al día!</p>
