@@ -18,4 +18,4 @@ No se retocaron las fotografías. Se conserva la versión original de romero y l
 | Origanum vulgare L. | [oregano.jpg](https://commons.wikimedia.org/wiki/File:20170328Origanum_vulgare1.jpg) | AnRo0002 | [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) |
 | Salvia rosmarinus Spenn. | [romero.jpg](https://commons.wikimedia.org/wiki/File:Starr_030418-0150_Rosmarinus_officinalis.jpg) | Forest & Kim Starr | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0) |
 
-Carga mediante `scripts/cargar-fotos-catalogo.ps1 -Bloque 02 -Aplicar`. Requiere la aplicación local, una cuenta de gestor y las fichas del bloque ya incorporadas. Conserva fotos existentes y verifica cada archivo recuperado por HTTP.
+Carga mediante `scripts/cargar-fotos-catalogo.ps1 -Bloque 02 -Aplicar`. Requiere la aplicación local, una cuenta del Ministerio de Salud y las fichas del bloque ya incorporadas. Conserva fotos existentes y verifica cada archivo recuperado por HTTP.

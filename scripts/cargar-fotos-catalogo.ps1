@@ -30,7 +30,7 @@ if (-not $Aplicar) { return }
 if (-not $BaseUrl.IsLoopback -or $BaseUrl.Scheme -notin @('http','https')) {
     throw 'Este script solo admite la aplicación local (localhost o dirección de bucle local).'
 }
-if (-not $Credencial) { $Credencial = Get-Credential -Message 'Cuenta de gestor de la aplicación local' }
+if (-not $Credencial) { $Credencial = Get-Credential -Message 'Cuenta del Ministerio de Salud de la aplicación local' }
 $raiz = $BaseUrl.GetLeftPart([UriPartial]::Authority)
 function Decodificar([string]$texto) { [Net.WebUtility]::HtmlDecode($texto) }
 function Atributos([string]$etiqueta) {
@@ -66,7 +66,7 @@ if (-not $csrf) { throw 'No se encontró el token CSRF del acceso.' }
 $acceso = Invoke-WebRequest "$raiz/login" -WebSession $sesion -Method Post -Body @{
     username = $Credencial.UserName; password = $Credencial.GetNetworkCredential().Password; _csrf = $csrf
 }
-if ($acceso.BaseResponse.RequestMessage.RequestUri.AbsolutePath -eq '/login') { throw 'No se pudo iniciar sesión como gestor.' }
+if ($acceso.BaseResponse.RequestMessage.RequestUri.AbsolutePath -eq '/login') { throw 'No se pudo iniciar sesión con la cuenta del Ministerio.' }
 $manejador = [Net.Http.HttpClientHandler]::new()
 $manejador.CookieContainer = $sesion.Cookies
 $cliente = [Net.Http.HttpClient]::new($manejador)

@@ -96,7 +96,7 @@ class CatalogoCargaInicialIT extends PruebaIntegracion {
 
     @Test void formularioYDetalleConservanLaCualidadFrescaYSusAclaraciones() throws Exception {
         var a = fabrica.escenario(0);
-        var actor = new UsuarioAutenticado(a.gestorUsuario());
+        var actor = new UsuarioAutenticado(a.revisor());
         mvc.perform(post("/gestor/plantas/catalogo").with(user(actor)).with(csrf())
                 .param("nombreComun", "Ficha contextual de prueba")
                 .param("cualidad", "FRESCA").param("contextoCualidad", "Tradición local de prueba")
