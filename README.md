@@ -28,7 +28,7 @@ Copy-Item .env.example .env        # ajusta DB_CLAVE y, si hay conflictos, DB_PU
 docker compose up -d --build
 ```
 
-Abre <http://localhost:8080> (o el `APP_PUERTO` que definas). Con `PERFIL=demo` se cargan datos sintéticos **solo si la base está vacía**.
+Abre <http://localhost:8081> (o el `APP_PUERTO` que definas). Con `PERFIL=demo` se cargan datos sintéticos **solo si la base está vacía**.
 Los datos viven en los volúmenes `huertos_datos-postgres` (base) y `huertos_evidencias` (fotografías) y **sobreviven a los reinicios**.
 
 ## Iniciar en el equipo (solo la base en Docker)
@@ -40,7 +40,7 @@ Copy-Item .env.example .env
 
 Las fotografías se guardan en `./datos/evidencias` (ignorado por Git) o en la ruta de `EVIDENCIAS_DIR`.
 
-> Si el puerto 5432 u 8080 ya está ocupado en tu equipo (por ejemplo, por otros contenedores), cambia `DB_PUERTO` y `APP_PUERTO` en `.env`.
+> Si el puerto 5432 o 8081 ya está ocupado en tu equipo (por ejemplo, por otros contenedores), cambia `DB_PUERTO` y `APP_PUERTO` en `.env`.
 
 ## Ejecutar las pruebas
 
@@ -59,13 +59,21 @@ Contraseña de todas: `Demo-2026!` (configurable con `DEMO_CLAVE`). **Son creden
 | `gestor_a` | Gestor de huerto (`GESTOR_HUERTO`) | Sumak Allpa (A) |
 | `participante_a1`, `a2`, `a3` | Participante (`PARTICIPANTE`) | A |
 | `participante_a4` | Participante **de baja** (no seleccionable) | A |
-| `revisor_a` | Administrador de evidencias (`ADMIN_EVIDENCIAS`) | revisa solo A |
+| `revisor_a` | Administrador del Ministerio de Salud (`ADMIN_MINISTERIO_SALUD`) | revisa solo A y gestiona solicitudes comunitarias |
 | `gestor_b` | Gestor de huerto | Pachamama Wasi (B) |
 | `participante_b1`, `b2` | Participante | B |
-| `revisor_b` | Administrador de evidencias | revisa solo B |
+| `revisor_b` | Administrador del Ministerio de Salud | revisa solo B y gestiona solicitudes comunitarias |
+| `admin_tecnico` | Administrador técnico | crea cuentas MSP y controla reasignaciones excepcionales |
 
-Provisión provisional de usuarios: no hay registro público ni recuperación por correo. Las cuentas las crea el cargador de demostración
-([DatosDemo](src/main/java/ec/edu/epn/huertos/demo/DatosDemo.java)); en otro entorno deben insertarse por el equipo (pendiente de definir).
+Las cuentas demo las crea el cargador sintético ([DatosDemo](src/main/java/ec/edu/epn/huertos/demo/DatosDemo.java)). También se puede crear una cuenta personal desde la portada; esta empieza sin comunidad. Crear una comunidad y su primer huerto genera una solicitud que el Administrador del Ministerio de Salud debe aprobar. Para integrarse a otra comunidad, el gestor envía una invitación que la persona acepta desde Mi cuenta.
+
+En un despliegue, el primer administrador técnico se puede provisionar una sola vez definiendo `ADMIN_TECNICO_USUARIO`, `ADMIN_TECNICO_NOMBRE` y `ADMIN_TECNICO_CLAVE` en el entorno; la clave debe tener al menos 12 caracteres. En una base demo vacía se crea además la cuenta `admin_tecnico` con la contraseña demo. Retira las variables de bootstrap tras usarlas. El administrador técnico crea usuarios MSP con una clave inicial y reasigna comunidades solo como excepción, indicando motivo.
+
+Los huertos pueden registrar varios espacios/diseños dentro del área total. Las evidencias admiten JPEG/PNG hasta 5 MB o MP4 H.264 hasta 120 segundos y 50 MB. Docker instala `ffprobe` para validar duración; en ejecución local se requiere FFmpeg/ffprobe disponible en el `PATH`.
+
+### Alta autorizada de comunidades
+
+Una cuenta sin comunidad abre `/cuenta/comunidad/nueva` para registrar comunidad, ubicación, contacto del responsable y ficha completa del primer huerto. La solicitud pasa a revisión ministerial; al aprobarse, se crean la comunidad y el huerto, y quien solicitó queda como gestor. El gestor puede archivar su comunidad o solicitar su eliminación permanente, que requiere aprobación ministerial. Solo se puede tener una comunidad activa a la vez. Los cupos incluyen al gestor: persona 1, familia 10, condominio 20 y barrio 25 integrantes activos. Las cuentas del Ministerio no se registran públicamente y requieren provisión institucional.
 
 ## Guion corto de demostración
 
@@ -92,7 +100,7 @@ docker compose up -d --build           # se vuelve a cargar la demo
 ```
 src/main/java/ec/edu/epn/huertos/
   autenticacion/  usuarios, roles, inicio de sesión, autorización por rol en servicios
-  comunidades/    comunidades, integrantes (cupo 25), asignación de revisores, panel del gestor
+  comunidades/    comunidades, integrantes (cupo según tipo), asignación de revisores, panel del gestor
   huertos/        huerto y plantas
   actividades/    actividades, participantes fijados, formularios, panel del participante
   evidencias/     fotografías (validación y almacenamiento), envíos, revisiones

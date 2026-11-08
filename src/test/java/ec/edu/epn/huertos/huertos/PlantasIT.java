@@ -37,13 +37,15 @@ class PlantasIT extends PruebaIntegracion {
         Escenario e = fabrica.escenario(1);
         Long id1 = servicio.crearPlanta(e.gestorUsuario().getId(), form("Hierba de prueba", 4)).getId();
         Long id2 = servicio.crearPlanta(e.gestorUsuario().getId(), form("Planta inactiva", 1)).getId();
+        // Editar la planta cambia sus datos propios, no el nombre de la especie compartida del catálogo.
         servicio.actualizarPlanta(e.gestorUsuario().getId(), id1, form("Hierba editada", 9));
+        assertThat(servicio.plantaDeGestor(e.gestorUsuario().getId(), id1).getCantidad()).isEqualTo(9);
         servicio.cambiarEstadoPlanta(e.gestorUsuario().getId(), id2, false);
 
         assertThat(servicio.plantasDeGestor(e.gestorUsuario().getId())).hasSize(2);
         String publica = mvc.perform(get("/comunidades/" + e.comunidad().getId())).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        assertThat(publica).contains("Hierba editada").doesNotContain("Planta inactiva");
+        assertThat(publica).contains("Hierba de prueba").doesNotContain("Hierba editada").doesNotContain("Planta inactiva");
     }
 
     @Test

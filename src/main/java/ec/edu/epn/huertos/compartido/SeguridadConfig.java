@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpMethod;
 
 /**
  * Primera línea de control de acceso (por URL y rol). La autorización por comunidad y recurso
@@ -18,12 +19,15 @@ public class SeguridadConfig {
     SecurityFilterChain cadenaDeFiltros(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/comunidades/*/solicitar-eliminacion").authenticated()
                         .requestMatchers("/", "/mapa", "/ranking", "/comunidades/**", "/api/publico/**",
-                                "/login", "/error", "/css/**", "/js/**", "/vendor/**", "/favicon.ico",
+                                "/login", "/registro", "/error", "/css/**", "/js/**", "/img/**", "/vendor/**", "/favicon.ico",
                                 "/actuator/health/**").permitAll()
+                        .requestMatchers("/admin/comunidades/**").hasRole("ADMIN_COMUNIDADES")
                         .requestMatchers("/gestor/**").hasRole("GESTOR_HUERTO")
                         .requestMatchers("/participante/**").hasRole("PARTICIPANTE")
-                        .requestMatchers("/revision/**").hasRole("ADMIN_EVIDENCIAS")
+                        .requestMatchers("/revision/**").hasRole("ADMIN_MINISTERIO_SALUD")
+                        .requestMatchers("/admin-tecnico/**").hasRole("ADMIN_TECNICO")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")

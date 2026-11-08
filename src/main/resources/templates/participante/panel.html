@@ -45,6 +45,10 @@
             </tbody>
         </table>
     </div>
+    <hr class="my-4">
+    <h2 class="h5">Cambiar de comunidad</h2>
+    <p class="small text-muted">Al salir conservas tu historial y puntos en esta comunidad. Para entrar a otra, acepta una invitación después de salir.</p>
+    <form th:action="@{/participante/comunidad/salir}" method="post"><button class="btn btn-outline-danger" type="submit" data-confirmar="¿Salir de esta comunidad? Tus registros históricos se conservarán.">Salir de la comunidad</button></form>
 </section>
 </body>
 </html>

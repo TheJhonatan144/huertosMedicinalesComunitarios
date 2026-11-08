@@ -8,11 +8,26 @@ import org.springframework.data.repository.query.Param;
 
 public interface IntegranteRepository extends JpaRepository<Integrante, Long> {
 
-    Optional<Integrante> findByUsuarioId(Long usuarioId);
+    Optional<Integrante> findByUsuarioIdAndActivoTrue(Long usuarioId);
+
+    Optional<Integrante> findFirstByUsuarioIdOrderByAltaEnDesc(Long usuarioId);
+
+    List<Integrante> findByUsuarioIdOrderByAltaEnDesc(Long usuarioId);
+
+    Optional<Integrante> findByComunidadIdAndUsuarioIdAndActivoTrue(Long comunidadId, Long usuarioId);
 
     long countByComunidadIdAndActivoTrue(Long comunidadId);
 
     List<Integrante> findByComunidadIdAndActivoTrue(Long comunidadId);
+
+    @Query("""
+            select distinct new ec.edu.epn.huertos.comunidades.ComunidadArchivadaVista(c.id, c.nombre, h.nombre, c.provincia, c.canton, c.archivadaPor, c.eliminacionPendiente)
+            from Integrante i join Comunidad c on c.id = i.comunidadId
+            left join Huerto h on h.comunidadId = c.id
+            where i.usuarioId = :usuarioId and c.activa = false
+            order by c.nombre
+            """)
+    List<ComunidadArchivadaVista> archivadasPorUsuario(@Param("usuarioId") Long usuarioId);
 
     @Query("""
             select new ec.edu.epn.huertos.comunidades.IntegranteVista(i.id, u.nombreCompleto, u.nombreUsuario, i.esGestor, i.activo)

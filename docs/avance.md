@@ -6,7 +6,7 @@ Organizado por **entregables** (sin fechas: la fecha del 13/11/2026 no está con
 |---|---|---|---|
 | 0. Diagnóstico | Hallazgos, supuestos, alcance provisional, pendientes | Hecha | Este documento, [alcance](alcance-prototipo.md), [pendientes](pendientes.md) |
 | 1. Base ejecutable | Proyecto Maven/Spring Boot 4.1.2, Flyway, PostgreSQL, almacenamiento persistente, Docker Compose | Hecha y verificada | App arrancó local y en contenedor, migraciones V1–V3 aplicadas, datos y fotos persisten tras reinicio |
-| 2. Autenticación y comunidades | Cuentas, roles, asignación de revisores, comunidades, integrantes, huertos, cupo 25, datos demo | Hecha y verificada | `CupoComunidadIT`, `SeguridadWebIT` |
+| 2. Autenticación y comunidades | Cuentas, roles, asignación de revisores, comunidades, integrantes, huertos, cupo por tipo, datos demo | Hecha y verificada | `CupoComunidadIT`, `SeguridadWebIT` |
 | 3. Actividades y evidencias | Formularios, lista fija, edición pendiente, fotos persistentes, estados | Hecha y verificada | `ActividadServicioIT`, `ValidadorImagenTest`, `AlmacenamientoLocalTest` |
 | 4. Revisión y recompensas | Bandeja, aprobar/rechazar, observaciones, reenvío, historial, concurrencia | Hecha y verificada | `RevisionServicioIT`, `RecorridoPrincipalIT` |
 | 5. Consulta pública y progreso | Mapa, fichas, progreso, ranking, lista alternativa | Hecha; **mapa/UX sin revisión en navegador** | `SeguridadWebIT`, `GamificacionReglasTest`; recorrido curl |

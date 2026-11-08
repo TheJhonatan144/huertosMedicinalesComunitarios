@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AlmacenamientoLocal implements AlmacenamientoArchivos {
 
-    private static final Pattern CLAVE = Pattern.compile("\\d{4}/\\d{2}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(jpg|png)");
+    private static final Pattern CLAVE = Pattern.compile("\\d{4}/\\d{2}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(jpg|png|mp4)");
 
     private final Path base;
 
@@ -54,6 +54,24 @@ public class AlmacenamientoLocal implements AlmacenamientoArchivos {
             }
         } catch (IOException e) {
             throw new UncheckedIOException("No se pudo guardar la fotografía", e);
+        }
+        return clave;
+    }
+
+    @Override
+    public String guardar(VideoValidado video) {
+        LocalDate hoy = LocalDate.now(ZoneOffset.UTC);
+        String clave = "%04d/%02d/%s.mp4".formatted(hoy.getYear(), hoy.getMonthValue(), UUID.randomUUID());
+        Path destino = resolver(clave);
+        try {
+            Files.createDirectories(destino.getParent());
+            try {
+                Files.move(video.temporal(), destino, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(video.temporal(), destino);
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException("No se pudo guardar el video", e);
         }
         return clave;
     }

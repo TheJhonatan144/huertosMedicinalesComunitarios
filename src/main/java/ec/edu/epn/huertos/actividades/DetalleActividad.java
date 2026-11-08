@@ -25,6 +25,7 @@ public record DetalleActividad(
         Integer progreso) {
 
     public record EnvioVista(Long id, int numero, String enviadoEn, EstadoRevision estado, String comentario,
-                             String archivo, String revisor, String revisadoEn, String observaciones) {
+                             String archivo, String tipoContenido, Integer duracionSegundos, String revisor,
+                             String revisadoEn, String observaciones) {
     }
 }

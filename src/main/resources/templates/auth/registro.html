@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina('Registrarse', ~{::section})}">
+<body><section>
+    <div class="row justify-content-center"><div class="col-lg-8">
+        <h1 class="h3">Crear cuenta</h1>
+        <p class="text-muted">Regístrate sin elegir un rol. Más adelante podrás crear una huerta o aceptar una invitación.</p>
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+        <form th:action="@{/registro}" th:object="${formulario}" method="post" class="row g-3">
+            <div class="col-12" th:if="${#fields.hasAnyErrors()}"><div class="alert alert-danger" role="alert"><p class="mb-1">Revisa estos campos:</p><ul class="mb-0"><li th:each="err : ${#fields.allErrors()}" th:text="${err}">Campo inválido</li></ul></div></div>
+            <div class="col-md-6"><label class="form-label" for="nombreCompleto">Nombre completo</label><input class="form-control" id="nombreCompleto" th:field="*{nombreCompleto}" maxlength="120" autocomplete="name" th:errorclass="is-invalid" required><div class="invalid-feedback" th:errors="*{nombreCompleto}"></div></div>
+            <div class="col-md-6"><label class="form-label" for="nombreUsuario">Nombre de usuario</label><input class="form-control" id="nombreUsuario" th:field="*{nombreUsuario}" minlength="3" maxlength="50" pattern="[A-Za-z0-9._-]+" autocomplete="username" th:errorclass="is-invalid" required><div class="form-text">Letras, números, punto, guion y guion bajo.</div><div class="invalid-feedback" th:errors="*{nombreUsuario}"></div></div>
+            <div class="col-md-6"><label class="form-label" for="correo">Correo electrónico</label><input class="form-control" id="correo" type="email" th:field="*{correo}" maxlength="254" autocomplete="email" th:errorclass="is-invalid" required><div class="invalid-feedback" th:errors="*{correo}"></div></div>
+            <div class="col-md-6"><label class="form-label" for="telefono">Teléfono</label><input class="form-control" id="telefono" type="tel" th:field="*{telefono}" maxlength="30" autocomplete="tel" th:errorclass="is-invalid" required><div class="invalid-feedback" th:errors="*{telefono}"></div></div>
+            <div class="col-md-6"><label class="form-label" for="fechaNacimiento">Fecha de nacimiento</label><input class="form-control" id="fechaNacimiento" type="date" th:field="*{fechaNacimiento}" th:errorclass="is-invalid" required><div class="invalid-feedback" th:errors="*{fechaNacimiento}"></div></div>
+            <div class="col-md-6"><label class="form-label" for="genero">Género</label><select class="form-select" id="genero" th:field="*{genero}" th:errorclass="is-invalid" required><option value="">Selecciona una opción</option><option value="FEMENINO">Femenino</option><option value="MASCULINO">Masculino</option><option value="NO_BINARIO">No binario</option><option value="OTRO">Otro</option><option value="PREFIERO_NO_DECIR">Prefiero no decirlo</option></select><div class="invalid-feedback" th:errors="*{genero}"></div></div>
+            <div class="col-md-6"><label class="form-label" for="nivelExperiencia">Nivel de experiencia</label><select class="form-select" id="nivelExperiencia" th:field="*{nivelExperiencia}" required><option value="APRENDIZ">Aprendiz</option><option value="OFICIAL">Oficial</option><option value="MAESTRO">Maestro</option></select></div>
+            <div class="col-12"><label class="form-label" for="talentosCertificados">Talentos certificados</label><textarea class="form-control" id="talentosCertificados" th:field="*{talentosCertificados}" maxlength="2000" rows="3" placeholder="Opcional"></textarea></div>
+            <div class="col-md-6"><label class="form-label" for="clave">Contraseña</label><input class="form-control" id="clave" type="password" th:field="*{clave}" minlength="8" maxlength="72" autocomplete="new-password" th:errorclass="is-invalid" required><div class="form-text">Mínimo 8 caracteres.</div><div class="invalid-feedback" th:errors="*{clave}"></div></div>
+            <div class="col-md-6"><label class="form-label" for="confirmarClave">Confirmar contraseña</label><input class="form-control" id="confirmarClave" type="password" th:field="*{confirmarClave}" minlength="8" maxlength="72" autocomplete="new-password" th:errorclass="is-invalid" required><div class="invalid-feedback" th:errors="*{confirmarClave}"></div></div>
+            <div class="col-12"><button class="btn btn-huerto" type="submit">Crear cuenta</button> <a class="btn btn-link" th:href="@{/login}">Ya tengo cuenta</a></div>
+        </form>
+    </div></div>
+</section></body></html>

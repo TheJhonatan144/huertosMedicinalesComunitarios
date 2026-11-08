@@ -8,6 +8,8 @@ public interface AlmacenamientoArchivos {
     /** Guarda la imagen y devuelve la clave interna (nunca derivada de datos del usuario). */
     String guardar(ImagenValidada imagen);
 
+    String guardar(VideoValidado video);
+
     Resource cargar(String clave);
 
     void eliminar(String clave);
