@@ -8,12 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Arma la vista del huerto virtual con datos reales y SOLO los lee: suelo y diseño del huerto, plantas plantadas y
- * activas (hasta dos) y el progreso que calcula {@link GamificacionServicio}. No otorga puntos ni recalcula nada.
+ * activas (se dibujan hasta dos; «plantada» no se limita) y el progreso que calcula {@link GamificacionServicio}. No otorga puntos ni recalcula nada.
  */
 @Service
 public class HuertoVirtualServicio {
 
-    /** Primera versión: se dibujan como máximo dos plantas. */
+    /** Tope SOLO del dibujo: se dibujan como máximo dos plantas; guardar «plantada» no tiene límite. */
     static final int MAXIMO_PLANTAS_VISIBLES = 2;
 
     private final HuertoServicio huertos;

@@ -29,12 +29,12 @@ class HuertoVirtualIT extends PruebaIntegracion {
     @Autowired FabricaDatos fabrica;
     @Autowired HuertoServicio huertos;
     @Autowired HuertoRepository huertoRepository;
-    @Autowired PlantaRepository plantaRepository;
     @Autowired HuertoVirtualServicio virtual;
     @Autowired GamificacionServicio gamificacion;
     @Autowired RevisionServicio revision;
     @Autowired EnvioEvidenciaRepository envios;
     @Autowired MockMvc mvc;
+    @Autowired CatalogoServicio catalogo;
 
     private FormularioPlanta planta(String nombre, int cantidad) {
         FormularioPlanta f = new FormularioPlanta();
@@ -43,7 +43,7 @@ class HuertoVirtualIT extends PruebaIntegracion {
         return f;
     }
 
-    /** Crea la planta con el servicio y la marca como plantada (respeta el máximo de dos del servicio). */
+    /** Crea la planta con el servicio y la marca como plantada (el servicio no limita cuántas). */
     private Long plantada(Escenario e, String nombre, int cantidad) {
         Long gestor = e.gestorUsuario().getId();
         Long id = huertos.crearPlanta(gestor, planta(nombre, cantidad)).getId();
@@ -55,7 +55,7 @@ class HuertoVirtualIT extends PruebaIntegracion {
     private void sueloYDiseno(Escenario e, String suelo, String diseno) {
         Huerto h = huertoRepository.findById(e.huerto().getId()).orElseThrow();
         h.actualizar(h.getNombre(), h.getDescripcion(), h.getProvincia(), h.getParroquia(), h.getDireccion(),
-                h.getAreaM2(), diseno, suelo, h.getFuenteAgua(), h.getAbonoNatural(), h.getCerramiento(),
+                h.getAreaM2(), diseno, suelo, h.getFuenteAgua(), h.getAbonoNatural(),
                 h.getLatitud(), h.getLongitud());
         huertoRepository.save(h);
     }
@@ -140,20 +140,16 @@ class HuertoVirtualIT extends PruebaIntegracion {
     }
 
     @Test
-    void conMasDeDosElegiblesSeDibujanDosEnOrdenYSeIndicaElTotal() throws Exception {
+    void sePuedenMarcarMasDeDosPlantadasYElDibujoMuestraDosEnOrdenConElTotal() throws Exception {
         Escenario e = fabrica.escenario(1);
-        // El servicio limita a dos plantadas; se insertan directamente para comprobar que la vista también limita.
-        for (String n : List.of("Ruda", "Albahaca", "Menta")) {
-            Planta p = new Planta(e.huerto().getId(), n, null, null, 1);
-            p.cambiarPlantada(true);
-            plantaRepository.save(p);
-        }
-        Planta inactiva = new Planta(e.huerto().getId(), "Aaa inactiva", null, null, 1);
-        inactiva.cambiarPlantada(true);
-        inactiva.cambiarActiva(false);
-        plantaRepository.save(inactiva);
+        Long gestor = e.gestorUsuario().getId();
+        // «plantada» es el estado real y no se limita: la tercera y la cuarta se aceptan por el mismo servicio.
+        for (String n : List.of("Ruda", "Albahaca", "Menta")) plantada(e, n, 1);
+        Long inactiva = plantada(e, "Aaa inactiva", 1);
+        huertos.cambiarEstadoPlanta(gestor, inactiva, false);
+        assertThat(huertos.plantasPlantadasDeGestor(gestor)).hasSize(4);
 
-        HuertoVirtual v = virtual.paraGestor(e.gestorUsuario().getId());
+        HuertoVirtual v = virtual.paraGestor(gestor);
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Menta");
         assertThat(v.totalPlantas()).isEqualTo(3);
 
@@ -162,7 +158,7 @@ class HuertoVirtualIT extends PruebaIntegracion {
         assertThat(ocurrencias(html, "class=\"hv-sprite\"")).isEqualTo(2);
         assertThat(html).contains("Ilustración de Albahaca").contains("Ilustración de Menta")
                 .doesNotContain("Ilustración de Ruda").doesNotContain("Aaa inactiva");
-        assertThat(html.replaceAll("\\s+", " ")).contains("Mostrando <span>2</span> de <span>3</span> plantas plantadas");
+        assertThat(html.replaceAll("\\s+", " ")).contains("Mostrando <span>2</span> de <span>3</span> plantadas.");
     }
 
     @Test
@@ -170,7 +166,7 @@ class HuertoVirtualIT extends PruebaIntegracion {
         Escenario e = fabrica.escenario(1);
         String html = fragmento(e);
         assertThat(html).contains("Tu parcela está lista y esperando plantas").contains("/gestor/plantas")
-                .contains("sin plantas plantadas").doesNotContain("Mostrando");
+                .contains("sin plantas plantadas").doesNotContain("Mostrando").doesNotContain("hasta dos");
     }
 
     @Test
@@ -225,6 +221,28 @@ class HuertoVirtualIT extends PruebaIntegracion {
                 .isInstanceOf(AccessDeniedException.class);
         mvc.perform(get("/gestor").with(user(new UsuarioAutenticado(a.participanteUsuarios().get(0)))))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void elDibujoUsaElNombreDeLaEspecieYCambiaAlRenombrarlaEnElCatalogo() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        Long gestor = e.gestorUsuario().getId();
+        plantada(e, "Albahaca", 1);
+        plantada(e, "Menta", 1);
+        Long ruda = plantada(e, "Ruda", 1);
+        assertThat(virtual.paraGestor(gestor).plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre)
+                .containsExactly("Albahaca", "Menta");
+
+        // Se renombra la especie de «Ruda» en el catálogo; la columna planta.nombre_comun conserva «Ruda».
+        Long especieId = huertos.plantaDeGestor(gestor, ruda).getEspecie().getId();
+        FichaEspecie ficha = FichaEspecie.de(catalogo.obtener(gestor, especieId));
+        ficha.setNombreComun("Anís");
+        catalogo.guardar(gestor, especieId, ficha, null);
+
+        HuertoVirtual v = virtual.paraGestor(gestor);
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Anís");
+        assertThat(fragmento(e)).contains("Ilustración de Anís").doesNotContain("Ilustración de Ruda")
+                .doesNotContain("Ilustración de Menta");
     }
 
     @Test

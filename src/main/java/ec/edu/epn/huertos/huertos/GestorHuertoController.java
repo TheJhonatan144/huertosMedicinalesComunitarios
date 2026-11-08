@@ -89,9 +89,7 @@ public class GestorHuertoController {
 
     @GetMapping("/gestor/plantas/nueva")
     String nueva(Model model) {
-        model.addAttribute("form", new FormularioPlanta());
-        model.addAttribute("accion", "/gestor/plantas");
-        return "gestor/planta-form";
+        return "redirect:/gestor/plantas/catalogo";
     }
 
     @PostMapping("/gestor/plantas")
@@ -108,9 +106,8 @@ public class GestorHuertoController {
 
     @GetMapping("/gestor/plantas/{id}/editar")
     String editar(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario, Model model) {
-        model.addAttribute("form", FormularioPlanta.de(huertos.plantaDeGestor(usuario.getId(), id)));
-        model.addAttribute("accion", "/gestor/plantas/" + id);
-        return "gestor/planta-form";
+        huertos.plantaDeGestor(usuario.getId(), id);
+        return "redirect:/gestor/plantas/" + id + "/siembra";
     }
 
     @PostMapping("/gestor/plantas/{id}")
@@ -139,7 +136,7 @@ public class GestorHuertoController {
                     @AuthenticationPrincipal UsuarioAutenticado usuario, RedirectAttributes flash) {
         try {
             huertos.cambiarPlantada(usuario.getId(), id, plantada);
-            flash.addFlashAttribute("mensaje", plantada ? "La planta aparecerá en el huerto virtual." : "La planta se retiró del huerto virtual.");
+            flash.addFlashAttribute("mensaje", plantada ? "Planta marcada como plantada." : "La planta ya no está marcada como plantada.");
         } catch (ec.edu.epn.huertos.compartido.ReglaNegocioException e) {
             flash.addFlashAttribute("error", e.getMessage());
         }

@@ -41,14 +41,14 @@
             <div class="fs-2" aria-hidden="true">🌱</div>
             <p class="mb-1 fw-semibold">Tu parcela está lista y esperando plantas.</p>
             <p class="mb-0 small" th:if="${hv.puedeRegistrar()}">
-                Marca hasta dos plantas como plantadas para verlas crecer aquí.
+                Marca tus plantas como plantadas para verlas crecer aquí.
                 <a th:href="@{/gestor/plantas}">Ir a mis plantas</a>
             </p>
             <p class="mb-0 small" th:unless="${hv.puedeRegistrar()}">Esta comunidad aún no tiene plantas plantadas.</p>
         </div>
         <p class="small text-muted mt-2 mb-0" th:if="${hv.hayMasPlantas()}">
             Mostrando <span th:text="${hv.plantas().size()}">2</span> de <span th:text="${hv.totalPlantas()}">3</span>
-            plantas plantadas.
+            plantadas.
         </p>
 
         <div class="mt-3 d-flex flex-wrap align-items-center gap-2">

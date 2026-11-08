@@ -85,6 +85,9 @@ public class DatosDemo implements ApplicationRunner {
                 "Huerto comunitario ficticio para la demostración del prototipo.", 0.2350, -78.2600));
         Huerto huertoB = huertos.save(new Huerto(chimborazo.getId(), "Huerto Demo Pachamama Wasi",
                 "Huerto comunitario ficticio para la demostración del prototipo.", -1.6640, -78.6540));
+        // El constructor corto deja el abono «No especificado», que no es una opción del formulario.
+        conAbono(huertoA, "COMPOST");
+        conAbono(huertoB, "RESTOS_VEGETALES");
         espacios.sincronizar(huertoA.getId(), huertoA.getAreaM2(), List.of(huertoA.getDiseno()));
         espacios.sincronizar(huertoB.getId(), huertoB.getAreaM2(), List.of(huertoB.getDiseno()));
         cerramientos.sincronizar(huertoA.getId(), List.of("NATURAL"));
@@ -136,5 +139,11 @@ public class DatosDemo implements ApplicationRunner {
             integrante.darDeBaja();
         }
         integrantes.save(integrante);
+    }
+
+    /** Cambia solo el abono, conservando el resto de datos del huerto (entidad gestionada dentro de run). */
+    private static void conAbono(Huerto h, String abono) {
+        h.actualizar(h.getNombre(), h.getDescripcion(), h.getProvincia(), h.getParroquia(), h.getDireccion(),
+                h.getAreaM2(), h.getDiseno(), h.getTipoSuelo(), h.getFuenteAgua(), abono, h.getLatitud(), h.getLongitud());
     }
 }

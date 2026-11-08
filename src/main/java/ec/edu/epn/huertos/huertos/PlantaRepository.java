@@ -11,5 +11,8 @@ public interface PlantaRepository extends JpaRepository<Planta, Long> {
 
     List<Planta> findByHuertoIdAndPlantadaTrueOrderByNombreComunAsc(Long huertoId);
 
-    long countByHuertoIdAndPlantadaTrue(Long huertoId);
+    boolean existsByHuertoIdAndEspecieId(Long huertoId, Long especieId);
+
+    @org.springframework.data.jpa.repository.Query(value = "select id from huerto where id = :id for update", nativeQuery = true)
+    Long bloquearHuerto(@org.springframework.data.repository.query.Param("id") Long id);
 }
