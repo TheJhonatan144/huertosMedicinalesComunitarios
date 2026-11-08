@@ -33,13 +33,21 @@ enlace a `/gestor/plantas` para marcarlas como plantadas.
   `PlantaPlantadaVista` (record de proyección), `templates/fragmentos/huerto-virtual.html`, `static/css/huerto-virtual.css`.
 - Modificados: `GestorPanelController` (atributo `huertoVirtual`), `gestor/panel.html` (bloque reemplazado),
   `fragmentos/base.html` (enlace al CSS).
-- Pruebas: `HuertoVirtualIT`, `HuertoVirtualTest`, `SpritePlantaTest`.
+- Pruebas: `HuertoVirtualIT`, `HuertoVirtualTest`, `PlantaVirtualLecturaIT`, `SpritePlantaTest`.
 - Sin migraciones nuevas. `PlantaRepository`, `Huerto` y `HuertoServicio` no se modificaron.
 - Las clases CSS usan el prefijo `hv-` para no chocar con `.huerto-virtual` y `.suelo-*` que ya existen en `app.css`.
 
 ## Cómo mostrarlo en otras pantallas (para sus dueños)
 
 Esta rama **no** edita esas pantallas. El fragmento recibe dos parámetros: la vista y si incluye la barra de progreso.
+
+> **`paraComunidad(...)` no autoriza.** Solo lee el huerto de la comunidad que se le pasa. Quien inserte el fragmento
+> (ficha pública, panel del participante) es responsable de verificar los permisos antes de llamarlo: obtener el
+> `comunidadId` de una fuente ya autorizada (la comunidad pública que se está mostrando, o la del integrante activo
+> autenticado; nunca un parámetro libre de la URL sin validar) y mostrar solo datos públicos. El fragmento no muestra
+> fotos de evidencias ni enlaces de gestión con `paraComunidad`, pero sí el nombre del huerto, el suelo, el diseño, los
+> nombres de las plantas plantadas y el progreso; si alguna comunidad no debe exponerlos (archivada, eliminación
+> pendiente, no pública), la pantalla que llama debe filtrarla antes.
 
 **Ficha pública de comunidad** (`publico/comunidad.html`, `/comunidades/{id}`):
 
@@ -67,6 +75,21 @@ model.addAttribute("huertoVirtual", huertoVirtualServicio.paraComunidad(comunida
 
 Si esa pantalla ya muestra la barra de progreso por su cuenta, usar `false` como segundo parámetro para no duplicarla.
 El CSS ya está enlazado en `fragmentos/base.html`.
+
+## Pendiente al integrar Camila_Paredes
+
+En `origin/Camila_Paredes`, `Planta` pasa a tener `especie` (`@ManyToOne`, `especie_id`) y `getNombreComun()` devuelve
+el nombre de la especie. `PlantaVirtualLectura` hoy proyecta y ordena por la columna `planta.nombre_comun`, que puede
+quedar desincronizada si se renombra la especie. Al integrar esa rama:
+
+- Cambiar la `@Query` para proyectar y ordenar por el nombre de la especie, con `join p.especie e`
+  (`select new ...PlantaPlantadaVista(p.id, e.nombreComun) ... order by e.nombreComun asc, p.id asc`).
+- Mantener el filtro por huerto y `p.plantada = true and p.activa = true`, el desempate por `p.id` y el límite de 2
+  aplicado **después** de filtrar (en `HuertoVirtualServicio`).
+- Agregar una prueba que renombre una especie y compruebe que cambian la etiqueta, el orden, la selección de las dos
+  visibles y el sprite (por ejemplo, renombrar «Ruda» a «Manzanilla» y ver que pasa al sprite de manzanilla y al
+  primer lugar).
+- Revisar además que la columna `plantada` no quede duplicada: Camila la agrega en su V4 y aquí ya existe por V11.
 
 ## Limitaciones conocidas
 
