@@ -20,7 +20,7 @@
         <div class="hv-parcela" aria-hidden="true">
             <div class="hv-viga"></div>
             <div class="hv-area hv-textura">
-                <div class="hv-slots" th:classappend="${hv.plantas().size() == 1} ? 'hv-una-planta'"
+                <div class="hv-slots" th:classappend="'hv-cols-' + ${hv.columnas()}"
                      th:unless="${hv.plantas().isEmpty()}">
                     <figure class="hv-slot" th:each="p, estado : ${hv.plantas()}" th:style="'--i:' + ${estado.index}">
                         <div class="hv-cuerpo">

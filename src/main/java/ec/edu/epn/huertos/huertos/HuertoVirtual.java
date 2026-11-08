@@ -89,6 +89,11 @@ public record HuertoVirtual(
         return disenoRegistrado() ? DISENOS.get(normalizar(codigoDiseno)) : "Diseño sin registrar";
     }
 
+    /** Columnas de la cuadrícula cuadrada: 1 planta → 1, 2–4 → 2, 5–9 → 3 (raíz cuadrada redondeada hacia arriba). */
+    public int columnas() {
+        return Math.max(1, (int) Math.ceil(Math.sqrt(plantas.size())));
+    }
+
     /** Hay más plantas elegibles que las dibujadas («Mostrando 2 de N»). */
     public boolean hayMasPlantas() {
         return totalPlantas > plantas.size();
