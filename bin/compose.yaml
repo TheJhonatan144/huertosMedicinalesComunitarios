@@ -1,0 +1,43 @@
+# Arranque local: PostgreSQL + aplicación. Requiere un archivo .env (copia .env.example).
+name: huertos
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NOMBRE:-huertos}
+      POSTGRES_USER: ${DB_USUARIO:-huertos}
+      POSTGRES_PASSWORD: ${DB_CLAVE:?Define DB_CLAVE en el archivo .env}
+    ports:
+      # Solo accesible desde la propia máquina (útil para ejecutar la app fuera de Docker).
+      - "127.0.0.1:${DB_PUERTO:-5432}:5432"
+    volumes:
+      - datos-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USUARIO:-huertos} -d ${DB_NOMBRE:-huertos}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${PERFIL:-demo}
+      DB_URL: jdbc:postgresql://db:5432/${DB_NOMBRE:-huertos}
+      DB_USUARIO: ${DB_USUARIO:-huertos}
+      DB_CLAVE: ${DB_CLAVE:?Define DB_CLAVE en el archivo .env}
+      DEMO_CLAVE: ${DEMO_CLAVE:-Demo-2026!}
+      EVIDENCIAS_DIR: /datos/evidencias
+    ports:
+      - "${APP_PUERTO:-8080}:8080"
+    volumes:
+      - evidencias:/datos/evidencias
+
+volumes:
+  datos-postgres:
+  evidencias:

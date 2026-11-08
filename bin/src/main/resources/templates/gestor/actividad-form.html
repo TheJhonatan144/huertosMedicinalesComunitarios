@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina(${existente == null} ? 'Registrar actividad' : 'Editar actividad', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3" th:text="${existente == null} ? 'Registrar actividad' : 'Editar actividad'">Registrar actividad</h1>
+    <form th:object="${form}" method="post" enctype="multipart/form-data" data-una-vez novalidate
+          th:action="${existente == null} ? @{/gestor/actividades} : @{/gestor/actividades/{id}/editar(id=${existente.id()})}">
+        <div class="alert alert-danger" role="alert" th:if="${#fields.hasGlobalErrors()}">
+            <div th:each="e : ${#fields.globalErrors()}" th:text="${e}">Error</div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="tipo" class="form-label">Tipo de actividad</label>
+                <select id="tipo" class="form-select" th:field="*{tipo}" th:errorclass="is-invalid" required>
+                    <option value="">Selecciona…</option>
+                    <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.etiqueta()}">Riego manual</option>
+                </select>
+                <div class="invalid-feedback" th:errors="*{tipo}"></div>
+            </div>
+            <div class="col-md-6">
+                <label for="fecha" class="form-label">Fecha de la actividad</label>
+                <input type="date" id="fecha" class="form-control" th:field="*{fecha}" th:errorclass="is-invalid" th:max="${hoy}" required>
+                <div class="invalid-feedback" th:errors="*{fecha}"></div>
+            </div>
+            <div class="col-12">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <textarea id="descripcion" class="form-control" rows="3" th:field="*{descripcion}" th:errorclass="is-invalid" maxlength="2000" required></textarea>
+                <div class="invalid-feedback" th:errors="*{descripcion}"></div>
+            </div>
+
+            <div class="col-12" th:if="${existente == null}">
+                <fieldset>
+                    <legend class="form-label fs-6">Participantes (integrantes activos)</legend>
+                    <p class="small text-muted">La lista queda fijada al registrar la actividad y no podrá modificarse después.</p>
+                    <div class="row">
+                        <div class="col-md-6" th:each="i : ${elegibles}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="participanteIds" th:id="'p' + ${i.id()}"
+                                       th:value="${i.id()}" th:checked="${form.participanteIds.contains(i.id())}">
+                                <label class="form-check-label" th:for="'p' + ${i.id()}">
+                                    <span th:text="${i.nombre()}">Nombre</span>
+                                    <span class="badge text-bg-light" th:if="${i.gestor()}">Gestor</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-12" th:if="${existente == null}">
+                <label for="foto" class="form-label">Fotografía como evidencia (JPEG o PNG, hasta 5 MB)</label>
+                <input type="file" id="foto" name="foto" class="form-control" accept="image/jpeg,image/png" required>
+                <div class="form-text">La fotografía es privada: solo la ven el gestor y el revisor asignado.</div>
+            </div>
+            <div class="col-12" th:if="${existente != null}">
+                <div class="alert alert-info mb-0">
+                    Solo puedes editar mientras la actividad está pendiente. Los participantes y la fotografía enviada no cambian;
+                    si te la rechazan podrás reenviar una corrección.
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+            <button class="btn btn-huerto" type="submit" th:text="${existente == null} ? 'Registrar y enviar a revisión' : 'Guardar cambios'">Guardar</button>
+            <a class="btn btn-link" th:href="${existente == null} ? @{/gestor/actividades} : @{/gestor/actividades/{id}(id=${existente.id()})}">Cancelar</a>
+        </div>
+    </form>
+</section>
+</body>
+</html>
