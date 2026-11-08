@@ -60,7 +60,7 @@ public class RevisionServicio {
                               int numeroEnvio, String enviadoEn, int participantes) {
     }
 
-    public record DetalleRevision(Long envioId, EstadoRevision estadoEnvio, int numeroEnvio, DetalleActividad actividad) {
+    public record DetalleRevision(Long envioId, EstadoRevision estadoEnvio, int numeroEnvio, String tipoContenido, DetalleActividad actividad) {
     }
 
     public record ItemHistorial(Long actividadId, Long envioId, String comunidad, String tipo, int numeroEnvio,
@@ -97,7 +97,10 @@ public class RevisionServicio {
         EnvioEvidencia envio = envios.findById(envioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("El envío no existe."));
         Actividad actividad = actividadRevisable(revisorId, envio);
-        return new DetalleRevision(envio.getId(), envio.getEstado(), envio.getNumero(), detalles.construir(actividad));
+        DetalleActividad detalle = detalles.construir(actividad);
+        String tipo = detalle.envios().stream().filter(e -> e.id().equals(envioId))
+                .map(DetalleActividad.EnvioVista::tipoContenido).findFirst().orElse("image/jpeg");
+        return new DetalleRevision(envio.getId(), envio.getEstado(), envio.getNumero(), tipo, detalle);
     }
 
     @Transactional(readOnly = true)

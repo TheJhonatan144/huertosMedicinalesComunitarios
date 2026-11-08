@@ -1,13 +1,13 @@
 # Guion de demostración
 
 Requisitos: aplicación en ejecución con perfil `demo` (ver [README](../README.md)). Contraseña de todas las cuentas: `Demo-2026!`.
-Usa ventanas de incógnito o sesiones separadas para cada rol. Sustituye `8080` por tu `APP_PUERTO`.
+Usa ventanas de incógnito o sesiones separadas para cada rol. Sustituye `8081` por tu `APP_PUERTO`.
 
 ## 0. Preparación (una vez)
 
 ```powershell
 Copy-Item .env.example .env
-docker compose up -d --build        # http://localhost:8080
+docker compose up -d --build        # http://localhost:8081
 ```
 
 ## 1. Visitante (sin cuenta)

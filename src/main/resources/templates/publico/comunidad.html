@@ -18,6 +18,8 @@
                 <th:block th:if="${ficha.huerto() != null}">
                     <p class="mb-1 fw-semibold" th:text="${ficha.huerto().nombre}">Huerto</p>
                     <p th:text="${ficha.huerto().descripcion}">Descripción</p>
+                    <h3 class="h6">Espacios y diseños</h3>
+                    <ul class="mb-0"><li th:each="espacio : ${ficha.espacios()}" th:text="${espacio.nombre} + ' · ' + ${espacio.areaM2} + ' m²'"></li></ul>
                 </th:block>
                 <p th:if="${ficha.huerto() == null}" class="text-muted">Esta comunidad aún no registra un huerto.</p>
                 <h3 class="h6">Progreso del huerto virtual</h3>

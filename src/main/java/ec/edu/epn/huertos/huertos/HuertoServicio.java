@@ -15,11 +15,16 @@ public class HuertoServicio {
     private final ComunidadServicio comunidades;
     private final HuertoRepository huertos;
     private final PlantaRepository plantas;
+    private final EspacioHuertoServicio espacios;
+    private final HuertoCerramientoServicio cerramientos;
 
-    public HuertoServicio(ComunidadServicio comunidades, HuertoRepository huertos, PlantaRepository plantas) {
+    public HuertoServicio(ComunidadServicio comunidades, HuertoRepository huertos, PlantaRepository plantas,
+                          EspacioHuertoServicio espacios, HuertoCerramientoServicio cerramientos) {
         this.comunidades = comunidades;
         this.huertos = huertos;
         this.plantas = plantas;
+        this.espacios = espacios;
+        this.cerramientos = cerramientos;
     }
 
     @Transactional(readOnly = true)
@@ -34,6 +39,16 @@ public class HuertoServicio {
         return comunidades.comunidad(comunidades.gestorDe(gestorUsuarioId).getComunidadId());
     }
 
+    @Transactional(readOnly = true)
+    public List<EspacioHuerto> espaciosDeGestor(Long gestorUsuarioId) {
+        return espacios.activos(huertoDeGestor(gestorUsuarioId).getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> gruposCerramientoDeGestor(Long gestorUsuarioId) {
+        return cerramientos.grupos(huertoDeGestor(gestorUsuarioId).getId());
+    }
+
     @Transactional
     public void actualizarHuerto(Long gestorUsuarioId, FormularioHuerto form) {
         Long comunidadId = comunidades.gestorDe(gestorUsuarioId).getComunidadId();
@@ -42,7 +57,7 @@ public class HuertoServicio {
         if (!java.util.List.of("TIERRA_SURCOS", "TIERRA_CAMADAS", "TIERRA_CAMELLONES", "TIERRA_TERRAZAS", "VERTICAL_PAREDES", "COLGANTE_TECHOS", "PISO_MACETAS", "PISO_BOTELLAS_PATIO", "PISO_LLANTAS_PATIO", "PISO_TERRAZA", "PISO_GRADAS", "PISO_BALCONES", "PISO_FILOS_VENTANA").contains(form.getDiseno())
                 || !java.util.List.of("ARCILLOSO", "LIMOSO", "ARENOSO", "MARGOSO", "GREDOSO", "PANTANOSO").contains(form.getTipoSuelo())
                 || !java.util.List.of("BARBECHO", "RESTOS_VEGETALES", "HOJA", "COMPOST").contains(form.getAbonoNatural())
-                || !java.util.List.of("VIVO_HIGUERILLA", "VIVO_FLORIPONDIO", "VIVO_AGAVE", "VIVO_LAVANDA", "VIVO_NARANJOS", "VIVO_CAPULIES", "VIVO_TOCTE", "VIVO_GUABO", "NATURAL_CANA_GUADUA", "NATURAL_BAHAREQUE", "NATURAL_TAPIAL", "RECICLADO_TABLAS", "RECICLADO_BOTELLAS", "RECICLADO_NEUMATICOS", "METALICO_ALAMBRE_PUAS", "CONVENCIONAL_PIEDRA", "CONVENCIONAL_LADRILLO", "CONVENCIONAL_BLOQUE").contains(form.getCerramiento()))
+                || !HuertoCerramientoServicio.GRUPOS.containsAll(form.getGruposCerramiento() == null ? java.util.List.of() : form.getGruposCerramiento()))
             throw new ec.edu.epn.huertos.compartido.ReglaNegocioException("Selecciona opciones válidas de diseño, suelo, abono y cerramiento.");
         if (!java.util.List.of("PERSONA", "FAMILIA", "CONDOMINIO", "BARRIO").contains(form.getTipoComunidad()))
             throw new ec.edu.epn.huertos.compartido.ReglaNegocioException("Selecciona un tipo de comunidad válido.");
@@ -55,7 +70,9 @@ public class HuertoServicio {
         huertoDeGestor(gestorUsuarioId).actualizar(form.getNombre().trim(), form.getDescripcion().trim(),
                 form.getProvincia().trim(), form.getParroquia().trim(), form.getDireccion().trim(), form.getAreaM2(),
                 form.getDiseno(), form.getTipoSuelo(), form.getFuenteAgua().trim(), form.getAbonoNatural().trim(),
-                form.getCerramiento(), form.getLatitud(), form.getLongitud());
+                form.getLatitud(), form.getLongitud());
+        espacios.sincronizar(huertoDeGestor(gestorUsuarioId).getId(), form.getAreaM2(), form.getDisenos());
+        cerramientos.sincronizar(huertoDeGestor(gestorUsuarioId).getId(), form.getGruposCerramiento());
     }
 
     @Transactional(readOnly = true)

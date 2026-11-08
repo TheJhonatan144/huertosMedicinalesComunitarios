@@ -10,6 +10,7 @@ public enum Rol {
     GESTOR_HUERTO("Gestor de huerto"),
     PARTICIPANTE("Participante"),
     ADMIN_MINISTERIO_SALUD("Administrador del Ministerio de Salud"),
+    ADMIN_TECNICO("Administrador técnico del sistema"),
     SIN_ASIGNAR("Cuenta sin comunidad");
 
     private final String etiqueta;

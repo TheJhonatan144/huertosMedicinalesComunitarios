@@ -12,6 +12,15 @@ public interface AsignacionRevisorRepository extends JpaRepository<AsignacionRev
     List<AsignacionRevisor> findByComunidadId(Long comunidadId);
 
     @org.springframework.data.jpa.repository.Query("""
+            select new ec.edu.epn.huertos.comunidades.AsignacionTecnicaVista(c.id, c.nombre,
+                case when c.activa = true then 'Activa' else 'Archivada' end,
+                a.usuarioId, u.nombreCompleto, c.provincia, c.canton)
+            from Comunidad c left join AsignacionRevisor a on a.comunidadId = c.id
+            left join Usuario u on u.id = a.usuarioId order by c.nombre
+            """)
+    List<AsignacionTecnicaVista> todasParaAdministrar();
+
+    @org.springframework.data.jpa.repository.Query("""
             select new ec.edu.epn.huertos.comunidades.ComunidadAsignadaVista(c.id, c.nombre,
                 case when c.activa = true then 'Activa' else 'Archivada' end,
                 c.tipoComunidad, c.provincia, c.canton, h.nombre)

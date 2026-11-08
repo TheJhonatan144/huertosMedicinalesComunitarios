@@ -41,7 +41,8 @@
     <div class="huerto-virtual p-3 rounded-3" th:classappend="| suelo-${#strings.toLowerCase(huerto.tipoSuelo)}|">
         <div class="d-flex flex-wrap gap-3 align-items-start justify-content-between">
             <div><strong th:text="${#strings.capitalize(#strings.toLowerCase(huerto.tipoSuelo))}">Limoso</strong><span> · suelo seleccionado</span><br>
-                <span class="small" th:text="${huerto.areaM2} + ' m² · ' + ${huerto.diseno}">1 m² · TIERRA_SURCOS</span></div>
+                <span class="small d-block" th:text="${huerto.areaM2} + ' m² · área total'">1 m² · área total</span>
+                <ul class="small mb-0 mt-2"><li th:each="espacio : ${espaciosHuerto}" th:text="${espacio.nombre} + ' · ' + ${espacio.areaM2} + ' m²'"></li></ul></div>
             <img class="huerto-virtual-suelo" th:src="@{/img/huerto/suelo.svg}" alt="Capas ilustrativas del tipo de suelo seleccionado">
         </div>
         <div class="d-flex flex-wrap gap-2 mt-3" th:if="${!plantasPlantadas.isEmpty()}">

@@ -6,6 +6,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterAll;
@@ -47,15 +48,15 @@ class ValidacionFormulariosTest {
     }
 
     @Test
-    void validaAbonoDisenoYMaterialDelCerramientoContraOpcionesPermitidas() {
+    void validaAbonoDisenoYLimiteDeTiposDeCerca() {
         FormularioHuerto huerto = huertoValido();
         assertTrue(validator.validate(huerto).isEmpty());
         huerto.setDiseno("DISEÑO_DESCONOCIDO");
         huerto.setAbonoNatural("QUIMICO");
-        huerto.setCerramiento("MATERIAL_DESCONOCIDO");
+        huerto.setGruposCerramiento(List.of("VIVA", "NATURAL", "RECICLADO", "METALICO", "CONVENCIONAL", "EXTRA"));
         Set<String> campos = validator.validate(huerto).stream()
                 .map(error -> error.getPropertyPath().toString()).collect(Collectors.toSet());
-        assertTrue(campos.containsAll(Set.of("diseno", "abonoNatural", "cerramiento")));
+        assertTrue(campos.containsAll(Set.of("diseno", "abonoNatural", "gruposCerramiento")));
     }
 
     private static FormularioRegistroCuenta cuentaValida() {
@@ -70,6 +71,9 @@ class ValidacionFormulariosTest {
 
     private static FormularioHuerto huertoValido() {
         FormularioHuerto f = new FormularioHuerto();
+        f.setNombreComunidad("Comunidad demostrativa"); f.setTipoComunidad("FAMILIA");
+        f.setDescripcionComunidad("Comunidad de ejemplo"); f.setProvinciaComunidad("Pichincha");
+        f.setCantonComunidad("Quito"); f.setLatitudComunidad(-0.2); f.setLongitudComunidad(-78.5);
         f.setNombre("Huerto demostrativo"); f.setDescripcion("Descripción del huerto");
         f.setProvincia("Pichincha"); f.setParroquia("Centro"); f.setDireccion("Calle principal 123");
         f.setAreaM2(new BigDecimal("12.5")); f.setDiseno("VERTICAL_PAREDES");

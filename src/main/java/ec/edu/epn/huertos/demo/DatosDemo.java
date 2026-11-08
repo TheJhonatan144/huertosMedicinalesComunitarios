@@ -13,12 +13,16 @@ import ec.edu.epn.huertos.huertos.Huerto;
 import ec.edu.epn.huertos.huertos.HuertoRepository;
 import ec.edu.epn.huertos.huertos.Planta;
 import ec.edu.epn.huertos.huertos.PlantaRepository;
+import ec.edu.epn.huertos.huertos.EspacioHuertoServicio;
+import ec.edu.epn.huertos.huertos.HuertoCerramientoServicio;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @Profile("demo")
+@Order(1)
 public class DatosDemo implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DatosDemo.class);
@@ -40,18 +45,24 @@ public class DatosDemo implements ApplicationRunner {
     private final AsignacionRevisorRepository asignaciones;
     private final HuertoRepository huertos;
     private final PlantaRepository plantas;
+    private final EspacioHuertoServicio espacios;
+    private final HuertoCerramientoServicio cerramientos;
     private final PasswordEncoder encoder;
     private final String clave;
 
     public DatosDemo(UsuarioRepository usuarios, ComunidadRepository comunidades, IntegranteRepository integrantes,
                      AsignacionRevisorRepository asignaciones, HuertoRepository huertos, PlantaRepository plantas,
-                     PasswordEncoder encoder, @Value("${app.demo.clave}") String clave) {
+                     PasswordEncoder encoder, EspacioHuertoServicio espacios,
+                     HuertoCerramientoServicio cerramientos,
+                     @Value("${app.demo.clave}") String clave) {
         this.usuarios = usuarios;
         this.comunidades = comunidades;
         this.integrantes = integrantes;
         this.asignaciones = asignaciones;
         this.huertos = huertos;
         this.plantas = plantas;
+        this.espacios = espacios;
+        this.cerramientos = cerramientos;
         this.encoder = encoder;
         this.clave = clave;
     }
@@ -74,6 +85,10 @@ public class DatosDemo implements ApplicationRunner {
                 "Huerto comunitario ficticio para la demostración del prototipo.", 0.2350, -78.2600));
         Huerto huertoB = huertos.save(new Huerto(chimborazo.getId(), "Huerto Demo Pachamama Wasi",
                 "Huerto comunitario ficticio para la demostración del prototipo.", -1.6640, -78.6540));
+        espacios.sincronizar(huertoA.getId(), huertoA.getAreaM2(), List.of(huertoA.getDiseno()));
+        espacios.sincronizar(huertoB.getId(), huertoB.getAreaM2(), List.of(huertoB.getDiseno()));
+        cerramientos.sincronizar(huertoA.getId(), List.of("NATURAL"));
+        cerramientos.sincronizar(huertoB.getId(), List.of("CONVENCIONAL"));
 
         // Plantas: nombres comunes ilustrativos; sin propiedades medicinales ni recomendaciones (pendiente de fuentes).
         plantas.save(new Planta(huertoA.getId(), "Manzanilla", "Matricaria chamomilla",
@@ -105,7 +120,9 @@ public class DatosDemo implements ApplicationRunner {
         Usuario revisorB = crear("revisor_b", "Administrador Ministerio Demo B", Rol.ADMIN_MINISTERIO_SALUD);
         asignaciones.save(new AsignacionRevisor(revisorB.getId(), chimborazo.getId()));
 
-        log.info("Perfil demo: datos sintéticos cargados (2 comunidades, 9 cuentas de demostración).");
+        crear("admin_tecnico", "Administrador Técnico Demo", Rol.ADMIN_TECNICO);
+
+        log.info("Perfil demo: datos sintéticos cargados (2 comunidades, 11 cuentas de demostración).");
     }
 
     private Usuario crear(String nombreUsuario, String nombreCompleto, Rol rol) {

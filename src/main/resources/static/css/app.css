@@ -375,11 +375,13 @@ textarea.form-control { min-height: 6rem; }
     padding: .65rem .85rem;
 }
 
-.huerto-opcion { cursor: pointer; overflow: hidden; transition: border-color .15s ease, box-shadow .15s ease; }
+.huerto-opcion { cursor: pointer; overflow: hidden; position: relative; transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease; }
 .huerto-opcion:hover { border-color: #2f6b4f; }
-.btn-check:checked + .huerto-opcion { border: 2px solid #2f6b4f; box-shadow: 0 0 0 .2rem rgb(47 107 79 / 18%); }
+.btn-check:checked ~ .huerto-opcion { border: 3px solid #1f6848; background-color: #edf7ef; box-shadow: 0 0 0 .22rem rgb(47 107 79 / 24%); }
+.opcion-seleccionada { display: none; position: absolute; top: .5rem; right: .5rem; z-index: 2; border-radius: 999px; padding: .28rem .55rem; color: #fff; background: #1f6848; font-size: .78rem; font-weight: 700; box-shadow: 0 1px 4px rgb(0 0 0 / 25%); }
+.btn-check:checked ~ .huerto-opcion .opcion-seleccionada { display: inline-flex; align-items: center; }
 .btn-check:focus-visible + .huerto-opcion { outline: 3px solid #1b5e8a; outline-offset: 2px; }
-.ilustracion-opcion { height: 92px; object-fit: cover; }
+.ilustracion-opcion { height: 140px; object-fit: cover; }
 
 .huerto-virtual { border: 1px solid var(--borde); background: #f3efe6; min-height: 170px; }
 .huerto-virtual-suelo { width: min(100%, 320px); height: 110px; object-fit: cover; border-radius: .65rem; }

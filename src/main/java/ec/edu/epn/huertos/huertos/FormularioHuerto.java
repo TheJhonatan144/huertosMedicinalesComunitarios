@@ -6,6 +6,9 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotEmpty;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FormularioHuerto {
 
@@ -64,6 +67,9 @@ public class FormularioHuerto {
     @Pattern(regexp = "TIERRA_SURCOS|TIERRA_CAMADAS|TIERRA_CAMELLONES|TIERRA_TERRAZAS|VERTICAL_PAREDES|COLGANTE_TECHOS|PISO_MACETAS|PISO_BOTELLAS_PATIO|PISO_LLANTAS_PATIO|PISO_TERRAZA|PISO_GRADAS|PISO_BALCONES|PISO_FILOS_VENTANA", message = "Selecciona un diseño válido.")
     private String diseno;
 
+    @NotEmpty(message = "Selecciona al menos un espacio para el huerto.")
+    private List<String> disenos = new ArrayList<>();
+
     @NotBlank(message = "Selecciona el tipo de suelo.")
     private String tipoSuelo;
 
@@ -75,8 +81,10 @@ public class FormularioHuerto {
     @Pattern(regexp = "BARBECHO|RESTOS_VEGETALES|HOJA|COMPOST", message = "Selecciona un abono válido.")
     private String abonoNatural;
 
-    @NotBlank(message = "Selecciona el tipo de cerramiento.")
-    @Pattern(regexp = "VIVO_HIGUERILLA|VIVO_FLORIPONDIO|VIVO_AGAVE|VIVO_LAVANDA|VIVO_NARANJOS|VIVO_CAPULIES|VIVO_TOCTE|VIVO_GUABO|NATURAL_CANA_GUADUA|NATURAL_BAHAREQUE|NATURAL_TAPIAL|RECICLADO_TABLAS|RECICLADO_BOTELLAS|RECICLADO_NEUMATICOS|METALICO_ALAMBRE_PUAS|CONVENCIONAL_PIEDRA|CONVENCIONAL_LADRILLO|CONVENCIONAL_BLOQUE", message = "Selecciona un cerramiento válido.")
+    @Size(max = 5, message = "Selecciona hasta cinco tipos de cerca.")
+    private List<String> gruposCerramiento = new ArrayList<>();
+
+    // Solo conserva el valor anterior al modelo de varios grupos mientras se resuelven solicitudes pendientes.
     private String cerramiento;
 
     @DecimalMin(value = "-5.1", message = "La latitud está fuera de Ecuador.")
@@ -90,6 +98,15 @@ public class FormularioHuerto {
     private Double longitud;
 
     public static FormularioHuerto de(Huerto h, ec.edu.epn.huertos.comunidades.Comunidad c) {
+        return de(h, c, List.of(h.getDiseno()), List.of());
+    }
+
+    public static FormularioHuerto de(Huerto h, ec.edu.epn.huertos.comunidades.Comunidad c, List<String> disenosGuardados) {
+        return de(h, c, disenosGuardados, List.of());
+    }
+
+    public static FormularioHuerto de(Huerto h, ec.edu.epn.huertos.comunidades.Comunidad c,
+                                      List<String> disenosGuardados, List<String> gruposCerramiento) {
         FormularioHuerto f = new FormularioHuerto();
         f.nombreComunidad = c.getNombre(); f.descripcionComunidad = c.getDescripcion();
         f.tipoComunidad = c.getTipoComunidad(); f.provinciaComunidad = c.getProvincia();
@@ -99,7 +116,9 @@ public class FormularioHuerto {
         f.descripcion = h.getDescripcion();
         f.provincia = h.getProvincia(); f.parroquia = h.getParroquia(); f.direccion = h.getDireccion();
         f.areaM2 = h.getAreaM2(); f.diseno = h.getDiseno(); f.tipoSuelo = h.getTipoSuelo();
+        f.setDisenos(disenosGuardados == null || disenosGuardados.isEmpty() ? List.of(h.getDiseno()) : disenosGuardados);
         f.fuenteAgua = h.getFuenteAgua(); f.abonoNatural = h.getAbonoNatural(); f.cerramiento = h.getCerramiento();
+        f.setGruposCerramiento(gruposCerramiento);
         f.latitud = h.getLatitud(); f.longitud = h.getLongitud();
         return f;
     }
@@ -141,11 +160,22 @@ public class FormularioHuerto {
     public String getParroquia() { return parroquia; } public void setParroquia(String v) { parroquia = v; }
     public String getDireccion() { return direccion; } public void setDireccion(String v) { direccion = v; }
     public java.math.BigDecimal getAreaM2() { return areaM2; } public void setAreaM2(java.math.BigDecimal v) { areaM2 = v; }
-    public String getDiseno() { return diseno; } public void setDiseno(String v) { diseno = v; }
+    public String getDiseno() { return diseno; }
+    public void setDiseno(String v) {
+        diseno = v;
+        if ((disenos == null || disenos.isEmpty()) && v != null && !v.isBlank()) disenos = new ArrayList<>(List.of(v));
+    }
+    public List<String> getDisenos() { return disenos; }
+    public void setDisenos(List<String> v) {
+        disenos = v == null ? new ArrayList<>() : new ArrayList<>(v);
+        diseno = disenos.isEmpty() ? "" : disenos.getFirst();
+    }
     public String getTipoSuelo() { return tipoSuelo; } public void setTipoSuelo(String v) { tipoSuelo = v; }
     public String getFuenteAgua() { return fuenteAgua; } public void setFuenteAgua(String v) { fuenteAgua = v; }
     public String getAbonoNatural() { return abonoNatural; } public void setAbonoNatural(String v) { abonoNatural = v; }
     public String getCerramiento() { return cerramiento; } public void setCerramiento(String v) { cerramiento = v; }
+    public List<String> getGruposCerramiento() { return gruposCerramiento; }
+    public void setGruposCerramiento(List<String> v) { gruposCerramiento = v == null ? new ArrayList<>() : new ArrayList<>(v); }
     public Double getLatitud() { return latitud; } public void setLatitud(Double v) { latitud = v; }
     public Double getLongitud() { return longitud; } public void setLongitud(Double v) { longitud = v; }
 }

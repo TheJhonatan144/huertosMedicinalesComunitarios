@@ -9,7 +9,9 @@ RUN ./mvnw -q -B -DskipTests package
 
 # Etapa 2: ejecución con JRE mínimo y usuario sin privilegios
 FROM eclipse-temurin:21-jre
-RUN useradd --system --create-home --uid 10001 huertos \
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --create-home --uid 10001 huertos \
     && mkdir -p /datos/evidencias && chown -R huertos /datos
 WORKDIR /app
 COPY --from=build /app/target/huertos-medicinales-*.jar app.jar

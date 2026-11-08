@@ -24,6 +24,7 @@ Cada fila indica su **tipo**:
 | D-07 | Niveles Aprendiz, Oficial, Maestro; Maestro sin cupo máximo | Regla obligatoria del encargo (umbrales: ver RB06) | Implementada y verificada (reglas puras) |
 | D-08 | Revisor solo de comunidades asignadas y sin autorrevisión | Regla obligatoria del encargo | Implementada y verificada |
 | D-09 | Sin duplicación de recompensas por reintentos, dobles clics, reenvíos o revisiones concurrentes | Regla obligatoria del encargo | Implementada y verificada con PostgreSQL real |
+| D-10 | Cada comunidad tiene un único administrador MSP responsable; cada administrador puede tener varias comunidades. Las nuevas asignaciones se distribuyen automáticamente entre administradores activos con menor carga y las reasignaciones son controladas | Regla funcional acordada por el equipo | Implementada (índice único y asignación automática) |
 
 ## Contradicción RF10 vs RB05/RB09 (registrada, no corregida en la fuente)
 
