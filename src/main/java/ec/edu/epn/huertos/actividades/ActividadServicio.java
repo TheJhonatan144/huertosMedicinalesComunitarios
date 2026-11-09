@@ -14,6 +14,8 @@ import ec.edu.epn.huertos.evidencias.EnvioEvidenciaRepository;
 import ec.edu.epn.huertos.evidencias.EstadoRevision;
 import ec.edu.epn.huertos.evidencias.ImagenValidada;
 import ec.edu.epn.huertos.evidencias.ValidadorImagen;
+import ec.edu.epn.huertos.evidencias.ValidadorVideo;
+import ec.edu.epn.huertos.evidencias.VideoValidado;
 import ec.edu.epn.huertos.huertos.Huerto;
 import ec.edu.epn.huertos.huertos.HuertoRepository;
 import java.time.LocalDate;
@@ -37,12 +39,13 @@ public class ActividadServicio {
     private final IntegranteRepository integrantes;
     private final EnvioEvidenciaRepository envios;
     private final ValidadorImagen validador;
+    private final ValidadorVideo validadorVideo;
     private final AlmacenamientoArchivos almacenamiento;
 
     public ActividadServicio(ComunidadServicio comunidades, HuertoRepository huertos, ActividadRepository actividades,
                              ActividadParticipanteRepository participantes, IntegranteRepository integrantes,
                              EnvioEvidenciaRepository envios, ValidadorImagen validador,
-                             AlmacenamientoArchivos almacenamiento) {
+                             AlmacenamientoArchivos almacenamiento, ValidadorVideo validadorVideo) {
         this.comunidades = comunidades;
         this.huertos = huertos;
         this.actividades = actividades;
@@ -51,17 +54,19 @@ public class ActividadServicio {
         this.envios = envios;
         this.validador = validador;
         this.almacenamiento = almacenamiento;
+        this.validadorVideo = validadorVideo;
     }
 
     @Transactional
     public Long registrar(Long gestorUsuarioId, FormularioActividad form, MultipartFile foto) {
         Integrante gestor = comunidades.gestorDe(gestorUsuarioId);
+        comunidades.exigirComunidadOperativa(gestor.getComunidadId());
         Huerto huerto = huertos.findByComunidadId(gestor.getComunidadId())
                 .orElseThrow(() -> new ReglaNegocioException("Tu comunidad aún no tiene un huerto registrado."));
         validarFecha(form.getFecha());
         List<Integrante> seleccion = validarParticipantes(gestor, form.getParticipanteIds());
-        ImagenValidada imagen = validador.validar(foto);
-
+        Object evidencia = validarArchivo(foto);
+        try {
         Actividad actividad = actividades.save(new Actividad(gestor.getComunidadId(), huerto.getId(), gestorUsuarioId,
                 form.getTipo(), form.getDescripcion().trim(), form.getFecha()));
         for (Integrante i : seleccion) {
@@ -69,14 +74,16 @@ public class ActividadServicio {
         }
         participantes.flush();
         actividad.fijarParticipantes();
-        envios.save(new EnvioEvidencia(actividad.getId(), 1, guardarConLimpieza(imagen), imagen, null));
+        guardarEnvio(actividad.getId(), 1, evidencia, null);
         return actividad.getId();
+        } finally { limpiarTemporal(evidencia); }
     }
 
     /** Edición permitida solo mientras la actividad está pendiente; nunca toca los participantes. */
     @Transactional
     public void editar(Long gestorUsuarioId, Long actividadId, FormularioActividad form) {
         Integrante gestor = comunidades.gestorDe(gestorUsuarioId);
+        comunidades.exigirComunidadOperativa(gestor.getComunidadId());
         Actividad actividad = actividadDe(gestor, actividadId);
         if (actividad.getEstado() != EstadoRevision.PENDIENTE) {
             throw new ConflictoException("Solo se puede editar una actividad mientras está pendiente de revisión.");
@@ -90,6 +97,7 @@ public class ActividadServicio {
     public void reenviar(Long gestorUsuarioId, Long actividadId, FormularioActividad form, String comentario,
                          MultipartFile foto) {
         Integrante gestor = comunidades.gestorDe(gestorUsuarioId);
+        comunidades.exigirComunidadOperativa(gestor.getComunidadId());
         Actividad actividad = actividades.bloquearPorId(actividadId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("La actividad no existe."));
         if (!actividad.getComunidadId().equals(gestor.getComunidadId())) {
@@ -99,11 +107,13 @@ public class ActividadServicio {
             throw new ConflictoException("Solo se puede reenviar una actividad que fue rechazada.");
         }
         validarFecha(form.getFecha());
-        ImagenValidada imagen = validador.validar(foto);
+        Object evidencia = validarArchivo(foto);
+        try {
         int numero = envios.ultimoNumero(actividadId) + 1;
         actividad.editar(form.getTipo(), form.getDescripcion().trim(), form.getFecha());
         actividad.reabrirPorReenvio();
-        envios.save(new EnvioEvidencia(actividadId, numero, guardarConLimpieza(imagen), imagen, comentario));
+        guardarEnvio(actividadId, numero, evidencia, comentario);
+        } finally { limpiarTemporal(evidencia); }
     }
 
     @Transactional(readOnly = true)
@@ -141,7 +151,7 @@ public class ActividadServicio {
             throw new ReglaNegocioException("Selecciona al menos un participante.");
         }
         LinkedHashSet<Long> unicos = new LinkedHashSet<>(ids);
-        if (unicos.size() > comunidades.cupoMaximo()) {
+        if (unicos.size() > comunidades.cupoMaximo(gestor.getComunidadId())) {
             throw new ReglaNegocioException("La lista de participantes excede el máximo de la comunidad.");
         }
         List<Integrante> encontrados = integrantes.findAllById(unicos);
@@ -177,5 +187,34 @@ public class ActividadServicio {
             }
         });
         return clave;
+    }
+
+    private Object validarArchivo(MultipartFile archivo) {
+        String nombre = archivo == null ? "" : archivo.getOriginalFilename();
+        return nombre != null && nombre.toLowerCase(java.util.Locale.ROOT).endsWith(".mp4")
+                ? validadorVideo.validar(archivo) : validador.validar(archivo);
+    }
+
+    private void guardarEnvio(Long actividadId, int numero, Object evidencia, String comentario) {
+        if (evidencia instanceof VideoValidado video) {
+            envios.save(new EnvioEvidencia(actividadId, numero, guardarConLimpieza(video), video, comentario));
+        } else {
+            ImagenValidada imagen = (ImagenValidada) evidencia;
+            envios.save(new EnvioEvidencia(actividadId, numero, guardarConLimpieza(imagen), imagen, comentario));
+        }
+    }
+
+    private String guardarConLimpieza(VideoValidado video) {
+        String clave = almacenamiento.guardar(video);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override public void afterCompletion(int estado) { if (estado != STATUS_COMMITTED) almacenamiento.eliminar(clave); }
+        });
+        return clave;
+    }
+
+    private void limpiarTemporal(Object evidencia) {
+        if (evidencia instanceof VideoValidado video) {
+            try { java.nio.file.Files.deleteIfExists(video.temporal()); } catch (java.io.IOException ignored) { }
+        }
     }
 }

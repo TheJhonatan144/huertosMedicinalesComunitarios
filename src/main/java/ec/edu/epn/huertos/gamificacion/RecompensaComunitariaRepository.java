@@ -23,6 +23,7 @@ public interface RecompensaComunitariaRepository extends JpaRepository<Recompens
             select new ec.edu.epn.huertos.gamificacion.PuntosComunidad(c.id, c.nombre, c.provincia, coalesce(sum(r.puntos), 0L))
             from ec.edu.epn.huertos.comunidades.Comunidad c
               left join RecompensaComunitaria r on r.comunidadId = c.id
+            where c.activa = true and c.eliminacionPendiente = false
             group by c.id, c.nombre, c.provincia
             order by coalesce(sum(r.puntos), 0L) desc, c.nombre asc
             """)

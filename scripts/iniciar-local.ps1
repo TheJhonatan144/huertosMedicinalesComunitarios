@@ -19,6 +19,9 @@ $env:DB_USUARIO = $valores['DB_USUARIO'] ?? 'huertos'
 $env:DB_CLAVE = $valores['DB_CLAVE']
 $env:DEMO_CLAVE = $valores['DEMO_CLAVE'] ?? 'Demo-2026!'
 $env:SPRING_PROFILES_ACTIVE = $valores['PERFIL'] ?? 'demo'
-$env:SERVER_PORT = $valores['APP_PUERTO'] ?? '8080'
+$env:SERVER_PORT = $valores['APP_PUERTO'] ?? '8081'
+$env:ADMIN_TECNICO_USUARIO = $valores['ADMIN_TECNICO_USUARIO'] ?? ''
+$env:ADMIN_TECNICO_NOMBRE = $valores['ADMIN_TECNICO_NOMBRE'] ?? ''
+$env:ADMIN_TECNICO_CLAVE = $valores['ADMIN_TECNICO_CLAVE'] ?? ''
 
 .\mvnw.cmd spring-boot:run

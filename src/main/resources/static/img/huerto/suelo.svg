@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" role="img" aria-label="Ilustración de capas de suelo">
+  <rect width="320" height="150" rx="14" fill="#edf5e8"/><path d="M18 61q70-18 142 0t142 0v89H18Z" fill="#855c3a"/>
+  <path d="M18 85q72-16 142 0t142 0v26q-72 16-142 0T18 111Z" fill="#b27a4f"/>
+  <path d="M18 112q72-15 142 0t142 0v38H18Z" fill="#d3aa73"/>
+  <path d="M89 70V32m0 24c-17 0-23-11-23-22 13 0 23 8 23 22Zm0-10c15 0 22-11 22-22-13 0-22 8-22 22Z" fill="#498754"/>
+  <path d="M225 70V25m0 32c-19 0-26-13-26-25 15 0 26 9 26 25Zm0-13c16 0 24-12 24-24-14 0-24 9-24 24Z" fill="#5b9b5f"/>
+</svg>

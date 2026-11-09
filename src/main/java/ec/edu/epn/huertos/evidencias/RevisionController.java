@@ -3,6 +3,7 @@ package ec.edu.epn.huertos.evidencias;
 import ec.edu.epn.huertos.autenticacion.UsuarioAutenticado;
 import ec.edu.epn.huertos.compartido.ConflictoException;
 import ec.edu.epn.huertos.compartido.ReglaNegocioException;
+import ec.edu.epn.huertos.comunidades.AsignacionRevisorServicio;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,14 +17,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class RevisionController {
 
     private final RevisionServicio revision;
+    private final AsignacionRevisorServicio asignaciones;
 
-    public RevisionController(RevisionServicio revision) {
+    public RevisionController(RevisionServicio revision, AsignacionRevisorServicio asignaciones) {
         this.revision = revision;
+        this.asignaciones = asignaciones;
     }
 
     @GetMapping("/revision")
     String bandeja(@AuthenticationPrincipal UsuarioAutenticado usuario, Model model) {
         model.addAttribute("items", revision.bandeja(usuario.getId()));
+        var comunidades = asignaciones.comunidadesAsignadas(usuario.getId());
+        model.addAttribute("comunidadesAsignadas", comunidades);
+        model.addAttribute("cantidadComunidades", comunidades.size());
         return "revision/bandeja";
     }
 

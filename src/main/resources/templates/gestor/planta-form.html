@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragmentos/base :: pagina('Planta', ~{::section})}">
+      th:replace="~{fragmentos/base :: pagina(titulo='Planta', contenido=~{::section}, avisosPlantas=true)}">
 <body>
 <section>
+    <link rel="stylesheet" th:href="@{/css/plantas.css}">
+    <nav th:replace="~{fragmentos/plantas :: pestanas('mis-plantas')}"></nav>
     <h1 class="h3">Planta</h1>
     <form th:action="@{${accion}}" th:object="${form}" method="post" data-una-vez novalidate>
         <div class="mb-3">

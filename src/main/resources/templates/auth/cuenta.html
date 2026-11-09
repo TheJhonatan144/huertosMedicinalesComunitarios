@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina('Mi cuenta', ~{::section})}">
+<body><section class="mx-auto" style="max-width: 48rem">
+    <h1 class="h3">Tu cuenta está lista</h1>
+    <p>Tu perfil está guardado y actualmente no está vinculado a una comunidad.</p>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-huerto" th:href="@{/cuenta/comunidad/nueva}">Crear comunidad y huerta</a>
+        <a class="btn btn-outline-success" th:href="@{/cuenta/invitaciones}">Unirme a una comunidad</a>
+        <a class="btn btn-outline-success" th:href="@{/cuenta/archivadas}">Ver huertas archivadas</a>
+        <a class="btn btn-outline-success" th:href="@{/cuenta/solicitudes-comunidad}">Mis solicitudes</a>
+        <a class="btn btn-outline-success" th:href="@{/mapa}">Explorar el mapa</a>
+    </div>
+    <p class="form-text mt-2" id="unirse-pendiente">Para unirte, acepta una invitación enviada por el gestor de la comunidad.</p>
+    <p th:if="${mensaje}" class="small mt-3">Tu permiso se actualizó; cierra sesión y vuelve a entrar para abrir el panel de gestor.</p>
+</section></body></html>

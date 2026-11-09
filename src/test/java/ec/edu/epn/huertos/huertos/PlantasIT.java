@@ -6,6 +6,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import ec.edu.epn.huertos.FabricaDatos;
@@ -23,6 +24,7 @@ class PlantasIT extends PruebaIntegracion {
 
     @Autowired FabricaDatos fabrica;
     @Autowired HuertoServicio servicio;
+    @Autowired CatalogoServicio catalogo;
     @Autowired MockMvc mvc;
 
     private FormularioPlanta form(String nombre, int cantidad) {
@@ -37,13 +39,15 @@ class PlantasIT extends PruebaIntegracion {
         Escenario e = fabrica.escenario(1);
         Long id1 = servicio.crearPlanta(e.gestorUsuario().getId(), form("Hierba de prueba", 4)).getId();
         Long id2 = servicio.crearPlanta(e.gestorUsuario().getId(), form("Planta inactiva", 1)).getId();
+        // Editar la planta cambia sus datos propios, no el nombre de la especie compartida del catálogo.
         servicio.actualizarPlanta(e.gestorUsuario().getId(), id1, form("Hierba editada", 9));
+        assertThat(servicio.plantaDeGestor(e.gestorUsuario().getId(), id1).getCantidad()).isEqualTo(9);
         servicio.cambiarEstadoPlanta(e.gestorUsuario().getId(), id2, false);
 
         assertThat(servicio.plantasDeGestor(e.gestorUsuario().getId())).hasSize(2);
         String publica = mvc.perform(get("/comunidades/" + e.comunidad().getId())).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        assertThat(publica).contains("Hierba editada").doesNotContain("Planta inactiva");
+        assertThat(publica).contains("Hierba de prueba").doesNotContain("Hierba editada").doesNotContain("Planta inactiva");
     }
 
     @Test
@@ -66,12 +70,43 @@ class PlantasIT extends PruebaIntegracion {
     }
 
     @Test
-    void validaLosDatosDelFormulario() throws Exception {
-        Escenario e = fabrica.escenario(1);
-        String html = mvc.perform(post("/gestor/plantas").with(user(new UsuarioAutenticado(e.gestorUsuario()))).with(csrf())
-                        .param("nombreComun", "  ").param("cantidad", "-3"))
+    void eliminarUnaPlantaSoloQuitaElRegistroDeSuHuerto() throws Exception {
+        Escenario a = fabrica.escenario(1);
+        Escenario b = fabrica.escenario(1);
+        var form = form("Planta para eliminar", 2);
+        form.setPlantada(true);
+        var planta = servicio.crearPlanta(a.gestorUsuario().getId(), form);
+        Long especieId = planta.getEspecie().getId();
+        var siembra = new SiembraPlanta();
+        siembra.setCantidad(7);
+        siembra.setPlantada(true);
+        var otra = catalogo.seleccionar(b.gestorUsuario().getId(), especieId, siembra);
+        String ruta = "/gestor/plantas/" + planta.getId() + "/eliminar";
+        var gestorA = new UsuarioAutenticado(a.gestorUsuario());
+        var gestorB = new UsuarioAutenticado(b.gestorUsuario());
+
+        String lista = mvc.perform(get("/gestor/plantas").with(user(gestorA)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        assertThat(html).contains("Indica el nombre común").contains("La cantidad no puede ser negativa");
+        assertThat(lista).contains("action=\"" + ruta + "\"", "data-confirmar=");
+        mvc.perform(post(ruta).with(user(gestorB)).with(csrf())).andExpect(status().isForbidden());
+        mvc.perform(post(ruta).with(user(gestorA))).andExpect(status().isForbidden());
+        assertThat(servicio.plantasPlantadasDeGestor(a.gestorUsuario().getId())).hasSize(1);
+        mvc.perform(post(ruta).with(user(gestorA)).with(csrf()))
+                .andExpect(redirectedUrl("/gestor/plantas"));
+
+        assertThat(servicio.plantasDeGestor(a.gestorUsuario().getId())).isEmpty();
+        assertThat(servicio.plantasPlantadasDeGestor(a.gestorUsuario().getId())).isEmpty();
+        assertThat(servicio.plantaDeGestor(b.gestorUsuario().getId(), otra.getId()).getCantidad()).isEqualTo(7);
+        var registradaDeNuevo = catalogo.seleccionar(a.gestorUsuario().getId(), especieId, new SiembraPlanta());
+        assertThat(registradaDeNuevo.getEspecie().getId()).isEqualTo(especieId);
+    }
+
+    @Test
+    void elGestorNoPuedeCrearUnaEspeciePorElFormularioAnterior() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        mvc.perform(post("/gestor/plantas").with(user(new UsuarioAutenticado(e.gestorUsuario()))).with(csrf())
+                        .param("nombreComun", "Especie no autorizada").param("cantidad", "1"))
+                .andExpect(status().isForbidden());
         assertThat(servicio.plantasDeGestor(e.gestorUsuario().getId())).isEmpty();
     }
 }

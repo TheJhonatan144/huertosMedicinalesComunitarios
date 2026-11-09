@@ -17,9 +17,13 @@ public class AutorizacionServicio {
     }
 
     public Usuario exigirRol(Long usuarioId, Rol rol) {
+        return exigirAlgunRol(usuarioId, rol);
+    }
+
+    public Usuario exigirAlgunRol(Long usuarioId, Rol... roles) {
         Usuario usuario = usuarioId == null ? null : usuarios.findById(usuarioId).orElse(null);
-        if (usuario == null || !usuario.isActivo() || usuario.getRol() != rol) {
-            throw new AccessDeniedException("Se requiere el rol " + rol.etiqueta());
+        if (usuario == null || !usuario.isActivo() || !java.util.Arrays.asList(roles).contains(usuario.getRol())) {
+            throw new AccessDeniedException("Tu cuenta no tiene permiso para esta acción.");
         }
         return usuario;
     }

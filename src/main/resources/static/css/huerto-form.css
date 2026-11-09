@@ -1,0 +1,129 @@
+/* Formulario del huerto (sección 3): tarjetas seleccionables. Prefijo hf-. Sin JavaScript. */
+
+.hf-bloque {
+    --hf-verde-oscuro: #31543A;
+    --hf-verde: #4F7A4D;
+    --hf-verde-claro: #9CCB86;
+    --hf-crema: #FAF6EA;
+    --hf-terracota: #C87955;
+    --hf-sol: #E8BD59;
+}
+
+.hf-bloque-huerto { border-top: 1px solid var(--borde); padding-top: .5rem; }
+
+.hf-grupo { min-width: 0; }
+.hf-grupo legend { margin-bottom: .25rem; }
+.hf-ayuda { color: var(--texto-suave); font-size: .9rem; margin-bottom: .75rem; }
+.hf-error {
+    color: var(--error);
+    font-weight: 600;
+    font-size: .9rem;
+    margin-bottom: .75rem;
+}
+
+.hf-familia + .hf-familia { margin-top: 1rem; }
+.hf-familia-titulo {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--hf-verde-oscuro);
+    margin-bottom: .5rem;
+}
+
+.hf-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: .75rem;
+}
+
+.hf-opcion { position: relative; min-width: 0; }
+
+/* El radio sigue siendo el control real: oculto a la vista pero enfocable y anunciado por el lector de pantalla. */
+.hf-radio {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    margin: 0;
+}
+
+.hf-tarjeta {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    height: 100%;
+    padding: .5rem;
+    background: var(--superficie);
+    border: 2px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+}
+.hf-tarjeta:hover { border-color: var(--hf-verde); }
+
+.hf-ilustracion {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 120 / 72;
+    border-radius: var(--radio-sm);
+    background: var(--hf-crema);
+}
+
+.hf-nombre {
+    color: var(--texto);
+    font-weight: 600;
+    font-size: .9rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+/* Seleccionada: borde verde claro, fondo crema y marca ✓ (no depende solo del color). */
+.hf-radio:checked + .hf-tarjeta {
+    border-color: var(--hf-verde-claro);
+    background: var(--hf-crema);
+    box-shadow: 0 0 0 3px var(--hf-verde-claro);
+}
+.hf-radio:checked + .hf-tarjeta::after {
+    content: "✓" / "";
+    position: absolute;
+    top: .4rem;
+    right: .4rem;
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--hf-verde-oscuro);
+    color: #fff;
+    font-weight: 700;
+    font-size: .95rem;
+    line-height: 1;
+}
+.hf-radio:checked + .hf-tarjeta .hf-nombre { color: var(--hf-verde-oscuro); }
+
+/* Foco de teclado visible y distinto de la selección. */
+.hf-radio:focus-visible + .hf-tarjeta {
+    outline: 3px solid var(--hf-verde-oscuro);
+    outline-offset: 3px;
+}
+
+/* Móvil: tarjetas apiladas en una columna, ilustración a la izquierda. */
+@media (max-width: 575.98px) {
+    .hf-tarjetas { grid-template-columns: 1fr; gap: .5rem; }
+    .hf-tarjeta { flex-direction: row; align-items: center; padding: .4rem 2.4rem .4rem .4rem; }
+    .hf-ilustracion { width: 84px; flex: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hf-tarjeta { transition: none; }
+}
+
+/* Modo de alto contraste de Windows: la selección se marca con el color del sistema. */
+@media (forced-colors: active) {
+    .hf-radio:checked + .hf-tarjeta { outline: 4px solid Highlight; outline-offset: -4px; }
+    .hf-radio:checked + .hf-tarjeta::after { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+}

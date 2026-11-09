@@ -66,7 +66,7 @@ public class DetalleActividadServicio {
         List<DetalleActividad.EnvioVista> vistaEnvios = listaEnvios.stream().map(e -> {
             Revision r = porEnvio.get(e.getId());
             return new DetalleActividad.EnvioVista(e.getId(), e.getNumero(), Fechas.hora(e.getEnviadoEn()),
-                    e.getEstado(), e.getComentario(), e.getNombreOriginal(),
+                    e.getEstado(), e.getComentario(), e.getNombreOriginal(), e.getTipoContenido(), e.getDuracionSegundos(),
                     r == null ? null : nombres.get(r.getRevisorId()),
                     r == null ? null : Fechas.hora(r.getRevisadaEn()),
                     r == null ? null : r.getObservaciones());

@@ -17,8 +17,9 @@
         <li class="list-inline-item badge text-bg-light fw-normal fs-6" th:each="p : ${a.participantes()}" th:text="${p.nombre()}">Nombre</li>
     </ul>
 
-    <h2 class="h5 mt-3">Evidencia fotográfica (envío <span th:text="${revision.numeroEnvio()}">1</span>)</h2>
-    <img class="foto-evidencia" th:src="@{/evidencias/envios/{id}/foto(id=${revision.envioId()})}" alt="Fotografía enviada como evidencia de la actividad">
+    <h2 class="h5 mt-3">Evidencia (envío <span th:text="${revision.numeroEnvio()}">1</span>)</h2>
+    <img th:if="${revision.tipoContenido().startsWith('image/')}" class="foto-evidencia" th:src="@{/evidencias/envios/{id}/foto(id=${revision.envioId()})}" alt="Fotografía enviada como evidencia de la actividad">
+    <video th:if="${revision.tipoContenido() == 'video/mp4'}" controls preload="metadata" class="w-100" style="max-height: 36rem" th:src="@{/evidencias/envios/{id}/foto(id=${revision.envioId()})}">Tu navegador no puede reproducir este video.</video>
 
     <div class="mt-4" th:if="${revision.estadoEnvio().name() == 'PENDIENTE'}">
         <form th:action="@{/revision/envios/{id}/decision(id=${revision.envioId()})}" method="post" data-una-vez>

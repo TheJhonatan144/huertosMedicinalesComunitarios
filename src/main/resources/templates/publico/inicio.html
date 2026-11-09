@@ -11,6 +11,10 @@
         </p>
         <a class="btn btn-huerto me-2" th:href="@{/mapa}">Explorar el mapa</a>
         <a class="btn btn-outline-success" th:href="@{/ranking}">Ver el ranking</a>
+        <div class="mt-3 d-flex flex-wrap gap-2" th:if="${usuarioActual == null}">
+            <a class="btn btn-dark" th:href="@{/login}">Iniciar sesión</a>
+            <a class="btn btn-outline-dark" th:href="@{/registro}">Registrarse</a>
+        </div>
     </div>
 
     <div class="row g-4">

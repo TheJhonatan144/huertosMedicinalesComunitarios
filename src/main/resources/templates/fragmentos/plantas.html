@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav class="plantas-pestanas" aria-label="Secciones de Plantas" th:fragment="pestanas(activa)">
+    <a th:href="@{/gestor/plantas}"
+       th:attr="aria-current=${activa == 'mis-plantas' ? 'page' : null}">Mis plantas</a>
+    <a th:href="@{/gestor/plantas/catalogo}"
+       th:attr="aria-current=${activa == 'catalogo' ? 'page' : null}">Catálogo común</a>
+    <a th:href="@{/gestor/bodega}"
+       th:attr="aria-current=${activa == 'bodega' ? 'page' : null}">Bodega</a>
+</nav>
+
+<div class="toast-container plantas-avisos position-fixed bottom-0 end-0 p-3"
+     th:fragment="avisos" th:if="${mensaje != null or error != null}">
+    <div class="toast show plantas-aviso" th:if="${mensaje}">
+        <div class="plantas-aviso-contenido" role="status">
+            <span class="plantas-aviso-icono" aria-hidden="true">✓</span>
+            <div>
+                <strong>Cambio guardado</strong>
+                <p class="mb-0" th:text="${mensaje}"></p>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar aviso"></button>
+    </div>
+    <div class="toast show plantas-aviso plantas-aviso-error" th:if="${error}">
+        <div class="plantas-aviso-contenido" role="alert">
+            <span class="plantas-aviso-icono" aria-hidden="true">!</span>
+            <div>
+                <strong>No se pudo completar el cambio</strong>
+                <p class="mb-0" th:text="${error}"></p>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar aviso"></button>
+    </div>
+</div>
+</body>
+</html>

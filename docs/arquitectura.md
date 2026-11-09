@@ -7,7 +7,7 @@
 | Módulo (paquete) | Contenido |
 |---|---|
 | `autenticacion` | `Usuario`, `Rol`, `UsuarioAutenticado`, `AutorizacionServicio` (rol verificado contra la BD), login/panel |
-| `comunidades` | `Comunidad`, `Integrante`, `AsignacionRevisor`, `ComunidadServicio` (cupo, bajas, reactivaciones), panel del gestor |
+| `comunidades` | `Comunidad`, `Integrante`, `AsignacionRevisor`, `ComunidadServicio` (cupo, bajas, invitaciones aceptadas e historial de archivos), panel del gestor |
 | `huertos` | `Huerto`, `Planta`, `HuertoServicio`, formularios y controlador del gestor |
 | `actividades` | `Actividad`, `ActividadParticipante`, `ActividadServicio`, `DetalleActividadServicio`, panel del participante |
 | `evidencias` | `EnvioEvidencia`, `Revision`, `RevisionServicio`, `EvidenciaServicio`, `ValidadorImagen`, `AlmacenamientoArchivos`/`AlmacenamientoLocal` |
@@ -28,7 +28,7 @@ Las entidades guardan identificadores de otras entidades (no asociaciones JPA) p
 | Visitante | (anónimo) | Solo consulta pública |
 | Gestor de huerto | `GESTOR_HUERTO` | Su comunidad y huerto |
 | Participante | `PARTICIPANTE` | Datos propios y públicos |
-| Administrador de evidencias | `ADMIN_EVIDENCIAS` | Solo comunidades asignadas; sin autorrevisión |
+| Administrador del Ministerio de Salud | `ADMIN_MINISTERIO_SALUD` | Cuenta institucional; revisa evidencias y aprueba solicitudes de creación y eliminación comunitaria |
 
 ## Control de acceso (defensa en capas)
 
@@ -40,17 +40,17 @@ Las entidades guardan identificadores de otras entidades (no asociaciones JPA) p
 Además: CSRF activo (formularios y logout por POST), contraseñas con hash (`{bcrypt}` vía `DelegatingPasswordEncoder`),
 cabeceras CSP/Referrer-Policy, cookies de sesión `HttpOnly` y `SameSite=Lax`, validación de entrada en servidor (Bean Validation y reglas de servicio).
 
-## Modelo de datos (Flyway V1–V3)
+## Modelo de datos (Flyway V1–V15)
 
 `usuario` · `comunidad` · `integrante` · `asignacion_revisor` · `huerto` · `planta` · `actividad` · `actividad_participante` ·
-`envio_evidencia` · `revision` · `recompensa_individual` · `recompensa_comunitaria`.
+`envio_evidencia` · `revision` · `recompensa_individual` · `recompensa_comunitaria` · `invitacion_comunidad`. V6 conserva pertenencias inactivas y restringe cada cuenta a una sola pertenencia activa. V7 permite cuentas sin comunidad y guarda su perfil; V8 completa los datos del huerto; V9 gestiona invitaciones y traspasos; V10 permite archivar comunidades conservando su historial; V11 registra el estado `plantada` separado de `activa`; V12 agrega datos de comunidad y amplía opciones de diseño y cerramiento.
 Los totales (puntos, progreso, nivel) **se derivan** de los movimientos de recompensa: no hay contadores que puedan desincronizarse.
 
 ## Cómo se garantizan las reglas críticas
 
 | Regla | Mecanismo en servicio | Respaldo en base de datos |
 |---|---|---|
-| Máximo 25 integrantes activos (incl. gestor); una baja libera cupo | `ComunidadServicio.reactivar` bloquea la fila de `comunidad` (`FOR UPDATE`) y cuenta | Trigger `validar_cupo_comunidad`: bloquea la misma fila y cuenta con una instantánea nueva; la 2.ª transacción espera y ve el alta de la 1.ª |
+| Cupo por tipo de comunidad (incl. gestor): persona 1, familia 10, condominio 20, barrio 25; una baja libera cupo | `ComunidadServicio.aceptarInvitacion` aplica el límite del tipo, bloquea la fila de `comunidad` (`FOR UPDATE`) y cuenta; para volver después de una baja hace falta aceptar una invitación nueva | Trigger `validar_cupo_comunidad` aplica los mismos límites, bloquea la fila y cuenta con una instantánea nueva; la 2.ª transacción espera y ve el alta de la 1.ª |
 | Participantes solo activos y de la comunidad | `ActividadServicio.validarParticipantes` | FK compuestas `(integrante_id, comunidad_id)` y `(actividad_id, comunidad_id)` |
 | Lista fija de participantes | Se asigna al registrar y se marca `participantes_fijados` | Triggers: `INSERT` rechazado si está fijada; `UPDATE`/`DELETE` siempre rechazados |
 | Una sola decisión por envío | `RevisionServicio.decidir` bloquea el envío (`PESSIMISTIC_WRITE` = `SELECT … FOR UPDATE`) y exige estado `PENDIENTE`; el perdedor recibe `ConflictoException` sin efectos | `UNIQUE (envio_id)` en `revision`; índices parciales: un solo envío `PENDIENTE` y uno `APROBADA` por actividad |
