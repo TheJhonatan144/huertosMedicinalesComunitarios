@@ -44,4 +44,15 @@ class HuertoVirtualTest {
         assertThat(cinco.hayMasPlantas()).isTrue();
         assertThat(cinco.descripcionTextual()).contains("2 plantas: A y B").contains("de 5 plantadas");
     }
+
+    @Test
+    void laCuadriculaCrecePorColumnasParaMantenerLaParcelaCuadrada() {
+        int[][] casos = {{0, 1}, {1, 1}, {2, 2}, {4, 2}, {5, 3}, {9, 3}};
+        for (int[] caso : casos) {
+            List<HuertoVirtual.PlantaVirtual> ps = java.util.stream.IntStream.range(0, caso[0])
+                    .mapToObj(i -> new HuertoVirtual.PlantaVirtual("P" + i, "generica")).toList();
+            assertThat(new HuertoVirtual("H", "LIMOSO", "PISO_MACETAS", ps, caso[0], null, false).columnas())
+                    .as(caso[0] + " plantas").isEqualTo(caso[1]);
+        }
+    }
 }

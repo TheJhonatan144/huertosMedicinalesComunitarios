@@ -140,25 +140,31 @@ class HuertoVirtualIT extends PruebaIntegracion {
     }
 
     @Test
-    void sePuedenMarcarMasDeDosPlantadasYElDibujoMuestraDosEnOrdenConElTotal() throws Exception {
+    void laParcelaDibujaTodasLasPlantadasEnCuadriculaYSoloCortaPasadasLasNueve() throws Exception {
         Escenario e = fabrica.escenario(1);
         Long gestor = e.gestorUsuario().getId();
-        // «plantada» es el estado real y no se limita: la tercera y la cuarta se aceptan por el mismo servicio.
         for (String n : List.of("Ruda", "Albahaca", "Menta")) plantada(e, n, 1);
         Long inactiva = plantada(e, "Aaa inactiva", 1);
         huertos.cambiarEstadoPlanta(gestor, inactiva, false);
         assertThat(huertos.plantasPlantadasDeGestor(gestor)).hasSize(4);
 
         HuertoVirtual v = virtual.paraGestor(gestor);
-        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Menta");
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Menta", "Ruda");
         assertThat(v.totalPlantas()).isEqualTo(3);
+        assertThat(v.columnas()).isEqualTo(2);
 
         String html = fragmento(e);
-        assertThat(ocurrencias(html, "class=\"hv-etiqueta-madera\"")).isEqualTo(2);
-        assertThat(ocurrencias(html, "class=\"hv-sprite\"")).isEqualTo(2);
-        assertThat(html).contains("Ilustración de Albahaca").contains("Ilustración de Menta")
-                .doesNotContain("Ilustración de Ruda").doesNotContain("Aaa inactiva");
-        assertThat(html.replaceAll("\\s+", " ")).contains("Mostrando <span>2</span> de <span>3</span> plantadas.");
+        assertThat(ocurrencias(html, "class=\"hv-etiqueta-madera\"")).isEqualTo(3);
+        assertThat(ocurrencias(html, "class=\"hv-sprite\"")).isEqualTo(3);
+        assertThat(html).contains("hv-cols-2").contains("Ilustración de Ruda").doesNotContain("Aaa inactiva")
+                .doesNotContain("Mostrando");
+
+        for (int i = 0; i < 7; i++) plantada(e, "Zeta " + i, 1);                // 10 activas plantadas en total
+        HuertoVirtual diez = virtual.paraGestor(gestor);
+        assertThat(diez.plantas()).hasSize(9);
+        assertThat(diez.totalPlantas()).isEqualTo(10);
+        assertThat(diez.columnas()).isEqualTo(3);
+        assertThat(fragmento(e).replaceAll("\\s+", " ")).contains("Mostrando <span>9</span> de <span>10</span> plantadas.");
     }
 
     @Test
@@ -231,18 +237,17 @@ class HuertoVirtualIT extends PruebaIntegracion {
         plantada(e, "Menta", 1);
         Long ruda = plantada(e, "Ruda", 1);
         assertThat(virtual.paraGestor(gestor).plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre)
-                .containsExactly("Albahaca", "Menta");
+                .containsExactly("Albahaca", "Menta", "Ruda");
 
         // Se renombra la especie de «Ruda» en el catálogo; la columna planta.nombre_comun conserva «Ruda».
         Long especieId = huertos.plantaDeGestor(gestor, ruda).getEspecie().getId();
         FichaEspecie ficha = FichaEspecie.de(catalogo.obtener(gestor, especieId));
         ficha.setNombreComun("Anís");
-        catalogo.guardar(gestor, especieId, ficha, null);
+        catalogo.guardar(e.revisor().getId(), especieId, ficha, null);
 
         HuertoVirtual v = virtual.paraGestor(gestor);
-        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Anís");
-        assertThat(fragmento(e)).contains("Ilustración de Anís").doesNotContain("Ilustración de Ruda")
-                .doesNotContain("Ilustración de Menta");
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Anís", "Menta");
+        assertThat(fragmento(e)).contains("Ilustración de Anís").doesNotContain("Ilustración de Ruda");
     }
 
     @Test

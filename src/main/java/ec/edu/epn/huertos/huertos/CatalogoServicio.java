@@ -26,10 +26,12 @@ public class CatalogoServicio {
   this.especies = especies; this.permisos = permisos; this.huertos = huertos;
   this.imagenes = imagenes; this.archivos = archivos; this.validador = validador;
  }
- private void gestor(Long usuarioId) { permisos.exigirRol(usuarioId, Rol.GESTOR_HUERTO); }
+ private void autorizarConsulta(Long usuarioId) {
+  permisos.exigirAlgunRol(usuarioId, Rol.GESTOR_HUERTO, Rol.ADMIN_MINISTERIO_SALUD);
+ }
  @Transactional(readOnly = true)
  public List<Especie> listar(Long usuarioId, String texto, RegionPlanta region, String provincia, Integer altitud) {
-  gestor(usuarioId);
+  autorizarConsulta(usuarioId);
   String q = normalizarBusqueda(texto);
   String prov = normalizarBusqueda(provincia);
   return especies.findAll().stream()
@@ -46,11 +48,12 @@ public class CatalogoServicio {
  }
  @Transactional(readOnly = true)
  public Especie obtener(Long usuarioId, Long id) {
-  gestor(usuarioId); return especies.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("La especie no existe en el catálogo."));
+  autorizarConsulta(usuarioId);
+  return especies.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("La especie no existe en el catálogo."));
  }
  @Transactional
  public Especie guardar(Long usuarioId, Long id, FichaEspecie ficha, MultipartFile foto) {
-  gestor(usuarioId);
+  permisos.exigirRol(usuarioId, Rol.ADMIN_MINISTERIO_SALUD);
   if (!validador.validate(ficha).isEmpty()) throw new ReglaNegocioException("Revisa los datos de la ficha y sus fuentes.");
   Especie especie = id == null ? new Especie(ficha.getNombreComun(), ficha.getNombreCientifico()) : obtener(usuarioId, id);
   if (id != null && especie.getVersion() != ficha.getVersion()) throw new ConflictoException("La ficha cambió. Vuelve a abrirla antes de editar.");
@@ -70,6 +73,7 @@ public class CatalogoServicio {
  }
  @Transactional
  public Planta seleccionar(Long usuarioId, Long especieId, SiembraPlanta form) {
+  permisos.exigirRol(usuarioId, Rol.GESTOR_HUERTO);
   if (!validador.validate(form).isEmpty()) throw new ReglaNegocioException("Revisa la cantidad de plantas.");
   return huertos.seleccionarEspecie(usuarioId, obtener(usuarioId, especieId), form.getCantidad(), form.isPlantada());
  }

@@ -138,6 +138,12 @@ public class HuertoServicio {
         plantaDeGestor(gestorUsuarioId, plantaId).cambiarPlantada(plantada);
     }
 
+    @Transactional
+    public void eliminarPlanta(Long gestorUsuarioId, Long plantaId) {
+        comunidades.exigirComunidadOperativa(comunidades.gestorDe(gestorUsuarioId).getComunidadId());
+        plantas.delete(plantaDeGestor(gestorUsuarioId, plantaId));
+    }
+
     @Transactional(readOnly = true)
     public List<Planta> plantasActivasPublicas(Long huertoId) {
         return plantas.findByHuertoIdAndActivaTrueOrderByNombreComunAsc(huertoId);

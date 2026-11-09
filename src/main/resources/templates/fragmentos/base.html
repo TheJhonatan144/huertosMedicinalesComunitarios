@@ -36,6 +36,7 @@
                     <li class="nav-item"><a class="nav-link" th:href="@{/cuenta/solicitudes-comunidad}">Mis solicitudes</a></li>
                 </th:block>
                 <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'ADMIN_MINISTERIO_SALUD'}">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/gestor/plantas/catalogo}">Catálogo de plantas</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/revision}">Evidencias</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/revision/solicitudes-comunidad}">Solicitudes comunitarias</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/revision/historial}">Historial</a></li>
@@ -62,10 +63,15 @@
 </nav>
 
 <main class="app-main container py-4 flex-grow-1" id="contenido">
-    <div th:if="${mensaje}" class="alert alert-success" role="status" th:text="${mensaje}"></div>
-    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    <th:block th:unless="${avisosPlantas}">
+        <div th:if="${mensaje}" class="alert alert-success" role="status" th:text="${mensaje}"></div>
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    </th:block>
     <th:block th:replace="${contenido}"/>
 </main>
+<th:block th:if="${avisosPlantas}">
+    <div th:replace="~{fragmentos/plantas :: avisos}"></div>
+</th:block>
 
 <footer class="app-footer border-top py-3 small text-muted">
     <div class="container">

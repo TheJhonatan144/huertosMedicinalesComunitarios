@@ -24,6 +24,14 @@ public class SeguridadConfig {
                                 "/login", "/registro", "/error", "/css/**", "/js/**", "/img/**", "/vendor/**", "/favicon.ico",
                                 "/actuator/health/**").permitAll()
                         .requestMatchers("/admin/comunidades/**").hasRole("ADMIN_COMUNIDADES")
+                        .requestMatchers(HttpMethod.GET, "/gestor/plantas/catalogo/nueva",
+                                "/gestor/plantas/catalogo/*/editar").hasRole("ADMIN_MINISTERIO_SALUD")
+                        .requestMatchers(HttpMethod.POST, "/gestor/plantas/catalogo",
+                                "/gestor/plantas/catalogo/*").hasRole("ADMIN_MINISTERIO_SALUD")
+                        .requestMatchers(HttpMethod.GET, "/gestor/plantas/catalogo",
+                                "/gestor/plantas/catalogo/*", "/gestor/plantas/catalogo/*/foto")
+                                .hasAnyRole("GESTOR_HUERTO", "ADMIN_MINISTERIO_SALUD")
+                        .requestMatchers(HttpMethod.POST, "/gestor/plantas").denyAll()
                         .requestMatchers("/gestor/**").hasRole("GESTOR_HUERTO")
                         .requestMatchers("/participante/**").hasRole("PARTICIPANTE")
                         .requestMatchers("/revision/**").hasRole("ADMIN_MINISTERIO_SALUD")

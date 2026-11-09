@@ -23,7 +23,7 @@ La carga conserva fichas con fuente documental. Solo completa un registro existe
 
 `fotografias/bloque-02/` contiene once JPEG, su manifiesto de hashes y dimensiones, y un README con autores, licencias y enlaces de origen. Las fotos son referencias de especies, no fotos de ejemplares de las comunidades. Se adjuntaron mediante los formularios autenticados existentes, respetando CSRF, validación de imagen y almacenamiento de evidencias.
 
-`scripts/cargar-fotos-catalogo.ps1` admite `-Bloque 01` y `-Bloque 02`. Sin `-Aplicar` solo verifica archivos, hashes y créditos. Con `-Aplicar` solicita una cuenta de gestor y conserva cualquier foto que ya exista; no reemplaza fotos del usuario. El bloque predeterminado sigue siendo 01.
+`scripts/cargar-fotos-catalogo.ps1` admite `-Bloque 01` y `-Bloque 02`. Sin `-Aplicar` solo verifica archivos, hashes y créditos. Con `-Aplicar` solicita una cuenta del Ministerio de Salud y conserva cualquier foto que ya exista; no reemplaza fotos del usuario. El bloque predeterminado sigue siendo 01.
 
 ## Mejoras de la interfaz
 
