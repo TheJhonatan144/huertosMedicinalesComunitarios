@@ -60,22 +60,26 @@
     border: 2px dashed #b9b2a5;
 }
 .hv-viga { display: none; }
-.hv-area { border-radius: 14px; padding: 20px 10px 14px; }
+.hv-parcela { width: 100%; max-width: 560px; margin-inline: auto; }
+/* Área de cultivo SIEMPRE cuadrada (no rectángulo), con las plantas en cuadrícula centrada. */
+.hv-area { border-radius: 14px; padding: 20px 10px 14px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; box-sizing: border-box; overflow: hidden; }
 .hv-maceta { display: none; }
 
 .hv-slots {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(var(--hv-cols, 2), minmax(0, 1fr));
+    gap: .5rem;
     justify-items: center;
     align-items: end;
-    min-height: 190px;
+    align-content: center;
+    width: 100%;
 }
-.hv-slots.hv-una-planta { grid-template-columns: minmax(0, 1fr); }
-.hv-area:not(:has(.hv-slots)) { min-height: 120px; }
+.hv-cols-1 { --hv-cols: 1; --hv-tam: 300px; }
+.hv-cols-2 { --hv-cols: 2; --hv-tam: 185px; }
+.hv-cols-3 { --hv-cols: 3; --hv-tam: 105px; }
 
 .hv-slot { margin: 0; position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; min-width: 0; max-width: 100%; }
-.hv-sprite-caja { width: min(130px, 100%); aspect-ratio: 1; position: relative; z-index: 1; }
+.hv-sprite-caja { width: min(var(--hv-tam, 130px), 100%); aspect-ratio: 1; position: relative; z-index: 1; }
 .hv-sprite-caja .hv-sprite { width: 100%; height: 100%; overflow: visible; display: block; }
 
 .hv-etiqueta-madera {
@@ -228,8 +232,8 @@
     .hv-parcela { padding: 10px; }
     .hv-composicion-tierra .hv-area, .hv-composicion-vertical .hv-area { border-width: 9px; }
     .hv-area { padding: 16px 4px 10px; }
-    .hv-slots { gap: .5rem; min-height: 160px; }
-    .hv-sprite-caja { width: min(110px, 100%); }
-    .hv-etiqueta-madera { font-size: .78rem; padding: .1rem .5rem; }
+    .hv-slots { gap: .25rem; }
+    .hv-cols-1 { --hv-tam: 170px; } .hv-cols-2 { --hv-tam: 115px; } .hv-cols-3 { --hv-tam: 80px; }
+    .hv-etiqueta-madera { font-size: .7rem; padding: .05rem .35rem; }
     .hv-composicion-piso .hv-maceta, .hv-composicion-vertical .hv-maceta, .hv-composicion-colgante .hv-maceta { width: min(84px, 90%); margin-top: -24px; }
 }
