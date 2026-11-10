@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpMethod;
 
 /**
  * Primera línea de control de acceso (por URL y rol). La autorización por comunidad y recurso
@@ -18,12 +19,23 @@ public class SeguridadConfig {
     SecurityFilterChain cadenaDeFiltros(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/comunidades/*/solicitar-eliminacion").authenticated()
                         .requestMatchers("/", "/mapa", "/ranking", "/comunidades/**", "/api/publico/**",
-                                "/login", "/error", "/css/**", "/js/**", "/vendor/**", "/favicon.ico",
+                                "/login", "/registro", "/error", "/css/**", "/js/**", "/img/**", "/vendor/**", "/favicon.ico",
                                 "/actuator/health/**").permitAll()
+                        .requestMatchers("/admin/comunidades/**").hasRole("ADMIN_COMUNIDADES")
+                        .requestMatchers(HttpMethod.GET, "/gestor/plantas/catalogo/nueva",
+                                "/gestor/plantas/catalogo/*/editar").hasRole("ADMIN_MINISTERIO_SALUD")
+                        .requestMatchers(HttpMethod.POST, "/gestor/plantas/catalogo",
+                                "/gestor/plantas/catalogo/*").hasRole("ADMIN_MINISTERIO_SALUD")
+                        .requestMatchers(HttpMethod.GET, "/gestor/plantas/catalogo",
+                                "/gestor/plantas/catalogo/*", "/gestor/plantas/catalogo/*/foto")
+                                .hasAnyRole("GESTOR_HUERTO", "ADMIN_MINISTERIO_SALUD")
+                        .requestMatchers(HttpMethod.POST, "/gestor/plantas").denyAll()
                         .requestMatchers("/gestor/**").hasRole("GESTOR_HUERTO")
                         .requestMatchers("/participante/**").hasRole("PARTICIPANTE")
-                        .requestMatchers("/revision/**").hasRole("ADMIN_EVIDENCIAS")
+                        .requestMatchers("/revision/**").hasRole("ADMIN_MINISTERIO_SALUD")
+                        .requestMatchers("/admin-tecnico/**").hasRole("ADMIN_TECNICO")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -34,7 +46,7 @@ public class SeguridadConfig {
                         .logoutSuccessUrl("/?sesionCerrada"))
                 .headers(headers -> headers
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
-                                "default-src 'self'; img-src 'self' data: https://*.tile.openstreetmap.org; "
+                                "default-src 'self'; img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org; "
                                         + "style-src 'self' 'unsafe-inline'; script-src 'self'; "
                                         + "frame-ancestors 'none'; form-action 'self'"))
                         .referrerPolicy(ref -> ref.policy(

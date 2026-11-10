@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina(titulo='Consultar especie', contenido=~{::#ficha-botanica}, avisosPlantas=true)}">
+<body>
+<section id="ficha-botanica">
+  <link rel="stylesheet" th:href="@{/css/plantas.css}">
+  <th:block th:unless="${editorCatalogo}"><nav th:replace="~{fragmentos/plantas :: pestanas('catalogo')}"></nav></th:block>
+
+  <nav aria-label="Ruta de navegación">
+    <ol class="breadcrumb ficha-ruta">
+      <li class="breadcrumb-item"><a th:href="@{/gestor/plantas/catalogo}">Catálogo de plantas</a></li>
+      <li class="breadcrumb-item active" aria-current="page" th:text="${especie.nombreComun}"></li>
+    </ol>
+  </nav>
+
+  <header class="ficha-portada">
+    <div class="ficha-portada-foto">
+      <img th:classappend="${especie.fotoClave == null ? 'ficha-ilustracion' : ''}"
+           th:src="${especie.fotoClave != null} ? @{/gestor/plantas/catalogo/{id}/foto(id=${especie.id})} : @{/img/planta-referencia.svg}"
+           th:alt="${especie.fotoClave != null} ? 'Fotografía de ' + ${especie.nombreComun} : 'Ilustración genérica; fotografía pendiente'">
+    </div>
+    <div class="ficha-portada-texto">
+      <p class="plantas-ceja">Ficha botánica</p>
+      <h1 th:text="${especie.nombreComun}"></h1>
+      <p class="fst-italic mb-0" th:text="${especie.nombreCientifico ?: 'Nombre científico pendiente'}"></p>
+    </div>
+  </header>
+
+  <nav class="ficha-indice" aria-label="Secciones de la ficha">
+    <a href="#identificacion">Identificación</a>
+    <a href="#distribucion">Distribución</a>
+    <a href="#ciclo">Ciclo y cualidad</a>
+    <a href="#usos">Usos y saberes</a>
+    <a href="#fuentes">Fuentes</a>
+    <a th:unless="${editorCatalogo}" href="#mi-comunidad">Mi comunidad</a>
+  </nav>
+
+  <div class="ficha-contenido">
+    <div class="ficha-informacion">
+      <section id="identificacion" class="plantas-panel" aria-labelledby="titulo-identificacion">
+        <h2 id="titulo-identificacion" class="h5">Identificación botánica</h2>
+        <dl class="ficha-datos">
+          <div>
+            <dt>Familia botánica</dt>
+            <dd th:text="${especie.familiaBotanica ?: 'Sin documentar'}"></dd>
+          </div>
+          <div>
+            <dt>Otros nombres</dt>
+            <dd th:text="${especie.otrosNombres ?: 'Sin documentar'}"></dd>
+          </div>
+        </dl>
+      </section>
+
+      <section id="distribucion" class="plantas-panel" aria-labelledby="titulo-distribucion">
+        <h2 id="titulo-distribucion" class="h5">Distribución y entorno</h2>
+        <dl class="ficha-datos">
+          <div class="ficha-dato-amplio">
+            <dt>Regiones</dt>
+            <dd class="d-flex flex-wrap gap-1">
+              <span class="badge text-bg-light" th:each="r : ${especie.regiones}" th:text="${r.etiqueta()}"></span>
+              <span th:if="${especie.regiones.isEmpty()}">Sin documentar</span>
+            </dd>
+          </div>
+          <div>
+            <dt>Provincias</dt>
+            <dd th:text="${especie.provincias ?: 'Sin documentar'}"></dd>
+          </div>
+          <div>
+            <dt>Clima</dt>
+            <dd th:text="${especie.clima ?: 'Sin documentar'}"></dd>
+          </div>
+          <div>
+            <dt>Altitud mínima</dt>
+            <dd th:text="${especie.altitudMinima != null ? especie.altitudMinima + ' m s. n. m.' : 'Sin documentar'}"></dd>
+          </div>
+          <div>
+            <dt>Altitud máxima</dt>
+            <dd th:text="${especie.altitudMaxima != null ? especie.altitudMaxima + ' m s. n. m.' : 'Sin documentar'}"></dd>
+          </div>
+          <div class="ficha-dato-amplio" th:if="${especie.observacionesAltitud != null}">
+            <dt>Alcance de la altitud</dt>
+            <dd class="texto-documentado" th:text="${especie.observacionesAltitud}"></dd>
+          </div>
+        </dl>
+      </section>
+
+      <section id="ciclo" class="plantas-panel" aria-labelledby="titulo-ciclo">
+        <h2 id="titulo-ciclo" class="h5">Ciclo y cualidad tradicional</h2>
+        <dl class="ficha-datos">
+          <div>
+            <dt>Ciclo</dt>
+            <dd th:text="${especie.ciclo != null ? especie.ciclo.etiqueta() : 'Sin documentar'}"></dd>
+            <dt th:if="${especie.observacionesCiclo != null}">Criterio del ciclo</dt>
+            <dd class="texto-documentado" th:if="${especie.observacionesCiclo != null}" th:text="${especie.observacionesCiclo}"></dd>
+          </div>
+          <div>
+            <dt>Cualidad tradicional</dt>
+            <dd th:text="${especie.cualidad != null ? especie.cualidad.etiqueta() : 'Sin documentar'}"></dd>
+            <dt th:if="${especie.contextoCualidad != null}">Contexto tradicional</dt>
+            <dd class="texto-documentado" th:if="${especie.contextoCualidad != null}" th:text="${especie.contextoCualidad}"></dd>
+          </div>
+        </dl>
+      </section>
+
+      <section id="usos" class="plantas-panel" aria-labelledby="titulo-usos">
+        <h2 id="titulo-usos" class="h5">Usos y saberes</h2>
+        <h3 class="h6">Usos medicinales documentados</h3>
+        <p class="texto-documentado" th:text="${especie.usosMedicinales ?: 'Sin documentar.'}"></p>
+        <h3 class="h6">Saberes y contexto cultural</h3>
+        <p class="texto-documentado" th:text="${especie.saberes ?: 'Sin documentar.'}"></p>
+        <p class="small text-muted mb-0">Información educativa de referencia. No constituye un diagnóstico ni una prescripción.</p>
+      </section>
+
+      <section id="fuentes" class="plantas-panel" aria-labelledby="titulo-fuentes">
+        <h2 id="titulo-fuentes" class="h5">Fuentes y créditos</h2>
+        <h3 class="h6">Fuentes documentales</h3>
+        <p class="texto-documentado" th:text="${especie.fuenteDocumental ?: 'Sin documentar.'}"></p>
+        <details class="ficha-creditos">
+          <summary>Créditos de la fotografía</summary>
+          <p class="texto-documentado small mb-0 mt-2" th:text="${especie.fotoFuente ?: 'Fotografía y atribución pendientes.'}"></p>
+        </details>
+      </section>
+    </div>
+
+    <aside th:unless="${editorCatalogo}" id="mi-comunidad" class="plantas-panel ficha-comunidad" aria-labelledby="titulo-comunidad">
+      <h2 id="titulo-comunidad" class="h5">En mi comunidad</h2>
+      <div th:if="${registrada != null}">
+        <p><span class="catalogo-estado">En mi huerto</span></p>
+        <p class="small text-muted">Gestiona la cantidad y el estado de siembra de esta planta en tu huerto.</p>
+        <a class="btn btn-huerto w-100" th:href="@{/gestor/plantas/{id}/siembra(id=${registrada.id})}">Editar mi cantidad y siembra</a>
+      </div>
+      <form th:if="${registrada == null}"
+            th:action="@{/gestor/plantas/catalogo/{id}/seleccionar(id=${especie.id})}" th:object="${form}" method="post" novalidate>
+        <div class="alert alert-danger" th:if="${#fields.hasAnyErrors()}" role="alert">
+          <ul class="mb-0"><li th:each="err : ${#fields.allErrors()}" th:text="${err}"></li></ul>
+        </div>
+        <label class="form-label" for="cantidad">Cantidad de plantas en mi huerto</label>
+        <input class="form-control mb-3" type="number" id="cantidad" th:field="*{cantidad}" min="0" max="100000" required>
+        <div class="form-check form-switch mb-3">
+          <input id="plantada" class="form-check-input" type="checkbox" th:field="*{plantada}">
+          <label for="plantada" class="form-check-label">Ya está plantada</label>
+        </div>
+        <button type="submit" class="btn btn-huerto w-100">Agregar a mi comunidad</button>
+      </form>
+    </aside>
+    <aside th:if="${editorCatalogo}" class="plantas-panel" aria-labelledby="titulo-edicion">
+      <h2 id="titulo-edicion" class="h5">Catálogo común</h2>
+      <a class="btn btn-huerto w-100" th:href="@{/gestor/plantas/catalogo/{id}/editar(id=${especie.id})}">Editar ficha común</a>
+    </aside>
+  </div>
+</section>
+</body>
+</html>

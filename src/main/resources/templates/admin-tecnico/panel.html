@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Administración técnica', ~{::section})}">
+<body><section>
+    <h1 class="h3">Administración técnica</h1>
+    <p class="text-muted">Crea las cuentas institucionales MSP y gestiona reasignaciones excepcionales. La asignación automática equilibrada sigue siendo el flujo normal.</p>
+    <h2 class="h5 mt-4">Administradores MSP <span class="badge text-bg-success" th:text="${revisores.size()}">0</span></h2>
+    <div class="table-responsive"><table class="table"><thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Estado</th><th>Comunidades asignadas</th></tr></thead>
+        <tbody><tr th:each="r : ${revisores}"><td th:text="${r.nombre()}"></td><td th:text="${r.usuario()}"></td><td th:text="${r.correo()}"></td><td th:text="${r.activo()} ? 'Activo' : 'Inactivo'"></td><td th:text="${r.carga()}"></td></tr></tbody>
+    </table></div>
+    <details class="card card-body mb-4"><summary class="fw-semibold">Crear cuenta MSP</summary>
+        <form th:action="@{/admin-tecnico/revisores}" method="post" class="row g-3 mt-1">
+            <div class="col-md-6"><label class="form-label" for="nombre">Nombre completo</label><input id="nombre" class="form-control" name="nombre" maxlength="120" required></div>
+            <div class="col-md-6"><label class="form-label" for="nombreUsuario">Usuario</label><input id="nombreUsuario" class="form-control" name="nombreUsuario" pattern="[A-Za-z0-9._-]{3,50}" required></div>
+            <div class="col-md-6"><label class="form-label" for="correo">Correo institucional</label><input id="correo" type="email" class="form-control" name="correo" maxlength="254" required></div>
+            <div class="col-md-6"><label class="form-label" for="claveTemporal">Clave inicial (12 caracteres mínimo)</label><input id="claveTemporal" type="password" class="form-control" name="claveTemporal" minlength="12" maxlength="72" autocomplete="new-password" required></div>
+            <div><button class="btn btn-huerto">Crear cuenta MSP</button></div>
+        </form>
+    </details>
+    <h2 class="h5">Comunidades y responsables asignados</h2>
+    <p class="small text-muted">Solo este perfil puede hacer cambios manuales; cada cambio requiere motivo y queda auditado.</p>
+    <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Comunidad</th><th>Estado</th><th>Ubicación</th><th>Responsable MSP</th><th>Reasignación excepcional</th></tr></thead>
+        <tbody><tr th:each="c : ${comunidades}"><td th:text="${c.comunidad()}"></td><td th:text="${c.estado()}"></td><td th:text="${c.canton()} + ', ' + ${c.provincia()}"></td><td th:text="${c.revisor() == null} ? 'Sin asignar' : ${c.revisor()}"></td>
+            <td><form th:action="@{/admin-tecnico/comunidades/{id}/reasignar(id=${c.comunidadId()})}" method="post" class="d-flex flex-column gap-2">
+                <select class="form-select form-select-sm" name="revisorId" required><option value="">Selecciona MSP activo</option><option th:each="r : ${revisoresActivos}" th:value="${r.id}" th:text="${r.nombreCompleto}"></option></select>
+                <input class="form-control form-control-sm" name="motivo" maxlength="2000" placeholder="Motivo obligatorio" required>
+                <button class="btn btn-sm btn-outline-success">Reasignar</button>
+            </form></td></tr></tbody>
+    </table></div>
+</section></body></html>

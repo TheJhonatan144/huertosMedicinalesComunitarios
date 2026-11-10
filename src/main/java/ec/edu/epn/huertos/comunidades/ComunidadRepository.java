@@ -6,8 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.util.List;
 
 public interface ComunidadRepository extends JpaRepository<Comunidad, Long> {
+
+    boolean existsByNombreIgnoreCase(String nombre);
+
+    List<Comunidad> findByActivaTrueAndEliminacionPendienteFalseOrderByNombreAsc();
 
     /** Bloquea la fila para serializar cambios de cupo de una misma comunidad. */
     @Lock(LockModeType.PESSIMISTIC_WRITE)

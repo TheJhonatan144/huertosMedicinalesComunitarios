@@ -14,12 +14,16 @@ import ec.edu.epn.huertos.FabricaDatos.Escenario;
 import ec.edu.epn.huertos.autenticacion.Usuario;
 import ec.edu.epn.huertos.autenticacion.UsuarioAutenticado;
 import ec.edu.epn.huertos.autenticacion.UsuarioRepository;
+import ec.edu.epn.huertos.autenticacion.Rol;
+import ec.edu.epn.huertos.comunidades.ComunidadServicio;
 import ec.edu.epn.huertos.evidencias.EnvioEvidenciaRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import org.springframework.mock.web.MockHttpSession;
 
 /** Permisos por rol, aislamiento entre comunidades, CSRF y privacidad de las fotografías (sobre HTTP). */
 @AutoConfigureMockMvc
@@ -29,9 +33,55 @@ class SeguridadWebIT extends PruebaIntegracion {
     @Autowired FabricaDatos fabrica;
     @Autowired EnvioEvidenciaRepository envios;
     @Autowired UsuarioRepository usuarios;
+    @Autowired ComunidadServicio comunidades;
+
+    @Test
+    void registroPublicoMuestraOpcionesYErroresDeValidacion() throws Exception {
+        mvc.perform(get("/registro"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Prefiero no decirlo")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Mínimo 8 caracteres.")));
+        mvc.perform(post("/registro").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("El correo es obligatorio.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Selecciona tu género.")));
+    }
 
     private RequestPostProcessor como(Usuario u) {
         return user(new UsuarioAutenticado(u));
+    }
+
+    @Test
+    void integranteDeBajaSoloMuestraEstadoYNoExisteRutaDeReactivacion() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        comunidades.darDeBaja(e.gestorUsuario().getId(), e.participantes().get(0).getId());
+
+        mvc.perform(get("/gestor/integrantes").with(como(e.gestorUsuario())))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("De baja")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("Reactivar"))));
+        mvc.perform(post("/gestor/integrantes/{id}/reactivar", e.participantes().get(0).getId())
+                        .with(como(e.gestorUsuario())).with(csrf()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void archivarConservaSesionActualizadaYMuestraLaHuertaArchivada() throws Exception {
+        Escenario e = fabrica.escenario(1);
+
+        MvcResult resultado = mvc.perform(post("/gestor/comunidad/archivar").with(como(e.gestorUsuario())).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/cuenta/archivadas"))
+                .andReturn();
+        MockHttpSession sesion = (MockHttpSession) resultado.getRequest().getSession(false);
+        assertThat(sesion).isNotNull();
+        assertThat(usuarios.findById(e.gestorUsuario().getId()).orElseThrow().getRol()).isEqualTo(Rol.SIN_ASIGNAR);
+
+        mvc.perform(get("/cuenta/archivadas").session(sesion))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(e.comunidad().getNombre())))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(e.huerto().getNombre())))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ver ficha histórica")));
     }
 
     @Test

@@ -1,42 +1,136 @@
-<!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragmentos/base :: pagina('Inicio', ~{::section})}">
-<body>
-<section>
-    <div class="heroe p-4 p-md-5 mb-4">
-        <h1 class="display-6 fw-semibold">Huertos medicinales comunitarios del Ecuador</h1>
-        <p class="lead mb-3">
-            Las comunidades cuidan sus huertos, registran sus actividades con fotografías y, tras una revisión humana,
-            suman puntos y hacen crecer su huerto virtual.
-        </p>
-        <a class="btn btn-huerto me-2" th:href="@{/mapa}">Explorar el mapa</a>
-        <a class="btn btn-outline-success" th:href="@{/ranking}">Ver el ranking</a>
-    </div>
-
-    <div class="row g-4">
-        <div class="col-md-7">
-            <h2 class="h5">¿Cómo funciona?</h2>
-            <ol>
-                <li>El gestor del huerto registra una actividad (por ejemplo, un riego manual) con sus participantes y una fotografía.</li>
-                <li>Un administrador de evidencias asignado revisa la evidencia.</li>
-                <li>Si se aprueba, los participantes reciben puntos individuales y la comunidad suma puntos y progreso.</li>
-                <li>Si se rechaza, el gestor recibe observaciones, corrige y reenvía; el historial se conserva.</li>
-            </ol>
-            <p class="small text-muted">
-                Hay <strong th:text="${huertos}">0</strong> huertos registrados. El riego es siempre una tarea manual de las personas.
-            </p>
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{fragmentos/base :: pagina('Cultivar nos une', ~{::section})}"
+>
+  <body>
+    <section class="pub-page">
+      <link rel="stylesheet" th:href="@{/css/publico.css}" />
+      <div class="pub-hero">
+        <div class="pub-hero-copy">
+          <p class="pub-eyebrow">HUERTOS MEDICINALES COMUNITARIOS · ECUADOR</p>
+          <h1>De la tierra nace<br />lo que <em>nos une.</em></h1>
+          <p>
+            Pequeños huertos. Saberes que se comparten. Comunidades que crecen
+            cuidando la vida a su alrededor.
+          </p>
+          <div class="pub-actions">
+            <a class="btn btn-huerto" th:href="@{/mapa}"
+              >Descubrir los huertos ↗</a
+            ><a class="pub-text-link" href="#como-funciona"
+              >Así crecemos juntos ↓</a
+            >
+          </div>
+          <div class="pub-hero-stat">
+            <span class="pub-stat-number" th:text="${huertos}">0</span
+            ><span
+              >comunidades en el mapa<br /><strong
+                >Una misma raíz: cuidar.</strong
+              ></span
+            >
+          </div>
         </div>
-        <div class="col-md-5">
-            <h2 class="h5">Ranking comunitario</h2>
-            <p class="text-muted" th:if="${ranking.isEmpty()}">Aún no hay comunidades registradas.</p>
-            <ol class="list-group list-group-numbered" th:unless="${ranking.isEmpty()}">
-                <li class="list-group-item d-flex justify-content-between" th:each="f : ${ranking}">
-                    <a th:href="@{/comunidades/{id}(id=${f.comunidadId()})}" th:text="${f.nombre()}">Comunidad</a>
-                    <span class="badge text-bg-success" th:text="${f.puntos()} + ' pts'">0 pts</span>
-                </li>
-            </ol>
+        <div class="pub-hero-art">
+          <img
+            th:src="@{/img/publico/sembrar.svg}"
+            alt="Ilustración de manos que sostienen una planta, rodeadas de montañas y hojas"
+            width="640"
+            height="580"
+          />
+          <div class="pub-art-note">
+            <span aria-hidden="true">✳</span
+            ><span
+              >Cultivamos plantas.<br /><strong
+                >También comunidad.</strong
+              ></span
+            >
+          </div>
         </div>
-    </div>
-</section>
-</body>
+      </div>
+      <div class="pub-values">
+        <span>Saberes compartidos</span><span aria-hidden="true">✳</span
+        ><span>Cuidado de la tierra</span><span aria-hidden="true">✳</span
+        ><span>Aprendizaje en comunidad</span>
+      </div>
+      <div class="pub-home-grid" id="como-funciona">
+        <div>
+          <p class="pub-eyebrow">DE LA ACCIÓN AL CRECIMIENTO</p>
+          <h2>Cada cuidado cuenta.</h2>
+          <p class="pub-intro">
+            El progreso tiene raíces reales: el trabajo de las personas.
+          </p>
+          <ol class="pub-steps">
+            <li>
+              <span>01</span>
+              <div>
+                <h3>Nos encontramos</h3>
+                <p>
+                  Explora el mapa y conoce los huertos y las comunidades que les
+                  dan vida.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <h3>Cultivamos y compartimos</h3>
+                <p>
+                  El gestor registra una actividad con sus participantes y una
+                  evidencia.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <h3>El esfuerzo florece</h3>
+                <p>
+                  Solo después de una revisión y aprobación se suman puntos y
+                  progreso al huerto.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+        <aside class="pub-ranking">
+          <div class="pub-line">
+            <p class="pub-eyebrow">CRECEMOS EN COMUNIDAD</p>
+            <span aria-hidden="true">↗</span>
+          </div>
+          <h2>Esfuerzos que inspiran</h2>
+          <p>Conoce el progreso de las comunidades.</p>
+          <ol th:unless="${ranking.isEmpty()}">
+            <li th:each="f : ${ranking}">
+              <span class="pub-rank-number" th:text="${f.posicion()}">1</span
+              ><a
+                th:href="@{/comunidades/{id}(id=${f.comunidadId()})}"
+                th:text="${f.nombre()}"
+                >Comunidad</a
+              ><strong th:text="${f.puntos()} + ' pts'">0 pts</strong>
+            </li>
+          </ol>
+          <p th:if="${ranking.isEmpty()}">
+            Las primeras historias de crecimiento están por comenzar.
+          </p>
+          <a class="pub-text-link" th:href="@{/ranking}"
+            >Ver ranking completo →</a
+          >
+        </aside>
+      </div>
+      <div class="pub-invitation">
+        <div>
+          <p class="pub-eyebrow">TU HISTORIA TAMBIÉN PUEDE ECHAR RAÍCES</p>
+          <h2>Un pequeño comienzo. Muchas posibilidades.</h2>
+          <p>Conoce el proyecto y encuentra tu lugar para participar.</p>
+        </div>
+        <a
+          class="btn btn-huerto"
+          th:href="${usuarioActual == null} ? @{/registro} : @{/panel}"
+          th:text="${usuarioActual == null} ? 'Crear mi cuenta ↗' : 'Ir a mi panel ↗'"
+          >Crear mi cuenta ↗</a
+        >
+      </div>
+    </section>
+  </body>
 </html>

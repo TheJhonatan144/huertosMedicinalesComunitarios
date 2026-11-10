@@ -12,6 +12,8 @@ public class UsuarioAutenticado implements UserDetails {
     private final Long id;
     private final String nombreUsuario;
     private final String nombreCompleto;
+    private final String correo;
+    private final String telefono;
     private final String claveHash;
     private final Rol rol;
     private final boolean activo;
@@ -20,6 +22,8 @@ public class UsuarioAutenticado implements UserDetails {
         this.id = usuario.getId();
         this.nombreUsuario = usuario.getNombreUsuario();
         this.nombreCompleto = usuario.getNombreCompleto();
+        this.correo = usuario.getCorreo();
+        this.telefono = usuario.getTelefono();
         this.claveHash = usuario.getClaveHash();
         this.rol = usuario.getRol();
         this.activo = usuario.isActivo();
@@ -32,6 +36,9 @@ public class UsuarioAutenticado implements UserDetails {
     public String getNombreCompleto() {
         return nombreCompleto;
     }
+
+    public String getCorreo() { return correo; }
+    public String getTelefono() { return telefono; }
 
     public Rol getRol() {
         return rol;

@@ -21,9 +21,9 @@ En `Descargas` hay otros documentos de nombre parecido (`Propuesta_Arquitectura_
 | P-01 | **RB06**: valores definitivos de recompensas, incrementos de progreso y umbrales de niveles | Hoy son de demostración (configurables) |
 | P-02 | **RF10**: corregir la fuente según la propuesta de [decisiones](decisiones.md) | Contradice RB05/RB09 |
 | P-03 | Límites de fotografías (tamaño, formatos, dimensiones) | Provisionales: 5 MiB, JPEG/PNG, 8000 px, 25 MP |
-| P-04 | Provisión de usuarios (alta de gestores, participantes y revisores) sin registro público | Hoy: cargador de demostración |
+| P-04 | Definir el proceso institucional del Ministerio para provisionar y retirar cuentas revisoras | Las invitaciones comunitarias ya se aceptan desde la cuenta |
 | P-05 | Quién puede ver las fotografías (¿participantes de la actividad? ¿público tras aprobar?) | Hoy: solo gestor y revisor asignado |
-| P-06 | ¿Un huerto por comunidad? ¿Un usuario en varias comunidades? | Hoy: 1 y 1 |
+| P-06 | ¿Un huerto por comunidad? | Prototipo: 1 huerto por comunidad; una pertenencia comunitaria activa por cuenta |
 | P-07 | Política para bajas: ¿una baja retira al integrante de actividades pendientes? | Hoy: la lista queda fija |
 | P-08 | Contenido de plantas (propiedades, usos) y **fuentes validadas** de saberes ancestrales | Hoy solo texto ilustrativo, sin afirmaciones medicinales |
 | P-09 | RF24 (en revisión) y RF25 (reservado) | No se les atribuye funcionalidad |

@@ -1,13 +1,13 @@
 # Guion de demostración
 
 Requisitos: aplicación en ejecución con perfil `demo` (ver [README](../README.md)). Contraseña de todas las cuentas: `Demo-2026!`.
-Usa ventanas de incógnito o sesiones separadas para cada rol. Sustituye `8080` por tu `APP_PUERTO`.
+Usa ventanas de incógnito o sesiones separadas para cada rol. Sustituye `8081` por tu `APP_PUERTO`.
 
 ## 0. Preparación (una vez)
 
 ```powershell
 Copy-Item .env.example .env
-docker compose up -d --build        # http://localhost:8080
+docker compose up -d --build        # http://localhost:8081
 ```
 
 ## 1. Visitante (sin cuenta)
@@ -62,10 +62,11 @@ docker compose up -d --build        # http://localhost:8080
 | Abrir `/gestor` | `participante_a1`, `revisor_a` | 403 |
 | Enviar un formulario sin token CSRF | cualquiera | 403 |
 
-## 8. Cupo de 25 integrantes y bajas
+## 8. Cupos por tipo de comunidad y bajas
 
-`gestor_a` → Integrantes: da de baja a `participante_a1` (libera cupo) y reactívalo. La regla de 25 se demuestra con las pruebas
-automáticas (`CupoComunidadIT`), porque la demo solo trae 4 integrantes.
+`gestor_a` → Integrantes: da de baja a `participante_a1` (libera cupo) y reactívalo. Los máximos (persona 1, familia 10,
+condominio 20 y barrio 25, incluido el gestor) se demuestran con las pruebas automáticas (`CupoComunidadIT`), porque la demo
+solo trae 4 integrantes.
 
 ## 9. Persistencia
 

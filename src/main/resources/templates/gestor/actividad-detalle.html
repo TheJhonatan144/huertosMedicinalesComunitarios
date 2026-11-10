@@ -39,9 +39,10 @@
             </div>
             <div class="small text-muted" th:text="'Enviado el ' + ${e.enviadoEn()} + ' · archivo: ' + ${e.archivo()}">fecha</div>
             <p class="mb-2" th:if="${e.comentario() != null}"><em>Comentario del gestor:</em> <span th:text="${e.comentario()}"></span></p>
-            <a th:href="@{/evidencias/envios/{id}/foto(id=${e.id()})}" target="_blank" rel="noopener">
+            <a th:if="${e.tipoContenido().startsWith('image/')}" th:href="@{/evidencias/envios/{id}/foto(id=${e.id()})}" target="_blank" rel="noopener">
                 <img class="miniatura" th:src="@{/evidencias/envios/{id}/foto(id=${e.id()})}" th:alt="'Fotografía del envío ' + ${e.numero()}">
             </a>
+            <video th:if="${e.tipoContenido() == 'video/mp4'}" controls preload="metadata" class="w-100" style="max-height: 32rem" th:src="@{/evidencias/envios/{id}/foto(id=${e.id()})}">Tu navegador no puede reproducir este video.</video>
             <div class="observacion mt-2" th:if="${e.observaciones() != null}">
                 <strong>Observaciones del revisor</strong> (<span th:text="${e.revisor()}">Revisor</span>, <span th:text="${e.revisadoEn()}">fecha</span>):
                 <span th:text="${e.observaciones()}"></span>

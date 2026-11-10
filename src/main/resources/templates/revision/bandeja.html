@@ -5,6 +5,13 @@
 <section>
     <h1 class="h3">Bandeja de revisión</h1>
     <p class="text-muted">Evidencias pendientes de las comunidades que tienes asignadas.</p>
+    <h2 class="h5 mt-4">Mis comunidades asignadas <span class="badge text-bg-success" th:text="${cantidadComunidades}">0</span></h2>
+    <div class="table-responsive" th:if="${!comunidadesAsignadas.isEmpty()}">
+        <table class="table table-sm align-middle"><caption class="visually-hidden">Comunidades asignadas a este administrador</caption>
+            <thead><tr><th>Comunidad</th><th>Huerto</th><th>Tipo</th><th>Ubicación</th><th>Estado</th></tr></thead>
+            <tbody><tr th:each="c : ${comunidadesAsignadas}"><td th:text="${c.nombre()}">Comunidad</td><td th:text="${c.huerto()}">Huerto</td><td th:text="${c.tipo()}">Barrio</td><td th:text="${c.canton()} + ', ' + ${c.provincia()}">Cantón, Provincia</td><td><span class="badge" th:classappend="${c.estado() == 'Activa'} ? 'text-bg-success' : 'text-bg-secondary'" th:text="${c.estado()}">Activa</span></td></tr></tbody>
+        </table>
+    </div>
     <p class="text-muted" th:if="${items.isEmpty()}">No tienes evidencias pendientes. ¡Todo al día!</p>
     <div class="table-responsive" th:unless="${items.isEmpty()}">
         <table class="table align-middle">

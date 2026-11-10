@@ -6,11 +6,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 
 /** Comunidad cuyas evidencias puede revisar un administrador de evidencias. */
 @Entity
-@Table(name = "asignacion_revisor")
+@Table(name = "asignacion_revisor", uniqueConstraints = @UniqueConstraint(name = "uq_asignacion_revisor_comunidad", columnNames = "comunidad_id"))
 public class AsignacionRevisor {
 
     @Id
@@ -37,6 +38,8 @@ public class AsignacionRevisor {
     public Long getUsuarioId() {
         return usuarioId;
     }
+
+    public void cambiarResponsable(Long usuarioId) { this.usuarioId = usuarioId; this.asignadaEn = Instant.now(); }
 
     public Long getComunidadId() {
         return comunidadId;

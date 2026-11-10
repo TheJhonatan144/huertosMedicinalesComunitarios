@@ -34,14 +34,22 @@ public class Planta {
     @Column(nullable = false)
     private boolean activa = true;
 
+    @Column(nullable = false)
+    private boolean plantada = false;
+
     @Column(name = "creada_en", nullable = false)
     private Instant creadaEn = Instant.now();
+
+    @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.EAGER, cascade = jakarta.persistence.CascadeType.PERSIST)
+    @jakarta.persistence.JoinColumn(name = "especie_id", nullable = false)
+    private Especie especie;
 
     protected Planta() {
     }
 
     public Planta(Long huertoId, String nombreComun, String nombreCientifico, String descripcion, int cantidad) {
         this.huertoId = huertoId;
+        this.especie = new Especie(nombreComun, nombreCientifico);
         actualizar(nombreComun, nombreCientifico, descripcion, cantidad);
     }
 
@@ -56,6 +64,8 @@ public class Planta {
         this.activa = activa;
     }
 
+    public void cambiarPlantada(boolean plantada) { this.plantada = plantada; }
+
     private static String vacioANulo(String valor) {
         return valor == null || valor.isBlank() ? null : valor.trim();
     }
@@ -69,11 +79,11 @@ public class Planta {
     }
 
     public String getNombreComun() {
-        return nombreComun;
+        return especie == null ? nombreComun : especie.getNombreComun();
     }
 
     public String getNombreCientifico() {
-        return nombreCientifico;
+        return especie == null ? nombreCientifico : especie.getNombreCientifico();
     }
 
     public String getDescripcion() {
@@ -87,4 +97,18 @@ public class Planta {
     public boolean isActiva() {
         return activa;
     }
+
+    public boolean isPlantada() { return plantada; }
+
+    /** Siembra desde el catálogo: la planta queda ligada a una especie común. */
+    public Planta(Long huertoId, Especie especie, int cantidad, boolean plantada) {
+        this.huertoId = huertoId; this.especie = especie;
+        actualizar(especie.getNombreComun(), especie.getNombreCientifico(), null, cantidad);
+        this.plantada = plantada;
+    }
+
+    public Especie getEspecie() { return especie; }
+
+    /** Cambia cantidad y plantada; no toca «activa» (son independientes). */
+    public void cambiarSiembra(int cantidad, boolean plantada) { this.cantidad = cantidad; this.plantada = plantada; }
 }

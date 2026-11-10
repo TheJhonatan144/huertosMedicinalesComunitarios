@@ -48,9 +48,9 @@
                 </fieldset>
             </div>
             <div class="col-12" th:if="${existente == null}">
-                <label for="foto" class="form-label">Fotografía como evidencia (JPEG o PNG, hasta 5 MB)</label>
-                <input type="file" id="foto" name="foto" class="form-control" accept="image/jpeg,image/png" required>
-                <div class="form-text">La fotografía es privada: solo la ven el gestor y el revisor asignado.</div>
+                <label for="foto" class="form-label">Evidencia (JPEG/PNG hasta 5 MB o video MP4 H.264 hasta 2 minutos y 50 MB)</label>
+                <input type="file" id="foto" name="foto" class="form-control" accept="image/jpeg,image/png,video/mp4,.mp4" required>
+                <div class="form-text">El archivo es privado: solo lo ven el gestor y el revisor asignado.</div>
             </div>
             <div class="col-12" th:if="${existente != null}">
                 <div class="alert alert-info mb-0">

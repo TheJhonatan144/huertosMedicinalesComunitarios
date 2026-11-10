@@ -1,52 +1,171 @@
-<!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragmentos/base :: pagina(${ficha.comunidad().nombre}, ~{::section})}">
-<body>
-<section>
-    <nav aria-label="breadcrumb"><ol class="breadcrumb">
-        <li class="breadcrumb-item"><a th:href="@{/mapa}">Mapa</a></li>
-        <li class="breadcrumb-item active" aria-current="page" th:text="${ficha.comunidad().nombre}">Comunidad</li>
-    </ol></nav>
-    <h1 class="h3" th:text="${ficha.comunidad().nombre}">Comunidad</h1>
-    <p class="text-muted"><span th:text="${ficha.comunidad().canton}">Cantón</span>, <span th:text="${ficha.comunidad().provincia}">Provincia</span></p>
-    <p th:text="${ficha.comunidad().descripcion}">Descripción</p>
-
-    <div class="row g-4">
-        <div class="col-md-6">
-            <div class="card tarjeta-huerto h-100"><div class="card-body">
-                <h2 class="h5">Huerto</h2>
-                <th:block th:if="${ficha.huerto() != null}">
-                    <p class="mb-1 fw-semibold" th:text="${ficha.huerto().nombre}">Huerto</p>
-                    <p th:text="${ficha.huerto().descripcion}">Descripción</p>
-                </th:block>
-                <p th:if="${ficha.huerto() == null}" class="text-muted">Esta comunidad aún no registra un huerto.</p>
-                <h3 class="h6">Progreso del huerto virtual</h3>
-                <div th:replace="~{fragmentos/componentes :: progreso(${ficha.progreso()})}"></div>
-            </div></div>
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{fragmentos/base :: pagina(${ficha.comunidad().nombre}, ~{::section})}"
+>
+  <body>
+    <section class="pub-page">
+      <link rel="stylesheet" th:href="@{/vendor/leaflet/leaflet.css}" /><link
+        rel="stylesheet"
+        th:href="@{/css/publico.css}"
+      />
+      <nav aria-label="Ruta de navegación" class="pub-breadcrumb">
+        <a th:href="@{/mapa}">Explorar comunidades</a
+        ><span aria-hidden="true"> / </span
+        ><span th:text="${ficha.comunidad().nombre}">Comunidad</span>
+      </nav>
+      <header class="pub-community-hero">
+        <div>
+          <p
+            class="pub-eyebrow"
+            th:text="${ficha.comunidad().provincia} + ' · ' + ${ficha.comunidad().canton}"
+          >
+            ECUADOR
+          </p>
+          <h1 th:text="${ficha.comunidad().nombre}">Comunidad</h1>
+          <p class="pub-intro" th:text="${ficha.comunidad().descripcion}">
+            Su historia
+          </p>
+          <span
+            class="pub-stage"
+            th:if="${ficha.comunidad().activa and !ficha.comunidad().eliminacionPendiente}"
+            >● Comunidad activa</span
+          ><span
+            class="pub-stage"
+            th:unless="${ficha.comunidad().activa and !ficha.comunidad().eliminacionPendiente}"
+            >Ficha histórica · fuera del mapa activo</span
+          >
         </div>
-        <div class="col-md-6">
-            <div class="card tarjeta-huerto h-100"><div class="card-body">
-                <h2 class="h5">Resultados comunitarios</h2>
-                <p class="display-6 mb-0" th:text="${ficha.puntosComunitarios()}">0</p>
-                <p class="text-muted">puntos comunitarios</p>
-                <p class="mb-1" th:if="${ficha.posicionRanking() != null}">Posición en el ranking: <strong th:text="${ficha.posicionRanking()}">1</strong></p>
-                <p class="mb-0 small text-muted">Integrantes activos: <span th:text="${ficha.integrantesActivos()}">0</span></p>
-                <a class="btn btn-sm btn-outline-success mt-2" th:href="@{/ranking}">Ver ranking</a>
-            </div></div>
+        <span class="pub-community-seal" aria-hidden="true">✳</span>
+      </header>
+      <div class="pub-metrics">
+        <div>
+          <strong th:text="${ficha.integrantesActivos()}">0</strong
+          ><span>integrantes activos</span>
         </div>
-    </div>
-
-    <h2 class="h5 mt-4">Plantas del huerto</h2>
-    <p class="small text-muted">Información de referencia registrada por la comunidad. No constituye una recomendación clínica ni terapéutica.</p>
-    <p class="text-muted" th:if="${ficha.plantas().isEmpty()}">Aún no hay plantas registradas.</p>
-    <ul class="list-group" th:unless="${ficha.plantas().isEmpty()}">
-        <li class="list-group-item" th:each="p : ${ficha.plantas()}">
-            <strong th:text="${p.nombreComun}">Planta</strong>
-            <em class="text-muted" th:if="${p.nombreCientifico != null}" th:text="'(' + ${p.nombreCientifico} + ')'"></em>
-            <span class="badge text-bg-light" th:text="${p.cantidad} + ' unidades'">1 unidades</span>
-            <div class="small text-muted" th:if="${p.descripcion != null}" th:text="${p.descripcion}"></div>
-        </li>
-    </ul>
-</section>
-</body>
+        <div>
+          <strong th:text="${ficha.puntosComunitarios()}">0</strong
+          ><span>puntos comunitarios</span>
+        </div>
+        <div>
+          <strong th:text="${ficha.progreso().etapa()}">Semilla</strong
+          ><span>etapa del huerto</span>
+        </div>
+        <div>
+          <strong
+            th:text="${ficha.posicionRanking() != null ? '#' + ficha.posicionRanking() : '—'}"
+            >—</strong
+          ><span>en el ranking comunitario</span>
+        </div>
+      </div>
+      <div class="pub-detail-grid">
+        <div>
+          <div class="pub-section-heading">
+            <p class="pub-eyebrow">UN ESPACIO PARA CUIDAR</p>
+            <h2
+              th:text="${ficha.huerto() != null ? ficha.huerto().nombre : 'Un huerto por comenzar'}"
+            >
+              El huerto
+            </h2>
+            <p
+              th:if="${ficha.huerto() != null}"
+              th:text="${ficha.huerto().descripcion}"
+            >
+              Descripción
+            </p>
+            <p th:if="${ficha.huerto() == null}">
+              La comunidad aún no tiene un huerto registrado.
+            </p>
+          </div>
+          <th:block th:if="${ficha.huertoVirtual() != null}"
+            ><section
+              th:replace="~{fragmentos/huerto-virtual :: parcela(${ficha.huertoVirtual()}, true)}"
+            ></section
+          ></th:block>
+          <div th:if="${ficha.huertoVirtual() == null}" class="pub-info-box">
+            <h3>Progreso comunitario</h3>
+            <div
+              th:replace="~{fragmentos/componentes :: progreso(${ficha.progreso()})}"
+            ></div>
+          </div>
+          <div class="pub-info-box" th:if="${!ficha.espacios().isEmpty()}">
+            <p class="pub-eyebrow">DISTINTAS FORMAS DE CULTIVAR</p>
+            <h3>Los espacios del huerto</h3>
+            <ul class="pub-spaces">
+              <li th:each="e : ${ficha.espacios()}">
+                <span th:text="${e.nombre}">Espacio</span
+                ><strong th:text="${e.areaM2} + ' m²'">0 m²</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <aside class="pub-location-card">
+          <p class="pub-eyebrow">AQUÍ ECHAMOS RAÍCES</p>
+          <h2>En el mapa</h2>
+          <p
+            th:text="${ficha.comunidad().canton} + ', ' + ${ficha.comunidad().provincia}"
+          >
+            Ubicación
+          </p>
+          <div
+            id="mapa-ficha"
+            class="pub-mini-map"
+            role="region"
+            aria-label="Ubicación del huerto"
+            th:attr="data-lat=${ficha.huerto() != null ? ficha.huerto().latitud : ficha.comunidad().latitud},data-lng=${ficha.huerto() != null ? ficha.huerto().longitud : ficha.comunidad().longitud},data-nombre=${ficha.comunidad().nombre}"
+          >
+            <p>Consulta la ubicación en el mapa de comunidades.</p>
+          </div>
+          <p id="ficha-mapa-aviso" class="small" role="status" hidden></p>
+          <a
+            class="pub-text-link"
+            th:href="@{/mapa(q=${ficha.comunidad().nombre})}"
+            >Volver a explorar ↗</a
+          >
+          <p class="pub-privacy-note">
+            Compartimos el lugar y su historia. Los datos personales y las
+            evidencias de las actividades son privados.
+          </p>
+        </aside>
+      </div>
+      <div class="pub-plants-section">
+        <div class="pub-section-heading">
+          <p class="pub-eyebrow">LA VIDA QUE CUIDAMOS</p>
+          <h2>Plantas de esta comunidad</h2>
+          <p>Conoce las plantas activas registradas en el huerto.</p>
+        </div>
+        <div class="pub-plant-grid" th:unless="${ficha.plantas().isEmpty()}">
+          <article class="pub-plant" th:each="p : ${ficha.plantas()}">
+            <span class="pub-plant-icon" aria-hidden="true">✳</span>
+            <div>
+              <h3 th:text="${p.nombreComun}">Planta</h3>
+              <p
+                class="pub-scientific"
+                th:if="${p.nombreCientifico != null}"
+                th:text="${p.nombreCientifico}"
+              >
+                Nombre científico
+              </p>
+              <span
+                class="pub-stage"
+                th:text="${p.plantada ? 'Plantada en el huerto' : 'Registrada en la comunidad'}"
+                >Registrada</span
+              >
+            </div>
+          </article>
+        </div>
+        <div class="pub-empty" th:if="${ficha.plantas().isEmpty()}">
+          <h3>Pronto, nuevas hojas.</h3>
+          <p>Esta comunidad aún no tiene plantas activas registradas.</p>
+        </div>
+        <p class="pub-bottom-note">
+          Información educativa de referencia. No constituye una recomendación
+          clínica ni terapéutica.
+        </p>
+      </div>
+      <script th:src="@{/vendor/leaflet/leaflet.js}"></script>
+      <script th:src="@{/js/mapa.js}"></script>
+    </section>
+  </body>
 </html>
