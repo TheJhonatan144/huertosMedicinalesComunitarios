@@ -46,7 +46,7 @@ public class SeguridadConfig {
                         .logoutSuccessUrl("/?sesionCerrada"))
                 .headers(headers -> headers
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
-                                "default-src 'self'; img-src 'self' data: https://*.tile.openstreetmap.org; "
+                                "default-src 'self'; img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org; "
                                         + "style-src 'self' 'unsafe-inline'; script-src 'self'; "
                                         + "frame-ancestors 'none'; form-action 'self'"))
                         .referrerPolicy(ref -> ref.policy(
