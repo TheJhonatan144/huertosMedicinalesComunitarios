@@ -25,6 +25,7 @@
             <div class="small text-muted">Mis puntos individuales</div>
             <div class="fs-3" th:text="${misPuntos.puntos()}">0</div>
             <span class="small">Nivel <strong th:text="${misPuntos.nivel().etiqueta()}">Aprendiz</strong></span>
+            <div th:replace="~{fragmentos/componentes :: progresoNivel(${misPuntos})}"></div>
         </div></div></div>
         <div class="col-6 col-lg-3"><div class="card tarjeta-huerto h-100"><div class="card-body">
             <div class="small text-muted">Actividades</div>

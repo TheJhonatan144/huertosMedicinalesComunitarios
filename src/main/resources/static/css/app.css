@@ -342,7 +342,6 @@ textarea.form-control { min-height: 6rem; }
 }
 
 .progress-bar.bg-huerto { background-color: var(--huerto) !important; }
-
 /* Maps and evidence */
 #mapa {
     border: 1px solid var(--borde);

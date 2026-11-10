@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Integrantes', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Integrantes de <span th:text="${comunidad.nombre}">Comunidad</span></h1>
+    <p class="text-muted">
+        Activos: <strong th:text="${activos} + ' de ' + ${cupo}">1 de 25</strong> (incluye al gestor).
+        Una baja libera un cupo; reactivar a alguien lo consume.
+    </p>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <caption class="visually-hidden">Integrantes de la comunidad</caption>
+            <thead><tr><th scope="col">Nombre</th><th scope="col">Usuario</th><th scope="col">Rol en la comunidad</th><th scope="col">Estado</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+            <tbody>
+            <tr th:each="i : ${integrantes}">
+                <td th:text="${i.nombre()}">Nombre</td>
+                <td th:text="${i.usuario()}">usuario</td>
+                <td th:text="${i.gestor()} ? 'Gestor' : 'Participante'">Participante</td>
+                <td><span class="badge" th:classappend="${i.activo()} ? 'text-bg-success' : 'text-bg-secondary'" th:text="${i.activo()} ? 'Activo' : 'De baja'">Activo</span></td>
+                <td class="text-end">
+                    <form th:if="${i.activo() and !i.gestor()}" th:action="@{/gestor/integrantes/{id}/baja(id=${i.id()})}" method="post" data-una-vez>
+                        <button class="btn btn-sm btn-outline-danger" type="submit" data-confirmar="¿Dar de baja a este integrante?">Dar de baja</button>
+                    </form>
+                    <form th:if="${!i.activo()}" th:action="@{/gestor/integrantes/{id}/reactivar(id=${i.id()})}" method="post" data-una-vez>
+                        <button class="btn btn-sm btn-outline-success" type="submit">Reactivar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="small text-muted">El alta de nuevos usuarios es provisional: la realiza el equipo del proyecto (ver README).</p>
+</section>
+</body>
+</html>

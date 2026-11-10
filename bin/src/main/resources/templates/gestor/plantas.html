@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Plantas del huerto', ~{::section})}">
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Plantas del huerto</h1>
+        <a class="btn btn-huerto" th:href="@{/gestor/plantas/nueva}">Agregar planta</a>
+    </div>
+    <p class="small text-muted">Los textos son descriptivos y los escribe la comunidad. El sistema no ofrece recomendaciones clínicas.</p>
+    <p class="text-muted" th:if="${plantas.isEmpty()}">Todavía no registras plantas. Usa «Agregar planta».</p>
+    <div class="table-responsive" th:unless="${plantas.isEmpty()}">
+        <table class="table align-middle">
+            <caption class="visually-hidden">Plantas del huerto</caption>
+            <thead><tr><th scope="col">Nombre común</th><th scope="col">Nombre científico</th><th scope="col">Cantidad</th><th scope="col">Estado</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+            <tbody>
+            <tr th:each="p : ${plantas}">
+                <td th:text="${p.nombreComun}">Planta</td>
+                <td><em th:text="${p.nombreCientifico}">Nombre científico</em></td>
+                <td th:text="${p.cantidad}">1</td>
+                <td><span class="badge" th:classappend="${p.activa} ? 'text-bg-success' : 'text-bg-secondary'" th:text="${p.activa} ? 'Activa' : 'Inactiva'">Activa</span></td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" th:href="@{/gestor/plantas/{id}/editar(id=${p.id})}">Editar</a>
+                    <form class="d-inline" th:action="@{/gestor/plantas/{id}/estado(id=${p.id})}" method="post" data-una-vez>
+                        <input type="hidden" name="activa" th:value="${!p.activa}">
+                        <button class="btn btn-sm btn-outline-secondary" type="submit" th:text="${p.activa} ? 'Desactivar' : 'Activar'">Desactivar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

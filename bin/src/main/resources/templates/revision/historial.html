@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Mis revisiones', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Mis revisiones</h1>
+    <p class="text-muted" th:if="${items.isEmpty()}">Todavía no has revisado evidencias.</p>
+    <div class="table-responsive" th:unless="${items.isEmpty()}">
+        <table class="table align-middle">
+            <caption class="visually-hidden">Historial de revisiones</caption>
+            <thead><tr><th scope="col">Fecha</th><th scope="col">Comunidad</th><th scope="col">Actividad</th><th scope="col">Envío</th><th scope="col">Decisión</th><th scope="col">Observaciones</th></tr></thead>
+            <tbody>
+            <tr th:each="i : ${items}">
+                <td th:text="${i.revisadaEn()}">fecha</td>
+                <td th:text="${i.comunidad()}">Comunidad</td>
+                <td th:text="${i.tipo()}">Riego manual</td>
+                <td th:text="${i.numeroEnvio()}">1</td>
+                <td><span th:replace="~{fragmentos/componentes :: estado(${i.decision()})}"></span></td>
+                <td th:text="${i.observaciones()}">—</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
