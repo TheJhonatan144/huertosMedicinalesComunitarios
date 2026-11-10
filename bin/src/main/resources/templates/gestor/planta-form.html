@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Planta', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Planta</h1>
+    <form th:action="@{${accion}}" th:object="${form}" method="post" data-una-vez novalidate>
+        <div class="mb-3">
+            <label for="nombreComun" class="form-label">Nombre común</label>
+            <input type="text" id="nombreComun" class="form-control" th:field="*{nombreComun}" th:errorclass="is-invalid" maxlength="100" required>
+            <div class="invalid-feedback" th:errors="*{nombreComun}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="nombreCientifico" class="form-label">Nombre científico (opcional)</label>
+            <input type="text" id="nombreCientifico" class="form-control" th:field="*{nombreCientifico}" th:errorclass="is-invalid" maxlength="120">
+            <div class="invalid-feedback" th:errors="*{nombreCientifico}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción (opcional)</label>
+            <textarea id="descripcion" class="form-control" rows="3" th:field="*{descripcion}" th:errorclass="is-invalid" maxlength="1000"></textarea>
+            <div class="form-text">Describe la planta en el huerto. No incluyas indicaciones médicas ni dosis.</div>
+            <div class="invalid-feedback" th:errors="*{descripcion}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="cantidad" class="form-label">Cantidad</label>
+            <input type="number" id="cantidad" class="form-control" th:field="*{cantidad}" th:errorclass="is-invalid" min="0" max="100000" required>
+            <div class="invalid-feedback" th:errors="*{cantidad}"></div>
+        </div>
+        <button class="btn btn-huerto" type="submit">Guardar</button>
+        <a class="btn btn-link" th:href="@{/gestor/plantas}">Cancelar</a>
+    </form>
+</section>
+</body>
+</html>

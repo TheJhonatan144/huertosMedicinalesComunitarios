@@ -17,6 +17,7 @@
             <div class="small text-muted" th:if="${panel.puntos().siguiente() != null}"
                  th:text="'Te faltan ' + ${panel.puntos().faltan()} + ' puntos para ' + ${panel.puntos().siguiente().etiqueta()} + '.'"></div>
             <div class="small text-muted" th:if="${panel.puntos().siguiente() == null}">Alcanzaste el nivel más alto.</div>
+            <div th:replace="~{fragmentos/componentes :: progresoNivel(${panel.puntos()})}"></div>
         </div></div></div>
         <div class="col-md-4"><div class="card tarjeta-huerto h-100"><div class="card-body">
             <div class="small text-muted">Puntos comunitarios (aparte de los individuales)</div>

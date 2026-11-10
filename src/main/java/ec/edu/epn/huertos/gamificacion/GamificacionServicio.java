@@ -58,10 +58,21 @@ public class GamificacionServicio {
         long puntos = individuales.totalPuntos(integranteId);
         Nivel nivel = nivelPara(puntos);
         return switch (nivel) {
-            case APRENDIZ -> new ResumenPuntos(puntos, nivel, Nivel.OFICIAL, (int) (config.umbralOficial() - puntos));
-            case OFICIAL -> new ResumenPuntos(puntos, nivel, Nivel.MAESTRO, (int) (config.umbralMaestro() - puntos));
-            case MAESTRO -> new ResumenPuntos(puntos, nivel, null, null);
+            case APRENDIZ -> new ResumenPuntos(puntos, nivel, Nivel.OFICIAL,
+                    (int) (config.umbralOficial() - puntos), porcentajeNivel(puntos, 0, config.umbralOficial()));
+            case OFICIAL -> new ResumenPuntos(puntos, nivel, Nivel.MAESTRO,
+                    (int) (config.umbralMaestro() - puntos),
+                    porcentajeNivel(puntos, config.umbralOficial(), config.umbralMaestro()));
+            case MAESTRO -> new ResumenPuntos(puntos, nivel, null, null, 100);
         };
+    }
+
+    private int porcentajeNivel(long puntos, int desde, int hasta) {
+        if (hasta <= desde) {
+            return puntos >= hasta ? 100 : 0;
+        }
+        long avance = Math.max(0, puntos - desde);
+        return (int) Math.min(100, Math.round(avance * 100.0 / (hasta - desde)));
     }
 
     public Nivel nivelPara(long puntos) {
@@ -82,6 +93,7 @@ public class GamificacionServicio {
     }
 
     public ProgresoHuerto progresoPara(int progreso) {
+        progreso = Math.max(0, progreso);
         List<PropiedadesGamificacion.Etapa> etapas = config.etapas().stream()
                 .sorted(java.util.Comparator.comparingInt(PropiedadesGamificacion.Etapa::desde)).toList();
         String actual = etapas.isEmpty() ? "Semilla" : etapas.get(0).nombre();
