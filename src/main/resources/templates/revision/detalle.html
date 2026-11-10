@@ -2,7 +2,8 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{fragmentos/base :: pagina('Revisar evidencia', ~{::section})}">
 <body>
-<section th:with="a=${revision.actividad()}">
+<section class="revision" th:with="a=${revision.actividad()}">
+  <link rel="stylesheet" th:href="@{/css/revision.css}">
     <nav aria-label="breadcrumb"><ol class="breadcrumb">
         <li class="breadcrumb-item"><a th:href="@{/revision}">Bandeja</a></li>
         <li class="breadcrumb-item active" aria-current="page" th:text="'Actividad #' + ${a.id()}">Actividad</li>
