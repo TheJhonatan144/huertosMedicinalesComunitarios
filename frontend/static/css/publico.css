@@ -1,8 +1,8 @@
 /* Sección 1 · estilos aislados; consume la identidad del proyecto. */
 .pub-page {
-  --pub-crema: #faf6ea;
-  --pub-hoja: #4f7a4d;
-  --pub-arcilla: #c87955;
+  --pub-crema: var(--al-fondo);
+  --pub-hoja: var(--al-verde);
+  --pub-arcilla: var(--al-oxido);
 }
 .pub-page [hidden] {
   display: none !important;
@@ -110,7 +110,7 @@
   display: flex;
   align-items: center;
   border: 1px solid var(--borde);
-  background: #f7f9f5;
+  background: var(--al-sauce-claro);
   border-radius: 0.5rem;
   padding: 0 0.7rem;
 }
@@ -179,7 +179,7 @@
 }
 .pub-garden:hover,
 .pub-garden.is-selected {
-  background: #f2f6ef;
+  background: var(--al-sauce-claro);
   border-left-color: var(--pub-hoja);
 }
 .pub-garden h3 {
@@ -193,7 +193,7 @@
   text-decoration: underline;
 }
 .pub-place {
-  color: #955235;
+  color: var(--al-oxido-oscuro);
   font-size: 0.63rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -202,7 +202,7 @@
 .pub-stage {
   display: inline-block;
   color: var(--huerto);
-  background: #edf3e7;
+  background: var(--al-sauce-claro);
   border-radius: 999px;
   padding: 0.2rem 0.55rem;
   font-size: 0.67rem;
@@ -230,7 +230,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: #e9eee2;
+  background: var(--al-sauce-claro);
   border-left: 1px solid var(--borde);
 }
 .pub-map-bar {
@@ -289,7 +289,7 @@
   color: var(--huerto);
 }
 .pub-map-notice {
-  background: #fff4dc;
+  background: var(--al-fondo);
   color: #755318;
   padding: 0.65rem 1rem;
   font-size: 0.75rem;
@@ -307,7 +307,7 @@
   border: 3px solid #fff;
   border-radius: 50% 50% 50% 8%;
   transform: rotate(-45deg);
-  box-shadow: 0 3px 10px #183b3b38;
+  box-shadow: 0 3px 10px var(--al-cafe);
 }
 .pub-pin svg {
   transform: rotate(45deg);
@@ -381,7 +381,7 @@
   grid-template-columns: 1.1fr 1fr;
   align-items: center;
   background: var(--pub-crema);
-  border: 1px solid #e8e5d5;
+  border: 1px solid var(--al-borde);
   border-radius: 1.25rem;
   overflow: hidden;
 }
@@ -412,7 +412,7 @@
   font-size: 0.8rem;
 }
 .pub-hero-stat {
-  border-top: 1px solid #dedfce;
+  border-top: 1px solid var(--al-borde);
   margin-top: 2.1rem;
   padding-top: 1.2rem;
   display: flex;
@@ -443,7 +443,7 @@
   bottom: 2rem;
   right: 1.5rem;
   background: #fffdf4ed;
-  border: 1px solid #dfdfcf;
+  border: 1px solid var(--al-borde);
   border-radius: 0.7rem;
   box-shadow: var(--sombra-suave);
   display: flex;
@@ -502,7 +502,7 @@
   margin-bottom: 0;
 }
 .pub-ranking {
-  background: #eaf0e5;
+  background: var(--al-sauce-claro);
   padding: 2rem;
   border-radius: 1rem;
   align-self: start;
@@ -520,7 +520,7 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  border-top: 1px solid #d2decd;
+  border-top: 1px solid var(--al-borde);
   padding: 1rem 0;
   font-size: 0.8rem;
 }
@@ -568,7 +568,7 @@
   border-radius: 1rem;
   padding: 2.5rem;
   background: var(--pub-crema);
-  border: 1px solid #e8e5d5;
+  border: 1px solid var(--al-borde);
 }
 .pub-community-hero h1 {
   overflow-wrap: anywhere;

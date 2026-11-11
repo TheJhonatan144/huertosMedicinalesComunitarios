@@ -1,0 +1,370 @@
+/*
+ * Pantallas internas de ALLPANA con la misma línea visual de la portada.
+ * Se carga en todas las páginas después de app.css. Usa solo los roles de paleta.css.
+ * La portada (body:has(.al-portada)) tiene su propio diseño y queda fuera de casi todo esto.
+ */
+
+/* ---------- Fondo cálido con hojas de luz ---------- */
+body:not(:has(.al-portada)) {
+    background:
+        radial-gradient(900px 420px at 100% 0%, color-mix(in srgb, var(--al-sauce) 22%, transparent), transparent 70%),
+        radial-gradient(700px 380px at 0% 30%, color-mix(in srgb, var(--al-gris-polvo) 45%, transparent), transparent 70%),
+        var(--al-fondo);
+    background-attachment: fixed;
+}
+
+/* ---------- Barra superior: menús desplegables y cuenta ---------- */
+.al-nav-principal .nav-link { position: relative; font-weight: 600; }
+@media (min-width: 992px) {
+    .al-nav-principal .nav-link { white-space: nowrap; padding-inline: .7rem !important; }
+    .al-nav-principal .nav-link:not(.dropdown-toggle)::after {
+        content: "";
+        position: absolute;
+        left: .7rem;
+        right: .7rem;
+        bottom: .3rem;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--al-helecho);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform .35s cubic-bezier(.2, .8, .2, 1);
+    }
+    .al-nav-principal .nav-link:hover::after,
+    .al-nav-principal .nav-link[aria-current="page"]::after { transform: scaleX(1); }
+    .app-navbar .nav-link:hover { background: transparent !important; }
+}
+.al-nav-principal .dropdown-toggle::after { vertical-align: .15em; transition: transform .3s ease; }
+.al-nav-principal .dropdown-toggle[aria-expanded="true"]::after { transform: rotate(180deg); }
+
+.al-menu {
+    --bs-dropdown-link-active-bg: var(--al-sauce-claro);
+    --bs-dropdown-link-active-color: var(--al-verde-oscuro);
+    min-width: 14rem;
+    padding: .5rem;
+    border: 1px solid var(--al-borde);
+    border-radius: 16px;
+    background: var(--al-superficie);
+    box-shadow: 0 18px 40px color-mix(in srgb, var(--al-cafe) 18%, transparent);
+}
+.al-menu.show { animation: al-menu-entra .25s cubic-bezier(.2, .8, .2, 1); }
+@keyframes al-menu-entra { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: none; } }
+.al-menu .dropdown-item {
+    border-radius: 10px;
+    padding: .55rem .8rem;
+    color: var(--al-texto);
+    font-weight: 600;
+    font-size: .92rem;
+    transition: background-color .2s ease, color .2s ease, padding-left .25s ease;
+}
+.al-menu .dropdown-item:hover, .al-menu .dropdown-item:focus { background: var(--al-sauce-claro); color: var(--al-verde-oscuro); padding-left: 1.05rem; }
+.al-menu .dropdown-divider { border-color: var(--al-borde); margin: .4rem .2rem; }
+.al-menu-cabecera { display: grid; padding: .5rem .8rem .7rem; margin-bottom: .3rem; border-bottom: 1px solid var(--al-borde); line-height: 1.3; }
+.al-menu-cabecera strong { color: var(--al-titulo); }
+.al-menu-cabecera span { font-size: .78rem; color: var(--al-texto-suave); }
+.al-menu-salir { color: var(--al-oxido) !important; }
+.al-menu-salir:hover { background: var(--al-oxido-claro) !important; color: var(--al-oxido-oscuro) !important; }
+
+.al-cuenta-boton {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .3rem .8rem .3rem .3rem;
+    border: 1px solid color-mix(in srgb, var(--al-gris-polvo) 35%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, #fff 8%, transparent);
+    color: #fff;
+    transition: background-color .25s ease, border-color .25s ease;
+}
+.al-cuenta-boton:hover, .al-cuenta-boton[aria-expanded="true"] { background: color-mix(in srgb, #fff 16%, transparent); border-color: var(--al-sauce); }
+.al-cuenta-boton:focus-visible { outline: 3px solid var(--al-sauce); outline-offset: 2px; }
+.al-avatar {
+    display: grid;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--al-sauce), var(--al-helecho));
+    color: var(--al-tinta);
+    font-weight: 800;
+    font-family: var(--al-serif);
+}
+.al-cuenta-texto { display: grid; text-align: left; line-height: 1.15; }
+.al-cuenta-texto strong { font-size: .82rem; max-width: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.al-cuenta-texto small { font-size: .7rem; color: var(--al-sauce); white-space: nowrap; }
+@media (max-width: 991.98px) {
+    .al-nav-cuenta { padding: .75rem 0 .25rem; }
+    .al-nav-principal .dropdown-menu { background: color-mix(in srgb, #fff 6%, transparent); border-color: transparent; box-shadow: none; }
+    .al-nav-principal .dropdown-item { color: var(--al-gris-polvo-claro); }
+}
+
+/* ---------- Entrada suave del contenido ---------- */
+body:not(:has(.al-portada)) .app-main > section,
+body:not(:has(.al-portada)) .app-main > div > section {
+    animation: al-pagina-entra .6s cubic-bezier(.2, .8, .2, 1) both;
+}
+@keyframes al-pagina-entra { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Encabezado de página editorial ---------- */
+body:not(:has(.al-portada)) .app-main section > h1:first-child,
+body:not(:has(.al-portada)) .app-main section > .d-flex:first-child h1 {
+    position: relative;
+    font-size: clamp(1.7rem, 2.6vw, 2.35rem);
+    padding-top: 1.1rem;
+    margin-bottom: .35rem;
+}
+body:not(:has(.al-portada)) .app-main section > h1:first-child::before,
+body:not(:has(.al-portada)) .app-main section > .d-flex:first-child h1::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 44px;
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--al-verde), var(--al-helecho));
+    animation: al-traza-raya .8s .2s cubic-bezier(.2, .8, .2, 1) both;
+    transform-origin: left;
+}
+@keyframes al-traza-raya { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+body:not(:has(.al-portada)) .app-main section > h1:first-child + p.text-muted { font-size: 1.02rem; margin-bottom: 1.6rem; }
+.app-main h2.h5, .app-main h3.h5, .app-main .h5:is(h2, h3) {
+    font-family: var(--al-serif);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--al-titulo);
+}
+
+/* ---------- Tarjetas de métricas (panel del gestor y similares) ---------- */
+.tarjeta-huerto {
+    position: relative;
+    border: 1px solid var(--al-borde) !important;
+    border-left: 1px solid var(--al-borde) !important;
+    border-radius: 20px !important;
+    background: var(--al-superficie);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--al-cafe) 6%, transparent);
+    transition: transform .45s cubic-bezier(.2, .8, .2, 1), box-shadow .45s ease, border-color .45s ease;
+    isolation: isolate;
+}
+.tarjeta-huerto::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 1.2rem;
+    right: 1.2rem;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: linear-gradient(90deg, var(--al-verde), var(--al-helecho));
+    transform: scaleX(.25);
+    transform-origin: left;
+    transition: transform .55s cubic-bezier(.2, .8, .2, 1);
+    z-index: 1;
+}
+.tarjeta-huerto:hover { transform: translateY(-6px); border-color: var(--al-sauce) !important; box-shadow: 0 20px 40px color-mix(in srgb, var(--al-cafe) 12%, transparent); }
+.tarjeta-huerto:hover::before { transform: scaleX(1); }
+.tarjeta-huerto .card-body { padding: 1.3rem 1.35rem; }
+.tarjeta-huerto .card-body > .small.text-muted:first-child {
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--al-texto-suave) !important;
+    margin-bottom: .35rem;
+}
+.tarjeta-huerto .fs-3 { font-family: var(--al-serif); font-weight: 700; font-size: 2.3rem !important; line-height: 1.1; color: var(--al-titulo); margin-bottom: .35rem; }
+.row > [class*="col"] > .tarjeta-huerto { animation: al-pagina-entra .6s cubic-bezier(.2, .8, .2, 1) both; }
+.row > [class*="col"]:nth-child(2) > .tarjeta-huerto { animation-delay: .07s; }
+.row > [class*="col"]:nth-child(3) > .tarjeta-huerto { animation-delay: .14s; }
+.row > [class*="col"]:nth-child(4) > .tarjeta-huerto { animation-delay: .21s; }
+.hv-huerto.tarjeta-huerto:hover { transform: none; }
+
+/* ---------- Tarjetas generales ---------- */
+.card:not(.tarjeta-huerto) { border-color: var(--al-borde); }
+.card-header { background: linear-gradient(180deg, var(--al-sauce-claro), color-mix(in srgb, var(--al-sauce-claro) 40%, #fff)); font-family: var(--al-serif); font-size: 1.05rem; }
+.card-body { padding: 1.25rem 1.35rem; }
+.card-img-top { border-radius: 18px 18px 0 0; transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
+.card:hover .card-img-top { transform: scale(1.03); }
+.card:has(.card-img-top) { overflow: hidden; }
+
+/* ---------- Barras de progreso animadas ---------- */
+.progress { height: .7rem; overflow: hidden; box-shadow: inset 0 1px 2px color-mix(in srgb, var(--al-cafe) 10%, transparent); }
+.progress-bar {
+    position: relative;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--al-verde), var(--al-helecho)) !important;
+    animation: al-progreso 1.3s .25s cubic-bezier(.2, .8, .2, 1) both;
+    transform-origin: left;
+}
+.progress-bar.bg-warning { background: linear-gradient(90deg, var(--al-musgo), var(--al-sauce)) !important; }
+.progress-bar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 45%), transparent);
+    transform: translateX(-100%);
+    animation: al-brillo-barra 3.2s 1.6s ease-in-out infinite;
+}
+@keyframes al-progreso { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes al-brillo-barra { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
+
+/* ---------- Tablas ---------- */
+.table-responsive {
+    border: 1px solid var(--al-borde);
+    border-radius: 18px;
+    background: var(--al-superficie);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--al-cafe) 6%, transparent);
+}
+.table-responsive > .table { margin: 0; }
+.table thead th { background: var(--al-sauce-claro) !important; color: var(--al-verde-oscuro) !important; border-bottom: 0; font-size: .72rem; letter-spacing: .1em; padding-block: .9rem; }
+.table > :not(caption) > * > * { padding: .85rem 1rem; border-bottom-color: var(--al-borde); }
+.table tbody tr { transition: background-color .25s ease; }
+.table tbody tr:hover > * { background: color-mix(in srgb, var(--al-sauce) 16%, transparent) !important; }
+.table tbody tr > :first-child { box-shadow: inset 0 0 0 0 var(--al-helecho); transition: box-shadow .3s ease; }
+.table tbody tr:hover > :first-child { box-shadow: inset 3px 0 0 0 var(--al-helecho); }
+.table tbody tr:last-child > * { border-bottom: 0; }
+
+/* ---------- Alertas con acento lateral ---------- */
+.alert {
+    position: relative;
+    border: 1px solid transparent;
+    border-left-width: 4px;
+    border-radius: 14px;
+    padding: .9rem 1.1rem .9rem 3rem;
+    animation: al-pagina-entra .5s cubic-bezier(.2, .8, .2, 1) both;
+}
+.alert::before {
+    position: absolute;
+    left: 1rem;
+    top: .95rem;
+    display: grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 50%;
+    font-size: .78rem;
+    font-weight: 800;
+    color: #fff;
+}
+.alert-success { border-left-color: var(--al-verde); }
+.alert-success::before { content: "✓"; background: var(--al-verde); }
+.alert-info { border-left-color: #3b7d91; }
+.alert-info::before { content: "i"; background: #3b7d91; font-family: var(--al-serif); }
+.alert-warning { border-left-color: #b98a1c; }
+.alert-warning::before { content: "!"; background: #b98a1c; }
+.alert-danger { border-left-color: var(--error, #a33e3e); }
+.alert-danger::before { content: "×"; background: var(--error, #a33e3e); font-size: 1rem; }
+
+/* ---------- Formularios ---------- */
+.form-label { font-weight: 650; font-size: .9rem; margin-bottom: .35rem; }
+.form-control, .form-select {
+    padding: .65rem .9rem;
+    background-color: color-mix(in srgb, var(--al-fondo) 55%, #fff);
+    transition: border-color .25s ease, box-shadow .25s ease, background-color .25s ease;
+}
+.form-control:hover, .form-select:hover { border-color: var(--al-sauce); }
+.form-control:focus, .form-select:focus { background-color: #fff; }
+.form-text { color: var(--al-texto-suave); font-size: .8rem; }
+.is-invalid { border-color: var(--error, #a33e3e) !important; }
+fieldset.plantas-panel, .plantas-panel {
+    border: 1px solid var(--al-borde);
+    border-radius: 20px;
+    background: var(--al-superficie);
+    padding: 1.4rem 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--al-cafe) 5%, transparent);
+}
+.plantas-panel > legend, fieldset > legend.h5 { font-family: var(--al-serif); font-weight: 700; color: var(--al-titulo); float: none; width: auto; padding: 0; margin-bottom: 1rem; }
+.form-check-input { transition: background-color .2s ease, transform .2s ease; }
+.form-check-input:active { transform: scale(.9); }
+
+/* Opciones visuales de elegir (diseños de huerto, suelos…) */
+.huerto-opcion { border-radius: 18px; transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s ease, border-color .35s ease; }
+.huerto-opcion:hover { transform: translateY(-4px); box-shadow: 0 14px 30px color-mix(in srgb, var(--al-cafe) 12%, transparent); border-color: var(--al-sauce); }
+.btn-check:checked ~ .huerto-opcion { border-color: var(--al-verde) !important; background-color: var(--al-sauce-claro) !important; box-shadow: 0 0 0 .22rem var(--al-foco) !important; }
+
+/* ---------- Botones ---------- */
+.btn-huerto, .btn-success, .btn-primary { position: relative; overflow: hidden; isolation: isolate; }
+.btn-huerto::after, .btn-success::after, .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 30%) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform .7s ease;
+}
+.btn-huerto:hover::after, .btn-success:hover::after, .btn-primary:hover::after { transform: translateX(120%); }
+.btn-outline-danger { border-color: color-mix(in srgb, var(--error, #a33e3e) 60%, transparent); }
+.btn-link { color: var(--al-verde); text-decoration: none; font-weight: 650; }
+.btn-link:hover { color: var(--al-verde-oscuro); text-decoration: underline; }
+
+/* ---------- Insignias, migas y pestañas ---------- */
+.badge { padding: .4em .8em; font-weight: 700; letter-spacing: .02em; }
+.breadcrumb { gap: .25rem; font-size: .85rem; }
+.breadcrumb-item a { color: var(--al-verde); text-decoration: none; padding: .2rem .6rem; border-radius: 999px; background: var(--al-sauce-claro); transition: background-color .25s ease; }
+.breadcrumb-item a:hover { background: var(--al-sauce-medio); }
+.nav-tabs { border-bottom: 1px solid var(--al-borde); gap: .25rem; }
+.nav-tabs .nav-link { border: 0; border-radius: 12px 12px 0 0; color: var(--al-texto-suave); font-weight: 650; position: relative; }
+.nav-tabs .nav-link::after { content: ""; position: absolute; left: .8rem; right: .8rem; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--al-verde); transform: scaleX(0); transition: transform .35s cubic-bezier(.2, .8, .2, 1); }
+.nav-tabs .nav-link:hover { color: var(--al-verde); }
+.nav-tabs .nav-link.active { background: transparent; color: var(--al-verde); }
+.nav-tabs .nav-link.active::after, .nav-tabs .nav-link:hover::after { transform: scaleX(1); }
+
+/* ---------- Revelado al hacer scroll (interior.js añade .al-int-js y .visible) ---------- */
+.al-int-js .al-revela { opacity: 0; transform: translateY(20px); transition: opacity .7s cubic-bezier(.2, .8, .2, 1), transform .7s cubic-bezier(.2, .8, .2, 1); }
+.al-int-js .al-revela.visible { opacity: 1; transform: none; }
+
+/* ---------- Accesibilidad ---------- */
+@media (prefers-reduced-motion: reduce) {
+    body:not(:has(.al-portada)) *, body:not(:has(.al-portada)) *::before, body:not(:has(.al-portada)) *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+    .al-int-js .al-revela { opacity: 1; transform: none; }
+}
+
+/* ---------- Formularios principales en un panel ---------- */
+body:not(:has(.al-portada)) .app-main section > form:not(.d-inline):not(.m-0):not([class*="d-flex"]):not(:has(.plantas-panel)):has(.form-control, .form-select) {
+    background: var(--al-superficie);
+    border: 1px solid var(--al-borde);
+    border-radius: 22px;
+    padding: clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 3.5vw, 2.25rem);
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--al-cafe) 7%, transparent);
+}
+
+/* Casillas como chips seleccionables (participantes, opciones múltiples) */
+.app-main form .form-check:not(.form-switch) {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    min-height: 0;
+    margin: .25rem .4rem .25rem 0;
+    padding: .5rem .95rem .5rem .75rem;
+    border: 1.5px solid var(--al-borde);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--al-fondo) 55%, #fff);
+    cursor: pointer;
+    transition: border-color .25s ease, background-color .25s ease, transform .25s cubic-bezier(.3, 1.5, .5, 1);
+}
+.app-main form .form-check:not(.form-switch) .form-check-input { float: none; margin: 0; cursor: pointer; }
+.app-main form .form-check:not(.form-switch) .form-check-label { cursor: pointer; }
+.app-main form .form-check:not(.form-switch):hover { border-color: var(--al-sauce); transform: translateY(-2px); }
+.app-main form .form-check:not(.form-switch):has(.form-check-input:checked) { border-color: var(--al-verde); background: var(--al-sauce-claro); }
+.app-main form .form-check:not(.form-switch):has(.form-check-input:disabled) { opacity: .55; transform: none; cursor: not-allowed; }
+
+/* Botón de elegir archivo */
+.form-control[type="file"] { padding: .45rem; }
+.form-control[type="file"]::file-selector-button {
+    margin-right: .9rem;
+    padding: .45rem 1rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--al-sauce-claro);
+    color: var(--al-verde-oscuro);
+    font-weight: 700;
+    transition: background-color .25s ease;
+}
+.form-control[type="file"]:hover::file-selector-button { background: var(--al-sauce-medio); }
+
+/* Enlace «Más» resaltado cuando la página actual está dentro de él */
+.al-nav-principal .dropdown-toggle[aria-current="page"] { color: #fff; }

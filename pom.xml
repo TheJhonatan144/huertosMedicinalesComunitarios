@@ -93,6 +93,25 @@
     </dependencies>
 
     <build>
+        <!--
+          Frontend separado del backend: las vistas Thymeleaf y los archivos estáticos viven en frontend/ y se
+          empaquetan en las mismas rutas del classpath que usa Spring Boot por defecto (templates/ y static/),
+          así que el código Java no cambia. src/main/resources sigue incluido (configuración y migraciones) y,
+          por compatibilidad, cualquier plantilla que aún llegue a src/main/resources/templates también funciona.
+        -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>frontend/templates</directory>
+                <targetPath>templates</targetPath>
+            </resource>
+            <resource>
+                <directory>frontend/static</directory>
+                <targetPath>static</targetPath>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

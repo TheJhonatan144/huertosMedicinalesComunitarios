@@ -108,7 +108,9 @@ src/main/java/ec/edu/epn/huertos/
   publico/        mapa, ficha pública y API pública
   demo/           datos sintéticos (perfil demo)
   compartido/     seguridad, errores, utilidades
-src/main/resources/db/migration/   migraciones Flyway V1–V3
+src/main/resources/                configuración (application*.yml) y migraciones Flyway (db/migration)
+frontend/templates/                vistas Thymeleaf (ver frontend/README.md)
+frontend/static/                   CSS, JavaScript, imágenes y librerías locales
 docs/                              documentación académica y técnica
 ```
 

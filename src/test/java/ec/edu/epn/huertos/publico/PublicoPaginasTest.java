@@ -69,7 +69,7 @@ class PublicoPaginasTest {
         String tercera = pagina("/comunidades/3");
         assertThat(segunda).contains("Pachamama Wasi", "Jardín del encuentro").doesNotContain("Sumak Allpa");
         assertThat(tercera).contains("Semillas del Austro", "Huerto del río").doesNotContain("Sumak Allpa");
-        assertThat(inicio).contains("Descubrir los huertos", "sembrar.svg", "href=\"/mapa\"");
+        assertThat(inicio).contains("Descubrir los huertos", "amazonia-1920.webp", "selva amazónica", "portada.js", "href=\"/mapa\"", "ALLPANA");
         assertThat(mapa).contains("data-id=\"1\"", "data-lat=\"-0.214\"", "href=\"/comunidades/2\"", "mapa-filtros");
         assertThat(detalle).contains("Huerto virtual", "Manzanilla", "Menta", "Jardín de aromáticas")
                 .doesNotContain("099-PRIVADO", "privado@example.test", "Ir a mis plantas", "/gestor/huerto", "/evidencias/envios/");
