@@ -2,7 +2,8 @@ spring:
   application:
     name: huertos-medicinales
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/huertos}
+    # DB_URL completo (Docker Compose) o, si no existe, se arma con las partes que entrega Render (DB_HOST, DB_PORT, DB_NOMBRE).
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NOMBRE:huertos}}
     username: ${DB_USUARIO:huertos}
     password: ${DB_CLAVE:}
   jpa:
@@ -25,6 +26,10 @@ spring:
     cache: true
 
 server:
+  # Render (y otros servicios en la nube) indican el puerto con la variable PORT; en local se usa 8080.
+  port: ${PORT:8080}
+  # Detrás del proxy HTTPS de Render: respeta X-Forwarded-* para redirecciones y enlaces correctos.
+  forward-headers-strategy: framework
   servlet:
     session:
       timeout: 30m

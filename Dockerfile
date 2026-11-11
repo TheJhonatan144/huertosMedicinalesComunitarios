@@ -5,6 +5,7 @@ COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 RUN sed -i 's/\r$//' mvnw && chmod +x mvnw && ./mvnw -q -B dependency:go-offline
 COPY src/ src/
+COPY frontend/ frontend/
 COPY docs/catalogo/ docs/catalogo/
 RUN ./mvnw -q -B -DskipTests package
 
