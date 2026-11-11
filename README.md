@@ -42,6 +42,10 @@ Las fotografías se guardan en `./datos/evidencias` (ignorado por Git) o en la r
 
 > Si el puerto 5432 o 8081 ya está ocupado en tu equipo (por ejemplo, por otros contenedores), cambia `DB_PUERTO` y `APP_PUERTO` en `.env`.
 
+## Publicar en internet (Render)
+
+La aplicación completa (vistas incluidas) se despliega en Render con el Blueprint `render.yaml`, que crea el servicio web y la base PostgreSQL. Guía paso a paso y limitaciones del plan gratuito: [docs/despliegue.md](docs/despliegue.md).
+
 ## Ejecutar las pruebas
 
 ```powershell
