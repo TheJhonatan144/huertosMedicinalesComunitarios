@@ -11,20 +11,25 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /** Datos compartidos de especies. La siembra pertenece exclusivamente a Planta/huerto. */
 @Service
 public class CatalogoServicio {
+ private static final String FOTO_INICIAL = "catalogo-inicial/";
  private final EspecieRepository especies;
  private final AutorizacionServicio permisos;
  private final HuertoServicio huertos;
  private final ValidadorImagen imagenes;
  private final AlmacenamientoArchivos archivos;
  private final Validator validador;
+ private final JdbcTemplate jdbc;
  public CatalogoServicio(EspecieRepository especies, AutorizacionServicio permisos, HuertoServicio huertos,
-        ValidadorImagen imagenes, AlmacenamientoArchivos archivos, Validator validador) {
+        ValidadorImagen imagenes, AlmacenamientoArchivos archivos, Validator validador, JdbcTemplate jdbc) {
   this.especies = especies; this.permisos = permisos; this.huertos = huertos;
   this.imagenes = imagenes; this.archivos = archivos; this.validador = validador;
+  this.jdbc = jdbc;
  }
  private void autorizarConsulta(Long usuarioId) {
   permisos.exigirAlgunRol(usuarioId, Rol.GESTOR_HUERTO, Rol.ADMIN_MINISTERIO_SALUD);
@@ -64,7 +69,7 @@ public class CatalogoServicio {
    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
     @Override public void afterCompletion(int estado) {
      if (estado != STATUS_COMMITTED) archivos.eliminar(nueva);
-     else if (anterior != null) archivos.eliminar(anterior);
+     else if (anterior != null && !anterior.startsWith(FOTO_INICIAL)) archivos.eliminar(anterior);
     }
    });
    especie.cambiarFoto(nueva, imagen.tipoContenido());
@@ -81,7 +86,13 @@ public class CatalogoServicio {
  public Resource foto(Long usuarioId, Long id) {
   Especie e = obtener(usuarioId, id);
   if (e.getFotoClave() == null) throw new RecursoNoEncontradoException("Fotografía pendiente de registrar.");
-  Resource recurso = archivos.cargar(e.getFotoClave());
+  String clave = e.getFotoClave();
+  if (clave.startsWith(FOTO_INICIAL)) {
+   return jdbc.query("SELECT contenido FROM foto_catalogo_inicial WHERE clave = ?",
+    (fila, numero) -> new ByteArrayResource(fila.getBytes(1)), clave).stream().findFirst()
+    .orElseThrow(() -> new RecursoNoEncontradoException("La fotografía no está disponible."));
+  }
+  Resource recurso = archivos.cargar(clave);
   if (!recurso.exists()) throw new RecursoNoEncontradoException("La fotografía no está disponible.");
   return recurso;
  }

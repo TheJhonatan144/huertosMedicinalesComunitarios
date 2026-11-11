@@ -284,6 +284,10 @@ $fichas_catalogo$::jsonb) AS datos(
    WHERE lower(btrim(e.nombre_cientifico)) = lower(btrim(ficha.nombre_cientifico))
     OR lower(btrim(e.nombre_cientifico)) IN (SELECT lower(btrim(n)) FROM unnest(ficha.nombres_previos) n);
   IF coincidencias > 1 THEN
+   IF current_setting('huertos.carga_catalogo_automatica', true) = 'on' THEN
+    RAISE WARNING 'Identificación repetida o equivalencia ambigua: %.', ficha.nombre_cientifico;
+    CONTINUE;
+   END IF;
    RAISE EXCEPTION 'Identificación repetida o equivalencia ambigua: %.', ficha.nombre_cientifico;
   ELSIF coincidencias = 1 THEN
    SELECT e.* INTO actual FROM especie e
@@ -296,6 +300,10 @@ $fichas_catalogo$::jsonb) AS datos(
    END IF;
    IF jsonb_strip_nulls(to_jsonb(actual) - ARRAY['id','version','nombre_comun','nombre_cientifico']) <> '{}'::jsonb
       OR EXISTS(SELECT 1 FROM especie_region WHERE especie_id = actual.id) THEN
+    IF current_setting('huertos.carga_catalogo_automatica', true) = 'on' THEN
+     RAISE WARNING 'La ficha % contiene datos previos sin fuente; revisar manualmente antes de completar.', actual.nombre_cientifico;
+     CONTINUE;
+    END IF;
     RAISE EXCEPTION 'La ficha % contiene datos previos sin fuente; revisar manualmente antes de completar.', actual.nombre_cientifico;
    END IF;
    UPDATE especie SET
@@ -315,6 +323,10 @@ $fichas_catalogo$::jsonb) AS datos(
    IF EXISTS (SELECT 1 FROM especie e
      WHERE lower(btrim(e.nombre_comun)) = lower(btrim(ficha.nombre_comun))
        AND NULLIF(btrim(e.nombre_cientifico),'') IS NULL) THEN
+    IF current_setting('huertos.carga_catalogo_automatica', true) = 'on' THEN
+     RAISE WARNING 'Ya existe % sin identificación científica; revisar antes de cargar.', ficha.nombre_comun;
+     CONTINUE;
+    END IF;
     RAISE EXCEPTION 'Ya existe % sin identificación científica; revisar antes de cargar.', ficha.nombre_comun;
    END IF;
    INSERT INTO especie(nombre_comun,nombre_cientifico,otros_nombres,familia_botanica,

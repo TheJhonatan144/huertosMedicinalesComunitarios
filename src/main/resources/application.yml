@@ -15,6 +15,7 @@ spring:
           time_zone: UTC
   flyway:
     enabled: true
+    locations: classpath:db/migration,classpath:db/catalogo
   servlet:
     multipart:
       # Margen sobre el límite de la aplicación para que el rechazo lo haga el validador propio (mensaje claro).
