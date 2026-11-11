@@ -2,5 +2,6 @@ target/
 .git/
 .env
 datos/
-docs/
+docs/*
+!docs/catalogo/
 *.md

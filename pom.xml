@@ -111,6 +111,15 @@
                 <directory>frontend/static</directory>
                 <targetPath>static</targetPath>
             </resource>
+            <resource>
+                <directory>docs/catalogo/</directory>
+                <targetPath>catalogo-inicial</targetPath>
+                <includes>
+                    <include>carga-bloque-*.sql</include>
+                    <include>fotografias/**/*.jpg</include>
+                    <include>fotografias/**/*.json</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
             <plugin>
