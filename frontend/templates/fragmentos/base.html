@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:fragment="pagina(titulo, contenido)">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' · ALLPANA · Huertos Medicinales Comunitarios'">ALLPANA · Huertos Medicinales Comunitarios</title>
+    <link rel="icon" th:href="@{/favicon.ico}" sizes="any">
+    <link rel="icon" type="image/png" th:href="@{/img/marca/allpana-emblema.png}">
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/paleta.css(v='20261110')}">
+    <link rel="stylesheet" th:href="@{/css/app.css(v='20261111')}">
+    <link rel="stylesheet" th:href="@{/css/interior.css(v='20261111b')}">
+    <link rel="stylesheet" th:href="@{/css/huerto-virtual.css}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+<a class="visually-hidden-focusable" href="#contenido">Saltar al contenido</a>
+<nav class="app-navbar navbar navbar-expand-lg navbar-dark bg-huerto">
+    <div class="container">
+        <a class="navbar-brand al-marca" th:href="@{/}" aria-label="ALLPANA · Huertos Medicinales Comunitarios, ir al inicio">
+            <span class="al-marca-emblema"><img th:src="@{/img/marca/allpana-emblema.png}" alt="" width="40" height="36"></span>
+            <span class="al-marca-texto"><strong>ALLPANA</strong><small>Huertos Medicinales</small></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+                aria-controls="menu" aria-expanded="false" aria-label="Mostrar u ocultar el menú">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="menu">
+            <!-- Enlaces principales según el rol (máximo tres a la vista); lo secundario va en «Más». -->
+            <ul class="navbar-nav me-auto al-nav-principal">
+                <th:block th:if="${usuarioActual == null}">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/mapa}">Mapa</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/ranking}">Ranking</a></li>
+                </th:block>
+                <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'GESTOR_HUERTO'}">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/gestor}">Mi comunidad</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/gestor/actividades}">Actividades</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/gestor/plantas}">Plantas</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
+                        <ul class="dropdown-menu al-menu">
+                            <li><a class="dropdown-item" th:href="@{/gestor/integrantes}">Integrantes</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/mapa}">Mapa</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ranking}">Ranking</a></li>
+                        </ul>
+                    </li>
+                </th:block>
+                <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'PARTICIPANTE'}">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/participante}">Mi progreso</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/mapa}">Mapa</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/ranking}">Ranking</a></li>
+                </th:block>
+                <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'SIN_ASIGNAR'}">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/cuenta}">Mi cuenta</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/cuenta/comunidad/nueva}">Crear huerta</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
+                        <ul class="dropdown-menu al-menu">
+                            <li><a class="dropdown-item" th:href="@{/cuenta/solicitudes-comunidad}">Mis solicitudes</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/mapa}">Mapa</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ranking}">Ranking</a></li>
+                        </ul>
+                    </li>
+                </th:block>
+                <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'ADMIN_MINISTERIO_SALUD'}">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/revision}">Evidencias</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/revision/solicitudes-comunidad}">Solicitudes comunitarias</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/gestor/plantas/catalogo}">Catálogo de plantas</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
+                        <ul class="dropdown-menu al-menu">
+                            <li><a class="dropdown-item" th:href="@{/revision/historial}">Historial</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/mapa}">Mapa</a></li>
+                            <li><a class="dropdown-item" th:href="@{/ranking}">Ranking</a></li>
+                        </ul>
+                    </li>
+                </th:block>
+                <th:block th:if="${usuarioActual != null and usuarioActual.rol.name() == 'ADMIN_TECNICO'}">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/admin-tecnico}">Administración técnica</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/mapa}">Mapa</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/ranking}">Ranking</a></li>
+                </th:block>
+            </ul>
+
+            <div class="d-flex align-items-center gap-2 al-nav-cuenta">
+                <a th:if="${usuarioActual == null}" class="btn btn-light btn-sm" th:href="@{/login}">Iniciar sesión</a>
+                <a th:if="${usuarioActual == null}" class="btn btn-outline-light btn-sm" th:href="@{/registro}">Registrarse</a>
+
+                <!-- Menú de cuenta: nombre, rol y acciones personales en un solo lugar -->
+                <div th:if="${usuarioActual != null}" class="dropdown">
+                    <button class="al-cuenta-boton dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                            th:attr="aria-label='Menú de la cuenta de ' + ${usuarioActual.nombreCompleto}">
+                        <span class="al-avatar" aria-hidden="true"
+                              th:text="${#strings.isEmpty(usuarioActual.nombreCompleto)} ? '?' : ${#strings.toUpperCase(#strings.substring(usuarioActual.nombreCompleto, 0, 1))}">A</span>
+                        <span class="al-cuenta-texto">
+                            <strong th:text="${usuarioActual.nombreCompleto}">Usuario</strong>
+                            <small th:text="${usuarioActual.rol.etiqueta()}">Rol</small>
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end al-menu">
+                        <li class="al-menu-cabecera">
+                            <strong th:text="${usuarioActual.nombreCompleto}">Usuario</strong>
+                            <span th:text="${usuarioActual.rol.etiqueta()}">Rol</span>
+                        </li>
+                        <th:block th:if="${usuarioActual.rol.name() != 'ADMIN_MINISTERIO_SALUD' and usuarioActual.rol.name() != 'ADMIN_TECNICO'}">
+                            <li><a class="dropdown-item" th:href="@{/cuenta/solicitudes-comunidad}">Mis solicitudes</a></li>
+                            <li><a class="dropdown-item" th:href="@{/cuenta/invitaciones}">Invitaciones</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                        </th:block>
+                        <li>
+                            <form th:action="@{/logout}" method="post" class="m-0">
+                                <button class="dropdown-item al-menu-salir" type="submit">Cerrar sesión</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<svg class="al-ola-nav" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true">
+    <path class="al-ola-fondo" d="M0 0 H1440 V22 C1260 38 1080 38 900 26 C720 14 540 12 360 22 C200 31 90 32 0 24 Z"/>
+    <path d="M0 0 H1440 V14 C1250 30 1060 30 880 18 C700 6 520 6 340 16 C190 24 80 24 0 16 Z"/>
+</svg>
+
+<main class="app-main container py-4 flex-grow-1" id="contenido">
+    <th:block th:unless="${avisosPlantas}">
+        <div th:if="${mensaje}" class="alert alert-success" role="status" th:text="${mensaje}"></div>
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    </th:block>
+    <th:block th:replace="${contenido}"/>
+</main>
+<th:block th:if="${avisosPlantas}">
+    <div th:replace="~{fragmentos/plantas :: avisos}"></div>
+</th:block>
+
+<footer class="app-footer al-pie">
+    <svg class="al-follaje" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+        <g class="al-follaje-atras">
+            <path d="M40 120 C30 80 46 46 70 20 C74 56 66 92 40 120Z"/><path d="M150 120 C150 86 170 60 200 44 C196 76 182 102 150 120Z"/>
+            <path d="M330 120 C318 84 330 50 352 26 C360 62 354 96 330 120Z"/><path d="M560 120 C566 90 588 68 620 58 C610 88 592 108 560 120Z"/>
+            <path d="M780 120 C770 86 782 56 806 34 C812 70 806 100 780 120Z"/><path d="M1010 120 C1014 88 1036 64 1068 54 C1058 86 1040 108 1010 120Z"/>
+            <path d="M1220 120 C1210 82 1224 50 1250 26 C1256 64 1248 98 1220 120Z"/><path d="M1380 120 C1384 90 1404 70 1434 62 C1426 90 1408 110 1380 120Z"/>
+        </g>
+        <g class="al-follaje-medio">
+            <path d="M90 120 C70 96 64 70 74 44 C92 66 100 92 90 120Z"/><path d="M90 120 C104 96 124 82 150 78 C140 100 120 114 90 120Z"/>
+            <path d="M260 120 C240 92 238 64 252 38 C268 64 272 92 260 120Z"/><path d="M450 120 C436 96 436 72 448 50 C462 72 464 98 450 120Z"/>
+            <path d="M450 120 C466 100 488 90 512 88 C500 108 478 118 450 120Z"/><path d="M690 120 C672 94 670 66 684 40 C700 66 704 94 690 120Z"/>
+            <path d="M900 120 C884 96 882 70 894 46 C910 70 912 96 900 120Z"/><path d="M900 120 C916 102 938 92 962 92 C950 110 928 120 900 120Z"/>
+            <path d="M1130 120 C1112 94 1110 64 1124 38 C1140 64 1144 94 1130 120Z"/><path d="M1320 120 C1306 96 1306 70 1318 46 C1334 70 1336 96 1320 120Z"/>
+        </g>
+        <path class="al-follaje-suelo" d="M0 104 C 160 92 320 98 480 106 C 640 114 800 100 960 98 C 1120 96 1280 106 1440 100 L1440 120 L0 120 Z"/>
+    </svg>
+    <div class="container al-pie-dentro">
+        <div class="al-pie-marca">
+            <span class="al-marca-emblema"><img th:src="@{/img/marca/allpana-emblema.png}" alt="" width="36" height="32"></span>
+            <span><strong>ALLPANA</strong><small>Huertos Medicinales Comunitarios</small></span>
+        </div>
+        <nav class="al-pie-enlaces" aria-label="Enlaces del pie de página">
+            <a th:href="@{/}">Inicio</a>
+            <a th:href="@{/mapa}">Mapa</a>
+            <a th:href="@{/ranking}">Ranking</a>
+        </nav>
+    </div>
+    <div class="container al-pie-legal">
+        Prototipo académico · Calidad de Software · Escuela Politécnica Nacional.
+        Los datos y textos de demostración son ficticios o ilustrativos; no constituyen recomendaciones clínicas.
+    </div>
+</footer>
+<script th:src="@{/vendor/bootstrap/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/app.js}"></script>
+<script th:src="@{/js/interior.js(v='20261111')}"></script>
+</body>
+</html>

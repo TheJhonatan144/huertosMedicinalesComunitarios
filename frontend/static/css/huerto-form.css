@@ -1,12 +1,12 @@
 /* Formulario del huerto (sección 3): tarjetas seleccionables. Prefijo hf-. Sin JavaScript. */
 
 .hf-bloque {
-    --hf-verde-oscuro: #31543A;
-    --hf-verde: #4F7A4D;
-    --hf-verde-claro: #9CCB86;
-    --hf-crema: #FAF6EA;
-    --hf-terracota: #C87955;
-    --hf-sol: #E8BD59;
+    --hf-verde-oscuro: var(--al-verde-oscuro);
+    --hf-verde: var(--al-verde);
+    --hf-verde-claro: var(--al-sauce);
+    --hf-crema: var(--al-fondo);
+    --hf-terracota: var(--al-oxido);
+    --hf-sol: var(--al-musgo);
 }
 
 .hf-bloque-huerto { border-top: 1px solid var(--borde); padding-top: .5rem; }

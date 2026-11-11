@@ -1,0 +1,64 @@
+# Blueprint de Render para ALLPANA (Huertos Medicinales Comunitarios).
+# Render lee este archivo y crea, ya conectados: la aplicación web (Spring Boot + vistas Thymeleaf, con el Dockerfile
+# del repositorio) y la base de datos PostgreSQL. Guía paso a paso: docs/despliegue.md
+#
+# Notas del plan gratuito (revisa las condiciones vigentes en render.com/pricing):
+#  - La aplicación se "duerme" tras un rato sin visitas; la primera visita luego tarda en despertar (~1 minuto).
+#  - El disco del servicio gratuito NO es persistente: las fotos/videos de evidencias se pierden al reiniciar o
+#    redesplegar. Para conservarlos hace falta un plan de pago con disco (ver docs/despliegue.md).
+#  - La base de datos gratuita tiene vencimiento; anota la fecha que muestre Render.
+
+services:
+  - type: web
+    name: allpana
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      # Datos de demostración (cuentas gestor_a, revisor_a…) SOLO si la base está vacía. Quita "demo" para producción real.
+      - key: SPRING_PROFILES_ACTIVE
+        value: demo
+      # Conexión a la base creada abajo (Render rellena estos valores solo).
+      - key: DB_HOST
+        fromDatabase:
+          name: allpana-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: allpana-db
+          property: port
+      - key: DB_NOMBRE
+        fromDatabase:
+          name: allpana-db
+          property: database
+      - key: DB_USUARIO
+        fromDatabase:
+          name: allpana-db
+          property: user
+      - key: DB_CLAVE
+        fromDatabase:
+          name: allpana-db
+          property: password
+      # Contraseña de las cuentas de demostración: Render la pide al crear el Blueprint (no se guarda en el repositorio).
+      - key: DEMO_CLAVE
+        sync: false
+      # Cuenta de administración técnica inicial (opcional): Render las pide al crear el Blueprint.
+      - key: ADMIN_TECNICO_USUARIO
+        sync: false
+      - key: ADMIN_TECNICO_NOMBRE
+        sync: false
+      - key: ADMIN_TECNICO_CLAVE
+        sync: false
+      # Java ajustado a los 512 MB del plan gratuito.
+      - key: JAVA_TOOL_OPTIONS
+        value: "-XX:MaxRAMPercentage=75 -XX:+UseSerialGC -Xss512k"
+
+databases:
+  - name: allpana-db
+    plan: free
+    databaseName: huertos
+    user: huertos
+    postgresMajorVersion: "17"
