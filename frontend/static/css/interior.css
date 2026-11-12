@@ -107,6 +107,7 @@ body:not(:has(.al-portada)) .app-main > div > section {
 
 /* ---------- Encabezado de página editorial ---------- */
 body:not(:has(.al-portada)) .app-main section > h1:first-child,
+body:not(:has(.al-portada)) .app-main .row.justify-content-center > [class*="col-"] > h1:first-child,
 body:not(:has(.al-portada)) .app-main section > .d-flex:first-child h1 {
     position: relative;
     font-size: clamp(1.7rem, 2.6vw, 2.35rem);
@@ -114,6 +115,7 @@ body:not(:has(.al-portada)) .app-main section > .d-flex:first-child h1 {
     margin-bottom: .35rem;
 }
 body:not(:has(.al-portada)) .app-main section > h1:first-child::before,
+body:not(:has(.al-portada)) .app-main .row.justify-content-center > [class*="col-"] > h1:first-child::before,
 body:not(:has(.al-portada)) .app-main section > .d-flex:first-child h1::before {
     content: "";
     position: absolute;
@@ -324,12 +326,17 @@ fieldset.plantas-panel, .plantas-panel {
 }
 
 /* ---------- Formularios principales en un panel ---------- */
+body:not(:has(.al-portada)) .app-main .row.justify-content-center > [class*="col-"] > form,
 body:not(:has(.al-portada)) .app-main section > form:not(.d-inline):not(.m-0):not([class*="d-flex"]):not(:has(.plantas-panel)):has(.form-control, .form-select) {
     background: var(--al-superficie);
     border: 1px solid var(--al-borde);
     border-radius: 22px;
     padding: clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 3.5vw, 2.25rem);
     box-shadow: 0 12px 32px color-mix(in srgb, var(--al-cafe) 7%, transparent);
+    /* Si el formulario usa .row de Bootstrap (márgenes negativos), el panel quedaba más ancho que el título */
+    margin-inline: 0;
+    margin-top: 0;
+    --bs-gutter-x: 1.5rem;
 }
 
 /* Casillas como chips seleccionables (participantes, opciones múltiples) */
@@ -368,3 +375,9 @@ body:not(:has(.al-portada)) .app-main section > form:not(.d-inline):not(.m-0):no
 
 /* Enlace «Más» resaltado cuando la página actual está dentro de él */
 .al-nav-principal .dropdown-toggle[aria-current="page"] { color: #fff; }
+
+/* Título sin subtítulo: espacio suficiente antes del contenido (formularios, tablas, alertas) */
+body:not(:has(.al-portada)) .app-main h1:first-child:not(:has(+ p)),
+body:not(:has(.al-portada)) .app-main .row.justify-content-center > [class*="col-"] > h1:first-child:not(:has(+ p)) {
+    margin-bottom: 1.25rem;
+}
