@@ -5,7 +5,7 @@
 <section>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Actividades del huerto</h1>
-        <a class="btn btn-huerto" th:href="@{/gestor/actividades/nueva}">Registrar actividad</a>
+        <div class="d-flex gap-2"><a class="btn btn-outline-success" th:href="@{/gestor/misiones}">Ver misiones</a><a class="btn btn-huerto" th:href="@{/gestor/actividades/nueva}">Registrar actividad</a></div>
     </div>
     <p class="text-muted" th:if="${actividades.isEmpty()}">Aún no has registrado actividades. Empieza con «Registrar actividad».</p>
     <div class="table-responsive" th:unless="${actividades.isEmpty()}">

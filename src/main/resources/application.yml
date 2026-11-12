@@ -3,7 +3,7 @@ spring:
     name: huertos-medicinales
   datasource:
     # DB_URL completo (Docker Compose) o, si no existe, se arma con las partes que entrega Render (DB_HOST, DB_PORT, DB_NOMBRE).
-    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NOMBRE:huertos}}
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:${DB_PUERTO:5432}}/${DB_NOMBRE:huertos}}
     username: ${DB_USUARIO:huertos}
     password: ${DB_CLAVE:}
   jpa:

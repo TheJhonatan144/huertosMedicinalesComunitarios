@@ -18,6 +18,7 @@ import ec.edu.epn.huertos.evidencias.ValidadorVideo;
 import ec.edu.epn.huertos.evidencias.VideoValidado;
 import ec.edu.epn.huertos.huertos.Huerto;
 import ec.edu.epn.huertos.huertos.HuertoRepository;
+import ec.edu.epn.huertos.misiones.MisionServicio;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -41,11 +42,13 @@ public class ActividadServicio {
     private final ValidadorImagen validador;
     private final ValidadorVideo validadorVideo;
     private final AlmacenamientoArchivos almacenamiento;
+    private final MisionServicio misiones;
 
     public ActividadServicio(ComunidadServicio comunidades, HuertoRepository huertos, ActividadRepository actividades,
                              ActividadParticipanteRepository participantes, IntegranteRepository integrantes,
                              EnvioEvidenciaRepository envios, ValidadorImagen validador,
-                             AlmacenamientoArchivos almacenamiento, ValidadorVideo validadorVideo) {
+                             AlmacenamientoArchivos almacenamiento, ValidadorVideo validadorVideo,
+                             MisionServicio misiones) {
         this.comunidades = comunidades;
         this.huertos = huertos;
         this.actividades = actividades;
@@ -55,20 +58,29 @@ public class ActividadServicio {
         this.validador = validador;
         this.almacenamiento = almacenamiento;
         this.validadorVideo = validadorVideo;
+        this.misiones = misiones;
     }
 
     @Transactional
     public Long registrar(Long gestorUsuarioId, FormularioActividad form, MultipartFile foto) {
+        return registrar(gestorUsuarioId, form, foto, null);
+    }
+
+    /** Registra una actividad vinculada a una misión disponible del huerto. */
+    @Transactional
+    public Long registrar(Long gestorUsuarioId, FormularioActividad form, MultipartFile foto, Long misionHuertoId) {
         Integrante gestor = comunidades.gestorDe(gestorUsuarioId);
         comunidades.exigirComunidadOperativa(gestor.getComunidadId());
         Huerto huerto = huertos.findByComunidadId(gestor.getComunidadId())
                 .orElseThrow(() -> new ReglaNegocioException("Tu comunidad aún no tiene un huerto registrado."));
         validarFecha(form.getFecha());
+        if (misionHuertoId != null) misiones.exigirDisponible(misionHuertoId, huerto.getId(), form.getTipo());
         List<Integrante> seleccion = validarParticipantes(gestor, form.getParticipanteIds());
         Object evidencia = validarArchivo(foto);
         try {
         Actividad actividad = actividades.save(new Actividad(gestor.getComunidadId(), huerto.getId(), gestorUsuarioId,
-                form.getTipo(), form.getDescripcion().trim(), form.getFecha()));
+                form.getTipo(), form.getDescripcion().trim(), form.getFecha(), misionHuertoId));
+        if (misionHuertoId != null) misiones.vincularActividad(misionHuertoId, huerto.getId(), actividad.getId());
         for (Integrante i : seleccion) {
             participantes.save(new ActividadParticipante(actividad.getId(), i.getId(), gestor.getComunidadId()));
         }
@@ -89,6 +101,8 @@ public class ActividadServicio {
             throw new ConflictoException("Solo se puede editar una actividad mientras está pendiente de revisión.");
         }
         validarFecha(form.getFecha());
+        if (actividad.getMisionHuertoId() != null && form.getTipo() != actividad.getTipo())
+            throw new ReglaNegocioException("No puedes cambiar el tipo de una actividad vinculada a una misión.");
         actividad.editar(form.getTipo(), form.getDescripcion().trim(), form.getFecha());
     }
 
@@ -107,11 +121,14 @@ public class ActividadServicio {
             throw new ConflictoException("Solo se puede reenviar una actividad que fue rechazada.");
         }
         validarFecha(form.getFecha());
+        if (actividad.getMisionHuertoId() != null && form.getTipo() != actividad.getTipo())
+            throw new ReglaNegocioException("El tipo de actividad debe conservar el de la misión.");
         Object evidencia = validarArchivo(foto);
         try {
         int numero = envios.ultimoNumero(actividadId) + 1;
         actividad.editar(form.getTipo(), form.getDescripcion().trim(), form.getFecha());
         actividad.reabrirPorReenvio();
+        misiones.reenviarActividad(actividadId);
         guardarEnvio(actividadId, numero, evidencia, comentario);
         } finally { limpiarTemporal(evidencia); }
     }

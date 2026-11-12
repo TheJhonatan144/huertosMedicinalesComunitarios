@@ -62,9 +62,10 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="tipo" class="form-label">Tipo de actividad</label>
-                        <select id="tipo" class="form-select" th:field="*{tipo}" required>
+                        <select id="tipo" class="form-select" th:field="*{tipo}" th:disabled="${misionVinculada}" required>
                             <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.etiqueta()}">Riego manual</option>
                         </select>
+                        <input type="hidden" th:if="${misionVinculada}" name="tipo" th:value="*{tipo}">
                     </div>
                     <div class="col-md-6">
                         <label for="fecha" class="form-label">Fecha</label>
