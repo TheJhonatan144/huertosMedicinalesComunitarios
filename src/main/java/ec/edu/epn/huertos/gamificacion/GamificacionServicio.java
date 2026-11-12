@@ -4,6 +4,7 @@ import ec.edu.epn.huertos.actividades.Actividad;
 import ec.edu.epn.huertos.actividades.ActividadParticipante;
 import ec.edu.epn.huertos.actividades.ActividadParticipanteRepository;
 import ec.edu.epn.huertos.evidencias.EstadoRevision;
+import ec.edu.epn.huertos.misiones.MisionServicio;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -20,14 +21,16 @@ public class GamificacionServicio {
     private final ActividadParticipanteRepository participantes;
     private final RecompensaIndividualRepository individuales;
     private final RecompensaComunitariaRepository comunitarias;
+    private final MisionServicio misiones;
 
     public GamificacionServicio(PropiedadesGamificacion config, ActividadParticipanteRepository participantes,
                                 RecompensaIndividualRepository individuales,
-                                RecompensaComunitariaRepository comunitarias) {
+                                RecompensaComunitariaRepository comunitarias, MisionServicio misiones) {
         this.config = config;
         this.participantes = participantes;
         this.individuales = individuales;
         this.comunitarias = comunitarias;
+        this.misiones = misiones;
     }
 
     /**
@@ -43,12 +46,17 @@ public class GamificacionServicio {
         if (comunitarias.existsByActividadId(actividad.getId())) {
             return false;
         }
+        MisionServicio.RecompensaMision mision = misiones == null ? null
+                : misiones.recompensa(actividad.getMisionHuertoId()).orElse(null);
+        int puntosIndividuales = mision == null ? config.puntosIndividualesPorActividad() : mision.puntosIndividuales();
+        int puntosComunitarios = mision == null ? config.puntosComunitariosPorActividad() : mision.puntosComunitarios();
+        int progreso = mision == null ? config.progresoPorActividad() : mision.progreso();
         for (ActividadParticipante p : participantes.findByActividadId(actividad.getId())) {
-            individuales.save(new RecompensaIndividual(actividad.getId(), p.getIntegranteId(),
-                    actividad.getComunidadId(), config.puntosIndividualesPorActividad()));
+            if (puntosIndividuales > 0) individuales.save(new RecompensaIndividual(actividad.getId(), p.getIntegranteId(),
+                    actividad.getComunidadId(), puntosIndividuales));
         }
         comunitarias.save(new RecompensaComunitaria(actividad.getId(), actividad.getComunidadId(),
-                config.puntosComunitariosPorActividad(), config.progresoPorActividad()));
+                puntosComunitarios, progreso));
         individuales.flush();
         return true;
     }

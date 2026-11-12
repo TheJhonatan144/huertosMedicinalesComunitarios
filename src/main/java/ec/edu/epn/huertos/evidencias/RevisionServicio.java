@@ -16,6 +16,7 @@ import ec.edu.epn.huertos.compartido.Fechas;
 import ec.edu.epn.huertos.compartido.RecursoNoEncontradoException;
 import ec.edu.epn.huertos.compartido.ReglaNegocioException;
 import ec.edu.epn.huertos.gamificacion.GamificacionServicio;
+import ec.edu.epn.huertos.misiones.MisionServicio;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -40,11 +41,13 @@ public class RevisionServicio {
     private final UsuarioRepository usuarios;
     private final GamificacionServicio gamificacion;
     private final DetalleActividadServicio detalles;
+    private final MisionServicio misiones;
 
     public RevisionServicio(AutorizacionServicio autorizacion, ComunidadServicio comunidades,
                             ActividadRepository actividades, ActividadParticipanteRepository participantes,
                             EnvioEvidenciaRepository envios, RevisionRepository revisiones, UsuarioRepository usuarios,
-                            GamificacionServicio gamificacion, DetalleActividadServicio detalles) {
+                            GamificacionServicio gamificacion, DetalleActividadServicio detalles,
+                            MisionServicio misiones) {
         this.autorizacion = autorizacion;
         this.comunidades = comunidades;
         this.actividades = actividades;
@@ -54,6 +57,7 @@ public class RevisionServicio {
         this.usuarios = usuarios;
         this.gamificacion = gamificacion;
         this.detalles = detalles;
+        this.misiones = misiones;
     }
 
     public record ItemBandeja(Long envioId, Long actividadId, String comunidad, String tipo, String registradaPor,
@@ -141,6 +145,9 @@ public class RevisionServicio {
         // Los triggers de recompensas consultan el estado persistido de la actividad: se vuelca antes de otorgar.
         actividades.flush();
         boolean recompensa = decision == EstadoRevision.APROBADA && gamificacion.otorgar(actividad);
+        if (actividad.getMisionHuertoId() != null) {
+            misiones.completarPorActividad(actividad.getId(), decision == EstadoRevision.APROBADA);
+        }
         revisiones.flush();
         return new Resultado(decision, recompensa);
     }
