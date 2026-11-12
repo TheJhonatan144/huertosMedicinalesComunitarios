@@ -52,7 +52,8 @@ public class HuertoVirtualServicio {
     private HuertoVirtual construir(Huerto huerto, boolean puedeRegistrar) {
         List<PlantaPlantadaVista> elegibles = plantas.plantadasActivas(huerto.getId());
         List<HuertoVirtual.PlantaVirtual> visibles = elegibles.stream().limit(MAXIMO_PLANTAS_VISIBLES)
-                .map(p -> new HuertoVirtual.PlantaVirtual(p.nombreComun(), SpritePlanta.paraNombre(p.nombreComun())))
+                .map(p -> new HuertoVirtual.PlantaVirtual(p.nombreComun(),
+                        SpritePlanta.paraEspecie(p.nombreCientifico(), p.nombreComun())))
                 .toList();
         return new HuertoVirtual(huerto.getNombre(), huerto.getTipoSuelo(), huerto.getDiseno(), visibles,
                 elegibles.size(), gamificacion.progreso(huerto.getComunidadId()), puedeRegistrar);

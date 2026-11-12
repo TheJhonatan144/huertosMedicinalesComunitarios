@@ -81,6 +81,8 @@
 .hv-slot { margin: 0; position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; min-width: 0; max-width: 100%; }
 .hv-sprite-caja { width: min(var(--hv-tam, 130px), 100%); aspect-ratio: 1; position: relative; z-index: 1; }
 .hv-sprite-caja .hv-sprite { width: 100%; height: 100%; overflow: visible; display: block; }
+/* Ilustración por especie (<img> de /img/huerto/plantas/<clave>.svg, viewBox 1024×1024, fondo transparente). */
+.hv-sprite-caja img.hv-sprite { object-fit: contain; }
 
 .hv-etiqueta-madera {
     margin-top: .4rem;
@@ -219,12 +221,20 @@
     animation: hv-flor 3.8s ease-in-out infinite;
     animation-delay: var(--d, 0s);
 }
+/* Balanceo de TODA la planta ilustrada: pivota abajo al centro, pocos grados, desfasado por planta (--i). */
+.hv-sprite-caja img.hv-sprite {
+    transform-origin: 50% 100%;
+    animation: hv-planta 5.6s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * -0.7s);
+}
 @keyframes hv-balanceo { 0%, 100% { transform: rotate(-2.6deg); } 50% { transform: rotate(2.6deg); } }
+@keyframes hv-planta   { 0%, 100% { transform: rotate(-1.8deg); } 50% { transform: rotate(1.8deg); } }
 @keyframes hv-flor     { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.07) rotate(5deg); } }
 @keyframes hv-columpio { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
 
 @media (prefers-reduced-motion: reduce) {
-    .hv-sprite .hv-hoja, .hv-sprite .hv-flor, .hv-composicion-colgante .hv-slot { animation: none !important; }
+    .hv-sprite .hv-hoja, .hv-sprite .hv-flor, .hv-composicion-colgante .hv-slot,
+    .hv-sprite-caja img.hv-sprite { animation: none !important; }
 }
 
 /* ---- Celular ---- */
