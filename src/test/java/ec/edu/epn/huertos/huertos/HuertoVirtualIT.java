@@ -198,7 +198,8 @@ class HuertoVirtualIT extends PruebaIntegracion {
                 .contains("visually-hidden").contains("con 1 planta: Manzanilla")
                 .doesNotContain("/evidencias/").doesNotContain(".jpg").doesNotContain(".png");
         assertThat(ocurrencias(html, "<img")).isEqualTo(1);
-        assertThat(html).as("sin sprites incrustados retirados").doesNotContain("<svg");
+        // Sin dibujos incrustados en la página: los objetos de la escena son solo referencias <use> al archivo de objetos.
+        assertThat(html).as("sin sprites incrustados").doesNotContain("<path").doesNotContain("class=\"hv-hoja\"");
     }
 
     @Test
@@ -298,5 +299,28 @@ class HuertoVirtualIT extends PruebaIntegracion {
         assertThat(v.puedeRegistrar()).isFalse();
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Menta");
         assertThat(virtual.paraComunidad(-1L)).isEmpty();
+    }
+
+    @Test
+    void laEscenaEnTierraMuestraMedallaCaminoAlRankingYObjetosDeLaFinca() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        plantada(e, "Menta", 1);
+        // Cualquier diseño de huerto usa la misma escena en tierra en esta primera versión.
+        sueloYDiseno(e, "ARENOSO", "PISO_MACETAS");
+        String html = fragmento(e);
+        assertThat(html).contains("hv-escena", "hv-etapa-0", "hv-medalla", "hv-camino", "hv-regadera", "hv-bomba",
+                "escena-objetos.svg#trofeo", "escena-objetos.svg#regadera", "Cada actividad aprobada suma")
+                .contains("hv-suelo-arenoso").contains("hv-composicion-piso");
+        // El camino al ranking dice algo útil: lidera o cuánto falta para alcanzar el siguiente puesto.
+        assertThat(html.replaceAll("\\s+", " ")).containsPattern("Lidera el ranking|Comparte el puesto #1|Faltan <strong>");
+        // La medalla y el camino son lectura: no aparecen botones ni formularios dentro de la escena.
+        assertThat(html).doesNotContain("<form").doesNotContain("<button");
+    }
+
+    @Test
+    void elHuertoVacioMuestraBrotesYNoMariposasHastaCrecer() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        String html = fragmento(e);
+        assertThat(html).contains("hv-brotes", "hv-etapa-0").doesNotContain("hv-sprite-caja");
     }
 }

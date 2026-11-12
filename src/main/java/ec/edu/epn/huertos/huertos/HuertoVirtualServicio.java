@@ -56,6 +56,7 @@ public class HuertoVirtualServicio {
                         SpritePlanta.paraEspecie(p.nombreCientifico(), p.nombreComun())))
                 .toList();
         return new HuertoVirtual(huerto.getNombre(), huerto.getTipoSuelo(), huerto.getDiseno(), visibles,
-                elegibles.size(), gamificacion.progreso(huerto.getComunidadId()), puedeRegistrar);
+                elegibles.size(), gamificacion.progreso(huerto.getComunidadId()), puedeRegistrar,
+                gamificacion.posicionEnRanking(huerto.getComunidadId()).orElse(null));
     }
 }
