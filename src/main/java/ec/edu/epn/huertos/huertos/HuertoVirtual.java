@@ -21,6 +21,10 @@ public record HuertoVirtual(
 
     /** Planta dibujada: nombre común (etiqueta) y sprite ilustrado (nunca una foto real). */
     public record PlantaVirtual(String nombre, String sprite) {
+        /** true = se dibuja con su archivo {@code /img/huerto/plantas/<sprite>.svg}; false = sprite genérico incrustado. */
+        public boolean tieneArchivo() {
+            return sprite != null && !SpritePlanta.GENERICA.equals(sprite);
+        }
     }
 
     /** Los 6 suelos válidos de V8. */

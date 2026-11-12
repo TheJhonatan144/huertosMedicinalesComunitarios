@@ -51,6 +51,18 @@ class HuertoVirtualIT extends PruebaIntegracion {
         return id;
     }
 
+    /** Especie del catálogo (la crea el administrador) seleccionada y marcada como plantada en el huerto del gestor. */
+    private void delCatalogo(Escenario e, String nombreComun, String nombreCientifico) {
+        FichaEspecie ficha = new FichaEspecie();
+        ficha.setNombreComun(nombreComun);
+        ficha.setNombreCientifico(nombreCientifico);
+        Long especieId = catalogo.guardar(e.revisor().getId(), null, ficha, null).getId();
+        SiembraPlanta siembra = new SiembraPlanta();
+        siembra.setCantidad(1);
+        siembra.setPlantada(true);
+        catalogo.seleccionar(e.gestorUsuario().getId(), especieId, siembra);
+    }
+
     /** Cambia suelo y diseño conservando el resto de datos del huerto (evita el formulario completo de comunidad). */
     private void sueloYDiseno(Escenario e, String suelo, String diseno) {
         Huerto h = huertoRepository.findById(e.huerto().getId()).orElseThrow();
@@ -128,7 +140,7 @@ class HuertoVirtualIT extends PruebaIntegracion {
         HuertoVirtual v = virtual.paraGestor(gestor);
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Manzanilla", "Menta");
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::sprite)
-                .containsExactly(SpritePlanta.MANZANILLA, SpritePlanta.MENTA);
+                .containsExactly("manzanilla", "menta");
         assertThat(fragmento(e)).doesNotContain("Ruda no plantada");
 
         huertos.cambiarEstadoPlanta(gestor, menta, false);                       // desactivada: sale del dibujo
@@ -181,9 +193,37 @@ class HuertoVirtualIT extends PruebaIntegracion {
         plantada(e, "Manzanilla", 2);
         fabrica.registrarActividad(e, e.participantes());
         String html = fragmento(e);
-        assertThat(html).contains("class=\"hv-sprite\"").contains("Ilustración de Manzanilla")
+        assertThat(html).contains("class=\"hv-sprite\"").contains("alt=\"Ilustración de Manzanilla\"")
+                .contains("src=\"/img/huerto/plantas/manzanilla.svg\"")
                 .contains("visually-hidden").contains("con 1 planta: Manzanilla")
-                .doesNotContain("<img").doesNotContain("/evidencias/");
+                .doesNotContain("/evidencias/").doesNotContain(".jpg").doesNotContain(".png");
+        assertThat(ocurrencias(html, "<img")).isEqualTo(1);
+        assertThat(html).as("sin sprites incrustados retirados").doesNotContain("<svg");
+    }
+
+    @Test
+    void conArchivoDibujaImgPorNombreCientificoYSinArchivoUsaLaGenerica() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        // Nombre común fuera de la tabla: la ilustración sale del nombre científico que trae PlantaVirtualLectura.
+        delCatalogo(e, "Menta piperita del barrio", "Mentha × piperita L.");
+        delCatalogo(e, "Romero", "Salvia rosmarinus Spenn.");
+
+        HuertoVirtual v = virtual.paraGestor(e.gestorUsuario().getId());
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Menta piperita del barrio", "Romero");
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::sprite).containsExactly("menta", SpritePlanta.GENERICA);
+
+        String html = fragmento(e);
+        java.util.regex.Matcher img = java.util.regex.Pattern.compile("<img[^>]*>").matcher(html);
+        assertThat(img.find()).isTrue();
+        String etiqueta = img.group();
+        assertThat(etiqueta).contains("class=\"hv-sprite\"").contains("src=\"/img/huerto/plantas/menta.svg\"")
+                .contains("alt=\"Ilustración de Menta piperita del barrio\"").contains("loading=\"lazy\"")
+                .contains("decoding=\"async\"").contains("width=\"300\"").contains("height=\"300\"");
+        assertThat(img.find()).as("solo la especie con archivo usa <img>").isFalse();
+        // Romero no tiene archivo: sprite genérico incrustado, con su texto alternativo y su etiqueta.
+        assertThat(html).contains("aria-label=\"Ilustración de Romero\"").contains("viewBox=\"0 0 120 120\"")
+                .doesNotContain("romero.svg");
+        assertThat(ocurrencias(html, "class=\"hv-etiqueta-madera\"")).isEqualTo(2);
     }
 
     @Test
