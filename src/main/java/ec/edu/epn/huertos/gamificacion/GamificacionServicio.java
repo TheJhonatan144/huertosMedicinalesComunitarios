@@ -128,4 +128,35 @@ public class GamificacionServicio {
         }
         return filas;
     }
+
+    /**
+     * Posición de una comunidad en el ranking y lo que le falta para subir. Vacío si la comunidad no aparece
+     * (inactiva o con eliminación pendiente). Solo lee: no otorga puntos ni cambia el orden.
+     */
+    @Transactional(readOnly = true)
+    public java.util.Optional<PosicionRanking> posicionEnRanking(Long comunidadId) {
+        List<FilaRanking> filas = ranking();
+        FilaRanking propia = filas.stream().filter(f -> f.comunidadId().equals(comunidadId)).findFirst().orElse(null);
+        if (propia == null) {
+            return java.util.Optional.empty();
+        }
+        int porActividad = Math.max(1, config.puntosComunitariosPorActividad());
+        // Comunidad más cercana por encima: la de menor puntaje que supere estrictamente al propio (la primera de su grupo si hay empate).
+        FilaRanking arriba = null;
+        for (FilaRanking f : filas) {
+            if (f.puntos() > propia.puntos() && (arriba == null || f.puntos() < arriba.puntos())) {
+                arriba = f;
+            }
+        }
+        if (arriba != null) {
+            long faltan = arriba.puntos() - propia.puntos();
+            int actividades = (int) Math.max(1, Math.ceil(faltan / (double) porActividad));
+            return java.util.Optional.of(new PosicionRanking(propia.posicion(), filas.size(), propia.puntos(),
+                    arriba.posicion(), arriba.nombre(), faltan, actividades, null, porActividad));
+        }
+        Long ventaja = filas.stream().filter(f -> f.puntos() < propia.puntos()).mapToLong(FilaRanking::puntos).max()
+                .stream().boxed().findFirst().map(segundo -> propia.puntos() - segundo).orElse(null);
+        return java.util.Optional.of(new PosicionRanking(propia.posicion(), filas.size(), propia.puntos(), null, null,
+                null, null, ventaja, porActividad));
+    }
 }

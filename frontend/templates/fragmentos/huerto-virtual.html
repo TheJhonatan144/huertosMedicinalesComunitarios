@@ -2,44 +2,99 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <!--
-  Huerto virtual 2D cenital.
+  Huerto virtual 2D "en tierra" (primera versión: una sola escena para todos los diseños).
   Uso: <section th:replace="~{fragmentos/huerto-virtual :: parcela(${huertoVirtual}, true)}"></section>
   Segundo parámetro: true = incluye la barra de progreso (leída de GamificacionServicio); false = la omite
   (el panel del gestor ya la muestra arriba). Solo ILUSTRACIONES SVG, nunca fotos reales. Datos: HuertoVirtualServicio.
+
+  Gamificación: la escena "crece" con la etapa del huerto (hv-etapa-0..3: semilla, brote, planta joven, huerto
+  floreciente) y la medalla muestra el puesto en el ranking comunitario; debajo, el «camino» dice cuánto falta para subir.
+  Nada aquí otorga puntos: solo lee lo que ya calculó GamificacionServicio.
+
   Plantas: especie con archivo → <img> de /img/huerto/plantas/<clave>.svg (nunca SVG incrustado, por peso y seguridad);
   sin archivo → sprite genérico incrustado. La clave la elige SpritePlanta (tabla especie → archivo).
+  Objetos de la escena: /img/huerto/escena-objetos.svg. Fondo: /img/huerto/escena-tierra.svg (ver huerto-virtual.css).
   Clases con prefijo hv- para no chocar con .huerto-virtual / .suelo-* de app.css.
 -->
 <section th:fragment="parcela(hv, conProgreso)" class="hv-huerto card tarjeta-huerto"
-         th:classappend="'hv-suelo-' + ${hv.claveSuelo()} + ' hv-composicion-' + ${hv.composicion()}">
+         th:classappend="'hv-suelo-' + ${hv.claveSuelo()} + ' hv-composicion-' + ${hv.composicion()} + ' hv-etapa-' + ${hv.etapaEscena()}">
     <div class="card-body">
-        <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-2">
+        <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3">
             <h2 class="h5 mb-0">Huerto virtual</h2>
             <span class="small text-muted" th:text="${hv.nombreHuerto()}">Huerto</span>
         </div>
 
         <p class="visually-hidden" th:text="${hv.descripcionTextual()}">Descripción del huerto virtual</p>
-        <div class="hv-parcela" aria-hidden="true">
-            <div class="hv-viga"></div>
-            <div class="hv-area hv-textura">
-                <div class="hv-slots" th:classappend="'hv-cols-' + ${hv.columnas()}"
-                     th:unless="${hv.plantas().isEmpty()}">
-                    <figure class="hv-slot" th:each="p, estado : ${hv.plantas()}" th:style="'--i:' + ${estado.index}">
-                        <div class="hv-cuerpo">
-                            <div class="hv-sprite-caja">
-                                <img th:if="${p.tieneArchivo()}" class="hv-sprite"
-                                     th:src="@{/img/huerto/plantas/{c}.svg(c=${p.sprite()})}"
-                                     th:alt="'Ilustración de ' + ${p.nombre()}" width="300" height="300"
-                                     loading="lazy" decoding="async">
-                                <th:block th:unless="${p.tieneArchivo()}"><th:block th:replace="~{fragmentos/huerto-virtual :: sprite-generica(${p.nombre()})}"></th:block></th:block>
+
+        <div class="hv-escena" aria-hidden="true">
+            <!-- Marcadores del juego: etapa del huerto y puesto en el ranking -->
+            <div class="hv-hud">
+                <span class="hv-chip-etapa" th:if="${hv.progreso() != null}">
+                    <svg class="hv-ico"><use th:href="@{/img/huerto/escena-objetos.svg#brote}"/></svg>
+                    <span th:text="${hv.progreso().etapa()}">Semilla</span>
+                </span>
+                <span class="hv-medalla" th:if="${hv.ranking() != null}"
+                      th:classappend="${hv.ranking().posicion() == 1} ? 'hv-medalla-oro' : (${hv.ranking().posicion() == 2} ? 'hv-medalla-plata' : (${hv.ranking().posicion() == 3} ? 'hv-medalla-bronce' : 'hv-medalla-hoja'))">
+                    <svg class="hv-ico-trofeo"><use th:href="@{/img/huerto/escena-objetos.svg#trofeo}"/></svg>
+                    <span class="hv-medalla-puesto">#<span th:text="${hv.ranking().posicion()}">1</span></span>
+                </span>
+            </div>
+
+            <!-- Vida que aparece al crecer el huerto -->
+            <div class="hv-vida">
+                <svg class="hv-mariposa hv-mariposa-1"><use th:href="@{/img/huerto/escena-objetos.svg#mariposa}"/></svg>
+                <svg class="hv-mariposa hv-mariposa-2"><use th:href="@{/img/huerto/escena-objetos.svg#mariposa}"/></svg>
+                <svg class="hv-abeja hv-abeja-1"><use th:href="@{/img/huerto/escena-objetos.svg#abeja}"/></svg>
+                <svg class="hv-abeja hv-abeja-2"><use th:href="@{/img/huerto/escena-objetos.svg#abeja}"/></svg>
+                <span class="hv-brillos"><i></i><i></i><i></i><i></i><i></i></span>
+            </div>
+
+            <div class="hv-parcela">
+                <!-- Objetos de la finca: regadera con gotas y bomba de agua -->
+                <div class="hv-regadera">
+                    <svg class="hv-regadera-dibujo"><use th:href="@{/img/huerto/escena-objetos.svg#regadera}"/></svg>
+                    <span class="hv-gotas"><i></i><i></i><i></i><i></i><i></i></span>
+                </div>
+                <div class="hv-bomba">
+                    <svg class="hv-bomba-dibujo"><use th:href="@{/img/huerto/escena-objetos.svg#bomba}"/></svg>
+                    <span class="hv-gotas hv-gotas-bomba"><i></i><i></i><i></i></span>
+                </div>
+
+                <div class="hv-area hv-textura">
+                    <div class="hv-slots" th:classappend="'hv-cols-' + ${hv.columnas()} + ' hv-esc-' + ${hv.columnasEscena()}"
+                         th:unless="${hv.plantas().isEmpty()}">
+                        <figure class="hv-slot" th:each="p, estado : ${hv.plantas()}" th:style="'--i:' + ${estado.index}">
+                            <div class="hv-cuerpo">
+                                <div class="hv-sprite-caja">
+                                    <img th:if="${p.tieneArchivo()}" class="hv-sprite"
+                                         th:src="@{/img/huerto/plantas/{c}.svg(c=${p.sprite()})}"
+                                         th:alt="'Ilustración de ' + ${p.nombre()}" width="300" height="300"
+                                         loading="lazy" decoding="async">
+                                    <th:block th:unless="${p.tieneArchivo()}"><th:block th:replace="~{fragmentos/huerto-virtual :: sprite-generica(${p.nombre()})}"></th:block></th:block>
+                                </div>
+                                <div class="hv-maceta"><span class="hv-tierra hv-textura"></span></div>
                             </div>
-                            <div class="hv-maceta"><span class="hv-tierra hv-textura"></span></div>
-                        </div>
-                        <figcaption class="hv-etiqueta-madera" th:text="${p.nombre()}">Planta</figcaption>
-                    </figure>
+                            <figcaption class="hv-etiqueta-madera" th:text="${p.nombre()}">Planta</figcaption>
+                        </figure>
+                    </div>
+                    <div class="hv-brotes" th:if="${hv.plantas().isEmpty()}">
+                        <svg><use th:href="@{/img/huerto/escena-objetos.svg#brote}"/></svg>
+                        <svg><use th:href="@{/img/huerto/escena-objetos.svg#brote}"/></svg>
+                        <svg><use th:href="@{/img/huerto/escena-objetos.svg#brote}"/></svg>
+                    </div>
+                </div>
+
+                <!-- Flores al frente de la parcela: aparecen desde la etapa «planta joven» -->
+                <div class="hv-flores">
+                    <svg class="hv-flor-1"><use th:href="@{/img/huerto/escena-objetos.svg#flor-roja}"/></svg>
+                    <svg class="hv-flor-2"><use th:href="@{/img/huerto/escena-objetos.svg#flor-amarilla}"/></svg>
+                    <svg class="hv-flor-3"><use th:href="@{/img/huerto/escena-objetos.svg#flor-azul}"/></svg>
+                    <svg class="hv-flor-4"><use th:href="@{/img/huerto/escena-objetos.svg#flor-roja}"/></svg>
+                    <svg class="hv-flor-5"><use th:href="@{/img/huerto/escena-objetos.svg#flor-amarilla}"/></svg>
                 </div>
             </div>
         </div>
+
         <div class="hv-vacia" th:if="${hv.plantas().isEmpty()}">
             <div class="fs-2" aria-hidden="true">🌱</div>
             <p class="mb-1 fw-semibold">Tu parcela está lista y esperando plantas.</p>
@@ -53,6 +108,38 @@
             Mostrando <span th:text="${hv.plantas().size()}">2</span> de <span th:text="${hv.totalPlantas()}">3</span>
             plantadas.
         </p>
+
+        <!-- Camino al ranking: lo que falta para subir (se calcula con el mismo orden del ranking público) -->
+        <div class="hv-camino" th:if="${hv.ranking() != null}" th:with="r=${hv.ranking()}">
+            <div class="hv-camino-puesto"
+                 th:classappend="${r.posicion() == 1} ? 'hv-camino-oro' : (${r.posicion() == 2} ? 'hv-camino-plata' : (${r.posicion() == 3} ? 'hv-camino-bronce' : ''))">
+                <span class="hv-camino-num">#<span th:text="${r.posicion()}">2</span></span>
+                <span class="hv-camino-de">de <span th:text="${r.total()}">5</span> <span th:text="${r.total() == 1} ? 'comunidad' : 'comunidades'">comunidades</span></span>
+            </div>
+            <div class="hv-camino-cuerpo">
+                <p class="hv-camino-titulo mb-1" th:if="${r.esUnica()}">Lidera el ranking: aún es la única comunidad con puntos en juego.</p>
+                <p class="hv-camino-titulo mb-1" th:if="${!r.esUnica() and r.vaPrimera() and r.ventajaPuntos() != null}">
+                    Lidera el ranking con <strong><span th:text="${r.ventajaPuntos()}">40</span> pts</strong> de ventaja.
+                </p>
+                <p class="hv-camino-titulo mb-1" th:if="${!r.esUnica() and r.vaPrimera() and r.ventajaPuntos() == null}">
+                    Comparte el puesto #1: una actividad aprobada más la deja al frente.
+                </p>
+                <p class="hv-camino-titulo mb-1" th:unless="${r.vaPrimera()}">
+                    Faltan <strong><span th:text="${r.faltanPuntos()}">20</span> pts</strong>
+                    (<span th:text="${r.actividadesParaSubir()}">1</span>
+                    <span th:text="${r.actividadesParaSubir() == 1} ? 'actividad aprobada' : 'actividades aprobadas'">actividad aprobada</span>)
+                    para alcanzar el puesto #<span th:text="${r.posicionSiguiente()}">1</span> de
+                    <strong th:text="${r.nombreSiguiente()}">Comunidad</strong>.
+                </p>
+                <div class="progress" role="progressbar" aria-label="Avance hacia el siguiente puesto del ranking"
+                     th:attr="aria-valuenow=${r.porcentajeHaciaSiguiente()},aria-valuemin=0,aria-valuemax=100">
+                    <div class="progress-bar" th:style="'width:' + ${r.porcentajeHaciaSiguiente()} + '%'"></div>
+                </div>
+                <p class="small text-muted mt-1 mb-0">
+                    Cada actividad aprobada suma <span th:text="${r.puntosPorActividad()}">20</span> puntos a la comunidad.
+                </p>
+            </div>
+        </div>
 
         <div class="mt-3 d-flex flex-wrap align-items-center gap-2">
             <span class="hv-etiqueta-suelo">
