@@ -1,87 +1,136 @@
 # Arquitectura
 
-**Monolito modular por capas** (sin microservicios). Cada módulo agrupa lo que cambia junto; no hay capas vacías.
+## Estilo y alcance
+
+**Monolito modular por capas**: un proyecto Maven, un JAR, una aplicación Spring Boot y una base PostgreSQL. Los módulos agrupan funciones de negocio; no son microservicios ni despliegues independientes. Las llamadas entre casos de uso siguen siendo síncronas para conservar las transacciones existentes.
+
+`frontend/` contiene las vistas Thymeleaf y los recursos del navegador. Se empaqueta en el mismo JAR: no es una SPA independiente del servidor.
+
+## Estructura física
+
+```text
+src/main/java/ec/edu/epn/huertos/
+  HuertosApplication.java
+  <modulo>/
+    presentacion/    controladores MVC, advice y adaptación HTTP
+    aplicacion/     casos de uso, consultas, comandos validados y records
+    dominio/        entidades, estados, valores, reglas y puertos
+    persistencia/   repositorios JPA, adaptadores JDBC/EntityManager y archivos
+    configuracion/  configuración técnica y propiedades
+src/main/java/db/catalogo/   migración Java descubierta por Flyway
+src/main/resources/         configuración y migraciones SQL
+frontend/templates/         única ubicación de plantillas activas
+frontend/static/            única ubicación de CSS, JS, imágenes y librerías web
+```
+
+Cada módulo tiene únicamente las capas que utiliza. Los formularios Java son contratos de entrada de aplicación: contienen validación de datos y no acceden a HTTP ni a la base. Las entidades no dependen de ellos.
+
+## Dependencias permitidas
+
+```mermaid
+flowchart LR
+    P[Presentación] --> A[Aplicación]
+    A --> D[Dominio]
+    A --> R[Persistencia]
+    R --> D
+    R -. proyecciones de consulta .-> A
+    C[Configuración] --> A
+    C --> P
+```
+
+1. **Presentación → aplicación:** los controladores usan comandos, identificadores, enums y records. No consultan repositorios, no usan JDBC/EntityManager y no reciben entidades JPA, tampoco anidadas en records.
+2. **Aplicación:** delimita transacciones, verifica permisos, invoca reglas y coordina persistencia. No depende de controladores ni accede directamente a JDBC/EntityManager.
+3. **Dominio:** no depende de aplicación, persistencia, presentación ni configuración. Mantiene las anotaciones JPA del diseño original: no se declara un dominio hexagonal libre de frameworks. Relaciona otras entidades mediante identificadores.
+4. **Persistencia:** contiene consultas, joins, bloqueos y almacenamiento. Los repositorios pueden devolver proyecciones de consulta de aplicación. No depende de la capa HTTP.
+5. **Configuración:** conecta Spring Security, propiedades y componentes; no implementa casos de uso de negocio.
+
+La coordinación entre módulos está en aplicación. Esta arquitectura no declara módulos autónomos, un grafo funcional acíclico ni una base por módulo. Las reglas exigidas son las de las capas y fronteras anteriores. La reorganización no debe confundirse con una implantación de arquitectura hexagonal o microservicios.
 
 ## Módulos
 
-| Módulo (paquete) | Contenido |
+| Módulo | Responsabilidad |
 |---|---|
-| `autenticacion` | `Usuario`, `Rol`, `UsuarioAutenticado`, `AutorizacionServicio` (rol verificado contra la BD), login/panel |
-| `comunidades` | `Comunidad`, `Integrante`, `AsignacionRevisor`, `ComunidadServicio` (cupo, bajas, invitaciones aceptadas e historial de archivos), panel del gestor |
-| `huertos` | `Huerto`, `Planta`, `HuertoServicio`, formularios y controlador del gestor |
-| `actividades` | `Actividad`, `ActividadParticipante`, `ActividadServicio`, `DetalleActividadServicio`, panel del participante |
-| `evidencias` | `EnvioEvidencia`, `Revision`, `RevisionServicio`, `EvidenciaServicio`, `ValidadorImagen`, `AlmacenamientoArchivos`/`AlmacenamientoLocal` |
-| `gamificacion` | `RecompensaIndividual`, `RecompensaComunitaria`, `GamificacionServicio`, niveles, progreso y ranking |
-| `publico` | Mapa, ficha pública y API JSON pública (sin datos personales) |
-| `demo` | Cargador de datos sintéticos (`@Profile("demo")`) |
-| `compartido` | Seguridad, manejo de errores, excepciones de dominio, formato de fechas |
+| `autenticacion` | Usuarios, roles, registro, autenticación, autorización y recarga de identidad de sesión |
+| `comunidades` | Membresías, cupos, invitaciones, transferencias, solicitudes, archivo/restauración, asignaciones y coordinación de eliminación |
+| `huertos` | Huerto real, espacios, cerramientos, catálogo común, plantas seleccionadas y lectura del huerto virtual |
+| `actividades` | Registro, participantes fijados, edición, reenvío, detalle y panel del participante |
+| `evidencias` | Validación de imágenes/videos, almacenamiento, envíos, revisión y limpieza de archivos |
+| `gamificacion` | Recompensas, niveles, puntos, progreso y ranking |
+| `misiones` | Plantillas, dependencias, instancias por huerto y transiciones |
+| `bodega` | CRUD básico de artículos, categorías y cantidades |
+| `publico` | Lecturas del mapa, fichas, portada y ranking público |
+| `compartido` | Excepciones de dominio, fechas, seguridad y manejo web de errores |
+| `demo` | Carga sintética al arrancar con perfil demo y base sin usuarios |
 
-Capas dentro de cada módulo: **presentación** (controladores + plantillas Thymeleaf) → **aplicación** (servicios `@Transactional`) →
-**dominio** (entidades con sus reglas, p. ej. `Actividad.aplicarDecision`) → **persistencia** (repositorios Spring Data + Flyway).
-Las entidades guardan identificadores de otras entidades (no asociaciones JPA) para evitar cargas perezosas en la capa web
-(`open-in-view` desactivado); las vistas se arman en los servicios con `record`.
+## Entidades e identificadores
 
-## Roles
+`Planta` persiste `especieId`, sin `@ManyToOne`. La especie se crea explícitamente en aplicación en los caminos heredados, sin cascadas. El esquema y los datos existentes no cambian.
 
-| Rol funcional | Constante técnica | Notas |
-|---|---|---|
-| Visitante | (anónimo) | Solo consulta pública |
-| Gestor de huerto | `GESTOR_HUERTO` | Su comunidad y huerto |
-| Participante | `PARTICIPANTE` | Datos propios y públicos |
-| Administrador del Ministerio de Salud | `ADMIN_MINISTERIO_SALUD` | Cuenta institucional; revisa evidencias y aprueba solicitudes de creación y eliminación comunitaria |
+Las lecturas resuelven la especie dentro de la transacción y construyen `PlantaVista`/`EspecieVista`. Nombre compartido y fotografía siguen procediendo de la especie; cantidad, activa, plantada y descripción local pertenecen al registro del huerto. El dibujo usa un join explícito en `PlantaVirtualLectura`.
 
-## Control de acceso (defensa en capas)
+`Especie.regiones` conserva una `@ElementCollection` de enums propios: son valores del agregado, no otras entidades. No se permiten `ManyToOne`, `OneToOne`, `OneToMany` ni `ManyToMany` entre entidades.
 
-1. **Por URL** (`SeguridadConfig`): `/gestor/**`, `/participante/**`, `/revision/**` por rol; el resto de lo privado exige sesión.
-2. **En servicios**: `AutorizacionServicio.exigirRol` consulta el rol en la BD; cada caso de uso verifica comunidad/propiedad del recurso
-   (`AccessDeniedException` → 403). Ocultar botones en las plantillas no es control de acceso.
-3. **En la base de datos**: claves compuestas `(id, comunidad_id)`, triggers (revisor asignado y no autor, cupo, inmutabilidad) y restricciones únicas.
+### Revisión de siembras integrada desde Develop
 
-Además: CSRF activo (formularios y logout por POST), contraseñas con hash (`{bcrypt}` vía `DelegatingPasswordEncoder`),
-cabeceras CSP/Referrer-Policy, cookies de sesión `HttpOnly` y `SameSite=Lax`, validación de entrada en servidor (Bean Validation y reglas de servicio).
+`Planta` incorpora `estadoRevision`, `plantadaEn` y `observacionesRevision`. Al pasar a plantada inicia una revisión pendiente; aprobar conserva la fecha de siembra y rechazar retira la planta de la vista virtual sin eliminar la ficha. La relación con especie sigue siendo `especieId`, sin cascadas JPA.
 
-## Modelo de datos (Flyway V1–V15)
+`huertos.aplicacion.RevisionSiembraServicio` autoriza al revisor asignado y decide bajo bloqueo pesimista. `huertos.presentacion.RevisionSiembraController` adapta las rutas `/revision/siembras`; utiliza records de aplicación. `PlantaVista` transporta el estado a las plantillas del gestor y `PlantaPlantadaVista` al huerto virtual. La revisión de una siembra no otorga las recompensas reservadas a las actividades aprobadas.
 
-`usuario` · `comunidad` · `integrante` · `asignacion_revisor` · `huerto` · `planta` · `actividad` · `actividad_participante` ·
-`envio_evidencia` · `revision` · `recompensa_individual` · `recompensa_comunitaria` · `invitacion_comunidad`. V6 conserva pertenencias inactivas y restringe cada cuenta a una sola pertenencia activa. V7 permite cuentas sin comunidad y guarda su perfil; V8 completa los datos del huerto; V9 gestiona invitaciones y traspasos; V10 permite archivar comunidades conservando su historial; V11 registra el estado `plantada` separado de `activa`; V12 agrega datos de comunidad y amplía opciones de diseño y cerramiento.
-Los totales (puntos, progreso, nivel) **se derivan** de los movimientos de recompensa: no hay contadores que puedan desincronizarse.
+La migración `V2026111102__revision_siembra_plantas.sql` se conserva sin alterar respecto de Develop. Las ilustraciones nuevas se integran con su selección y sus pruebas; el detalle de resolución está en [integración de Develop](integracion-develop.md).
 
-## Cómo se garantizan las reglas críticas
+`DatosEspecie` es un valor de dominio. `FichaEspecie` lo construye antes de actualizar la entidad. `ArticuloBodega` recibe nombre, categoría y cantidad sin conocer `FormularioArticulo`.
 
-| Regla | Mecanismo en servicio | Respaldo en base de datos |
-|---|---|---|
-| Cupo por tipo de comunidad (incl. gestor): persona 1, familia 10, condominio 20, barrio 25; una baja libera cupo | `ComunidadServicio.aceptarInvitacion` aplica el límite del tipo, bloquea la fila de `comunidad` (`FOR UPDATE`) y cuenta; para volver después de una baja hace falta aceptar una invitación nueva | Trigger `validar_cupo_comunidad` aplica los mismos límites, bloquea la fila y cuenta con una instantánea nueva; la 2.ª transacción espera y ve el alta de la 1.ª |
-| Participantes solo activos y de la comunidad | `ActividadServicio.validarParticipantes` | FK compuestas `(integrante_id, comunidad_id)` y `(actividad_id, comunidad_id)` |
-| Lista fija de participantes | Se asigna al registrar y se marca `participantes_fijados` | Triggers: `INSERT` rechazado si está fijada; `UPDATE`/`DELETE` siempre rechazados |
-| Una sola decisión por envío | `RevisionServicio.decidir` bloquea el envío (`PESSIMISTIC_WRITE` = `SELECT … FOR UPDATE`) y exige estado `PENDIENTE`; el perdedor recibe `ConflictoException` sin efectos | `UNIQUE (envio_id)` en `revision`; índices parciales: un solo envío `PENDIENTE` y uno `APROBADA` por actividad |
-| Rechazo exige observaciones | Validación en servicio | `CHECK` en `revision` |
-| Solo revisor asignado, con rol y sin autorrevisión | `actividadRevisable` + `exigirRol` | Trigger `validar_revisor` |
-| Pendiente/rechazada no genera puntos ni progreso | `otorgar` solo se invoca tras aprobar | Triggers de recompensa: exigen actividad `APROBADA` y, para individuales, participante de la lista |
-| Recompensa única por actividad (sin duplicar por dobles clics, reintentos o concurrencia) | Chequeo idempotente en `GamificacionServicio.otorgar` dentro de la misma transacción | `UNIQUE (actividad_id, integrante_id)` y `UNIQUE (actividad_id)` |
-| Historial no se altera | Entidades con columnas `updatable=false` | Triggers de inmutabilidad en `revision`, recompensas, participantes y borrado de envíos |
-| Reenvíos concurrentes | `ActividadRepository.bloquearPorId` serializa por actividad | Índice parcial único de envío `PENDIENTE` |
+## Frontera de lectura
 
-**Transacción de la aprobación:** (1) bloquear envío, (2) validar permisos y estado, (3) insertar `revision`, (4) cambiar estados de envío y
-actividad, (5) volcar a la BD (`flush`, porque los triggers consultan el estado persistido), (6) insertar recompensas individuales y comunitaria.
-Todo o nada.
+`HuertosConsultaServicio` y `ConsultaActividadServicio` preparan datos autorizados para las pantallas. Los records `ComunidadVista`, `PertenenciaVista`, `HuertoVista`, `EspacioVista`, `PlantaVista`, `EspecieVista`, `ActividadVista` y `ArticuloVista` no contienen entidades JPA.
 
-## Fotografías
+`PublicoServicio.Ficha` también contiene records en sus componentes anidados. La API JSON del mapa mantiene `HuertoMapa`. `open-in-view: false` permanece desactivado.
 
-`ValidadorImagen` comprueba tamaño, **firma binaria** (JPEG/PNG), coherencia con el decodificador de `ImageIO`, dimensiones máximas y decodifica la
-imagen (con submuestreo para acotar memoria); ignora extensión y `Content-Type` declarados. La clave interna es `AAAA/MM/<uuid>.<ext>`;
-`AlmacenamientoLocal` valida la clave con un patrón estricto y comprueba que la ruta resuelta no salga del directorio.
-Detrás de la interfaz `AlmacenamientoArchivos` (reemplazable por otro medio). Se guarda **fuera de los recursos estáticos**
-(`EVIDENCIAS_DIR`; volumen `huertos_evidencias` en Docker). Se sirven por `/evidencias/envios/{id}/foto` solo al gestor de la comunidad y al
-revisor asignado, con `Cache-Control: no-store` y `X-Content-Type-Options: nosniff`. Si la transacción falla, el archivo recién guardado se elimina.
+`SesionServicio` recarga el principal desde aplicación. Los controladores adaptan la sesión HTTP sin consultar `UsuarioRepository`. `AdminTecnicoServicio` prepara la selección de revisores y devuelve solo los datos necesarios.
 
-## Interfaz
+## Persistencia y transacciones
 
-Thymeleaf con un fragmento de página (`fragmentos/base`) y componentes (`fragmentos/componentes`), Bootstrap 5 local (sin CDN), JavaScript mínimo
-(`app.js`: evita dobles envíos y confirma acciones; `mapa.js`: Leaflet). El mapa muestra siempre, debajo, una **lista alternativa** y avisa si Leaflet
-o los mosaicos de OpenStreetMap no cargan.
+Los servicios declaran lectura por defecto y los comandos mantienen transacciones de escritura. Se conservan autorización, bloqueos e idempotencia existentes.
 
-## Perfiles
+Las consultas JDBC de misiones pertenecen a `MisionDependenciaRepository`; las fotos iniciales, a `FotoCatalogoInicialRepository`; el bloqueo de asignación, a `AsignacionBloqueo`. La eliminación se coordina en `comunidades.aplicacion.EliminacionComunidadServicio` y ejecuta SQL mediante `comunidades.persistencia.EliminacionComunidadRepository`.
 
-- *(por defecto)*: sin datos de demostración.
-- `demo`: cargador de datos sintéticos si la tabla `usuario` está vacía; plantillas sin caché.
-- `test`: usado por las pruebas (directorio temporal de evidencias).
+La decisión sobre evidencia sigue siendo una transacción: bloquear envío, validar revisor/comunidad/estado, escribir revisión, actualizar actividad/envío, hacer flush y generar recompensas. No se introduce mensajería asíncrona ni consistencia eventual.
+
+Flyway gobierna el esquema y Hibernate lo valida. Se mantienen versiones, SQL histórico y checksums de las migraciones. FKs compuestas, índices parciales y triggers continúan respaldando las reglas implementadas. Esta reorganización no equivale a afirmar que todas las invariantes funcionales estén completas; los pendientes están en `cambios-arquitectura.md`.
+
+## Seguridad, errores y archivos
+
+Se mantienen tres defensas: ruta/rol en Spring Security, autorización de cuenta/comunidad/recurso en servicios y restricciones en BD. Roles actuales: SIN_ASIGNAR, GESTOR_HUERTO, PARTICIPANTE, ADMIN_MINISTERIO_SALUD y ADMIN_TECNICO. El visitante es anónimo.
+
+Se conservan CSRF, logout por POST, hashes, CSP, cookies y privacidad de evidencias. Los controladores de solicitudes y administración técnica capturan excepciones de negocio; los errores de integridad se traducen centralmente en `ManejadorErrores`, sin copiar mensajes del driver al flash.
+
+`AlmacenamientoArchivos` conserva el puerto original. `ImagenValidada` y `VideoValidado` son valores de dominio. `AlmacenamientoLocal` es el adaptador de persistencia, guarda fuera de recursos estáticos y comprueba claves/rutas. El video requiere FFprobe.
+
+Se conservan la compensación de subidas fallidas y la cola de borrados posterior al commit. No se afirma atomicidad distribuida entre BD y disco ante un cierre abrupto.
+
+## Recursos y despliegue
+
+Maven toma las vistas solo de `frontend/`. Las antiguas rutas de plantillas/estáticos bajo `src/main/resources` se excluyen del empaquetado y las pruebas rechazan archivos allí. `bin/` es un árbol heredado ajeno a las fuentes activas y excluido del contexto Docker; no debe editarse ni ejecutarse como esta versión.
+
+Se conserva un despliegue con aplicación, PostgreSQL y almacenamiento de evidencias. Compose declara volúmenes para ambos. La persistencia del almacenamiento de un despliegue externo debe resolverse según su configuración; este cambio no contrata ni configura un proveedor nuevo.
+
+## Comprobaciones ejecutables
+
+`ArquitecturaTest` analiza bytecode productivo con ASM de Spring y verifica:
+
+1. Dominio independiente de capas externas y HTTP.
+2. Presentación sin persistencia ni entidades JPA.
+3. Aplicación y persistencia sin dependencia de presentación.
+4. JDBC y EntityManager únicamente en persistencia.
+5. Relaciones entre entidades mediante identificadores.
+6. Records sin entidades ni colecciones de entidades.
+7. Servicios con frontera transaccional declarada.
+8. Ubicación única de recursos de interfaz.
+
+Se ejecuta con `mvnw.cmd -Dtest=ArquitecturaTest test`, sin Docker. La suite completa se ejecuta con mvnw.cmd verify y mantiene PostgreSQL real, por defecto mediante Testcontainers. Para una base PostgreSQL desechable ya iniciada admite `-Dhuertos.test.db.url=...`, `-Dhuertos.test.db.usuario=...` y `-Dhuertos.test.db.clave=...`.
+
+Estas reglas no sustituyen pruebas funcionales, concurrencia, seguridad, rendimiento o revisión visual.
+
+## Arquitectura de pruebas
+
+Las pruebas reflejan módulo y capa en src/test/java; soporte y recorridos tienen ubicaciones explícitas. Surefire ejecuta *Test y Failsafe *IT. Véanse [guía](../src/test/README.md) y [criterios y verificación](calidad-pruebas.md).
