@@ -74,7 +74,11 @@
                                 </div>
                                 <div class="hv-maceta"><span class="hv-tierra hv-textura"></span></div>
                             </div>
-                            <figcaption class="hv-etiqueta-madera" th:text="${p.nombre()}">Planta</figcaption>
+                            <figcaption class="hv-etiqueta-madera">
+                                <span th:text="${p.nombre()}">Planta</span>
+                                <span class="badge text-bg-warning ms-1" th:if="${p.estadoRevision() == 'PENDIENTE'}">En revisión</span>
+                                <span class="badge text-bg-success ms-1" th:if="${p.estadoRevision() == 'APROBADA'}">Aprobada</span>
+                            </figcaption>
                         </figure>
                     </div>
                     <div class="hv-brotes" th:if="${hv.plantas().isEmpty()}">

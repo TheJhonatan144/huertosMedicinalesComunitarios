@@ -15,9 +15,9 @@ import org.springframework.data.repository.query.Param;
 public interface PlantaVirtualLectura extends Repository<Planta, Long> {
 
     @Query("""
-            select new ec.edu.epn.huertos.huertos.PlantaPlantadaVista(p.id, e.nombreComun, e.nombreCientifico)
+            select new ec.edu.epn.huertos.huertos.PlantaPlantadaVista(p.id, e.nombreComun, e.nombreCientifico, p.estadoRevision)
             from Planta p join p.especie e
-            where p.huertoId = :huertoId and p.plantada = true and p.activa = true
+            where p.huertoId = :huertoId and p.plantada = true and p.activa = true and p.estadoRevision <> ec.edu.epn.huertos.evidencias.EstadoRevision.RECHAZADA
             order by e.nombreComun asc, p.id asc
             """)
     List<PlantaPlantadaVista> plantadasActivas(@Param("huertoId") Long huertoId);

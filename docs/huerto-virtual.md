@@ -63,10 +63,24 @@ desde la base (`hv-planta` en `css/huerto-virtual.css`); con `prefers-reduced-mo
 | Llantén de hoja estrecha | *Plantago lanceolata* | `llanten-hoja-estrecha.svg` | 336 KB |
 | Marco | *Ambrosia arborescens* | `marco.svg` | 223 KB |
 | Taraxaco | *Taraxacum* (sect. Taraxacum) | `taraxaco.svg` | 213 KB |
+| Orégano | *Origanum vulgare* | `oregano.svg` | 210 KB |
+| Orquídea ecuatoriana | *Epidendrum quitensium* | `orquidea.svg` | 231 KB |
+| Ortiga menor | *Urtica urens* | `ortiga.svg` | 218 KB |
+| Paico | *Dysphania ambrosioides* | `paico.svg` | 279 KB |
+| Romero | *Salvia rosmarinus* (también *Rosmarinus officinalis*) | `romero.svg` | 381 KB |
+| Tomillo | *Thymus vulgaris* | `tomillo.svg` | 573 KB |
+| Toronjil | *Melissa officinalis* | `toronjil.svg` | 230 KB |
+| Uña de gato | *Uncaria tomentosa* | `una-de-gato.svg` | 157 KB |
+| Violeta | *Viola odorata* | `violeta.svg` | 230 KB |
+| Yuca | *Manihot esculenta* | `yuca.svg` | 189 KB |
 | Hierba luisa (no está en el catálogo; solo por nombre común) | — | `hierba-luisa.svg` | 101 KB |
+| Ruda (no está en el catálogo; solo por nombre común) | — | `ruda.svg` | 259 KB |
+
+Un sinónimo científico (como *Rosmarinus officinalis* para romero) se agrega como otra línea con la misma clave y sin
+nombres comunes.
 
 Tamaños tras optimizar con SVGO 4.1.0 (`--multipass --precision 1`, ejecutado con `npx`, sin agregarlo al proyecto):
-de 8,2 MB a 3,4 MB en total (−58 %). Se compararon en Edge original y optimizado píxel a píxel (1024 y 300 px): solo
+31 archivos, de 15,6 MB a 6,3 MB en total (−60 %). Se compararon en Edge original y optimizado píxel a píxel (1024 y 300 px): solo
 cambian bordes de 1 px por antialiasing, ninguna zona de relleno, así que se conservaron los optimizados. Comprimidos
 con gzip pesarían alrededor de un tercio (p. ej., `achiote.svg` 68 KB → 25 KB), pero la compresión HTTP no está
 activada en la aplicación.
@@ -79,16 +93,11 @@ activada en la aplicación.
 2. Agregar **una línea** a `SpritePlanta.ILUSTRACIONES`:
    `new Ilustracion("<clave>", "<Género epíteto>", "<nombre común>", ...)` (científico `null` si la especie no está en
    el catálogo).
-3. Correr `SpritePlantaTest` e `IlustracionesPlantasTest` (exigen que el archivo exista y sea seguro).
+3. Correr `SpritePlantaTest` e `IlustracionesPlantasTest`. Exigen que el archivo exista y sea seguro, y que la carpeta
+   tenga exactamente un SVG por clave: un archivo sin registrar en la tabla hace fallar la prueba.
 
-Especies del catálogo que aún usan el sprite genérico (11): Ajo sacha (*Mansoa alliacea*), Orégano
-(*Origanum vulgare*), Romero (*Salvia rosmarinus*), Orquídea ecuatoriana (*Epidendrum quitensium*), Tomillo
-(*Thymus vulgaris*), Toronjil (*Melissa officinalis*), Ortiga menor (*Urtica urens*), Violeta (*Viola odorata*), Paico
-(*Dysphania ambrosioides*), Yuca (*Manihot esculenta*) y Uña de gato (*Uncaria tomentosa*). En la carpeta ya hay SVG
-sin conectar con nombres `oregano`, `orquidea`, `ortiga`, `paico`, `romero`, `ruda`, `sin_identificar_hojas_corazon`,
-`tomillo`, `toronjil`, `una_de_gato`, `violeta` y `yuca` (12 archivos, sin optimizar): para usarlos basta renombrarlos a
-su clave final, revisarlos y agregar su línea a la tabla. `ruda` no está en el catálogo y
-`sin_identificar_hojas_corazon` no tiene especie asignada.
+Especie del catálogo que aún usa el sprite genérico: Ajo sacha (*Mansoa alliacea*). El archivo
+`sin_identificar_hojas_corazon.svg` no tiene especie asignada y se sacó del repositorio.
 
 ## Autorización y aislamiento
 
@@ -174,7 +183,7 @@ quedar desincronizada si se renombra la especie. Al integrar esa rama:
 - Las etiquetas de suelos y diseños de `HuertoVirtual` replican las de `GestorHuertoController` (allí son privadas); si
   cambian los códigos o etiquetas, hay que actualizar ambos lugares.
 - «Plantada» no tiene límite al guardar; el tope de 9 es solo del dibujo («Mostrando 9 de N»).
-- Hay ilustración propia para 20 especies (tabla de arriba); el resto usa la genérica.
+- Hay ilustración propia para 31 especies (29 del catálogo, más hierba luisa y ruda); el resto usa la genérica.
 
 ## Cómo probarlo a mano
 

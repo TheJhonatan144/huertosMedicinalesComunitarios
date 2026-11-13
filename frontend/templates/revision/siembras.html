@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Revisión de siembras', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Revisión de siembras</h1>
+    <p class="text-muted">Las plantas ya aparecen en el huerto y continúan creciendo desde su fecha de siembra mientras esperas revisarlas.</p>
+    <p class="text-muted" th:if="${items.isEmpty()}">No hay siembras pendientes de revisión.</p>
+    <div class="table-responsive" th:unless="${items.isEmpty()}">
+        <table class="table align-middle">
+            <thead><tr><th>Planta</th><th>Comunidad</th><th>Cantidad</th><th>Sembrada en</th><th>Decisión</th></tr></thead>
+            <tbody>
+            <tr th:each="i : ${items}">
+                <td th:text="${i.planta()}">Planta</td>
+                <td th:text="${i.comunidad()}">Comunidad</td>
+                <td th:text="${i.cantidad()}">1</td>
+                <td th:text="${i.sembradaEn()}">Fecha</td>
+                <td>
+                    <form class="d-flex flex-column gap-2" method="post" th:action="@{/revision/siembras/{id}/decision(id=${i.id()})}">
+                        <textarea class="form-control form-control-sm" name="observaciones" rows="2" placeholder="Motivo (obligatorio si rechazas)"></textarea>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-success" name="decision" value="APROBADA" type="submit">Aprobar</button>
+                            <button class="btn btn-sm btn-outline-danger" name="decision" value="RECHAZADA" type="submit"
+                                    onclick="return confirm('¿Rechazar esta siembra y retirarla del huerto?')">Rechazar</button>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <a class="btn btn-outline-secondary mt-3" th:href="@{/revision}">Volver a evidencias</a>
+</section>
+</body>
+</html>
