@@ -16,7 +16,7 @@ class PosicionRankingTest {
     private GamificacionServicio con(PuntosComunidad... filas) {
         RecompensaComunitariaRepository repo = mock(RecompensaComunitariaRepository.class);
         when(repo.puntosPorComunidad()).thenReturn(List.of(filas));
-        return new GamificacionServicio(CONFIG, null, null, repo);
+        return new GamificacionServicio(CONFIG, null, null, repo, null);
     }
 
     private static PuntosComunidad c(long id, String nombre, long puntos) {
