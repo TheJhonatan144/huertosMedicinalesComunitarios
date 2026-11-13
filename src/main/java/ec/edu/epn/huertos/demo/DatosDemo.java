@@ -16,6 +16,7 @@ import ec.edu.epn.huertos.huertos.PlantaRepository;
 import ec.edu.epn.huertos.huertos.EspecieRepository;
 import ec.edu.epn.huertos.huertos.EspacioHuertoServicio;
 import ec.edu.epn.huertos.huertos.HuertoCerramientoServicio;
+import ec.edu.epn.huertos.misiones.MisionServicio;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class DatosDemo implements ApplicationRunner {
     private final EspecieRepository especies;
     private final EspacioHuertoServicio espacios;
     private final HuertoCerramientoServicio cerramientos;
+    private final MisionServicio misiones;
     private final PasswordEncoder encoder;
     private final String clave;
 
@@ -56,7 +58,7 @@ public class DatosDemo implements ApplicationRunner {
                      AsignacionRevisorRepository asignaciones, HuertoRepository huertos, PlantaRepository plantas,
                      EspecieRepository especies,
                      PasswordEncoder encoder, EspacioHuertoServicio espacios,
-                     HuertoCerramientoServicio cerramientos,
+                     HuertoCerramientoServicio cerramientos, MisionServicio misiones,
                      @Value("${app.demo.clave}") String clave) {
         this.usuarios = usuarios;
         this.comunidades = comunidades;
@@ -67,6 +69,7 @@ public class DatosDemo implements ApplicationRunner {
         this.especies = especies;
         this.espacios = espacios;
         this.cerramientos = cerramientos;
+        this.misiones = misiones;
         this.encoder = encoder;
         this.clave = clave;
     }
@@ -96,6 +99,9 @@ public class DatosDemo implements ApplicationRunner {
         espacios.sincronizar(huertoB.getId(), huertoB.getAreaM2(), List.of(huertoB.getDiseno()));
         cerramientos.sincronizar(huertoA.getId(), List.of("NATURAL"));
         cerramientos.sincronizar(huertoB.getId(), List.of("CONVENCIONAL"));
+        // Ruta de misiones de inicio: la migración solo cubre huertos que ya existían al migrar.
+        misiones.crearParaHuerto(huertoA.getId());
+        misiones.crearParaHuerto(huertoB.getId());
 
         // Plantas: nombres comunes ilustrativos; sin propiedades medicinales ni recomendaciones (pendiente de fuentes).
         sembrarEjemplo(huertoA, "Manzanilla", "Matricaria chamomilla L.", 12);

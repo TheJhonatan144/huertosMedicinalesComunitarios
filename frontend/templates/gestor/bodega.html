@@ -1,5 +1,33 @@
 <!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina(titulo='Bodega', contenido=~{::section}, avisosPlantas=true)}"><body><section>
 <link rel="stylesheet" th:href="@{/css/plantas.css}">
+<link rel="stylesheet" th:href="@{/css/bodega.css(v='20261113b')}">
 <nav th:replace="~{fragmentos/plantas :: pestanas('bodega')}"></nav>
-<header class="plantas-heroe mb-4"><div><p class="plantas-ceja">Recursos de mi comunidad</p><h1 class="h2">Bodega del huerto</h1><p class="mb-0 text-muted">Un registro sencillo de herramientas, material de siembra y abonos.</p></div><a class="btn btn-huerto" th:href="@{/gestor/bodega/nuevo}">+ Registrar artículo</a></header><p class="small text-muted">Las existencias son independientes de las plantas sembradas.</p><p class="plantas-panel" th:if="${articulos.isEmpty()}">Tu bodega está vacía. Registra el primer artículo.</p><div class="table-responsive" th:unless="${articulos.isEmpty()}"><table class="table align-middle"><caption>Artículos y cantidades actuales de tu comunidad</caption><thead><tr><th scope="col">Nombre</th><th scope="col">Categoría</th><th scope="col">Cantidad</th><th scope="col">Acciones</th></tr></thead><tbody><tr th:each="a : ${articulos}"><td th:text="${a.nombre}"></td><td th:text="${a.categoria.etiqueta()}"></td><td th:text="${a.cantidad}"></td><td><a class="btn btn-sm btn-outline-success" th:href="@{/gestor/bodega/{id}/editar(id=${a.id})}">Editar</a><form class="d-inline" th:action="@{/gestor/bodega/{id}/eliminar(id=${a.id})}" method="post"><button class="btn btn-sm btn-outline-danger" type="submit" data-confirmar="¿Eliminar este artículo de bodega?">Eliminar</button></form></td></tr></tbody></table></div>
+<header class="plantas-heroe mb-4"><div><p class="plantas-ceja">Recursos de mi comunidad</p><h1 class="h2">Bodega del huerto</h1><p class="mb-0 text-muted">Un registro sencillo de herramientas, material de siembra y abonos.</p></div><a class="btn btn-huerto" th:href="@{/gestor/bodega/nuevo}">+ Registrar artículo</a></header>
+<p class="small text-muted">Las existencias son independientes de las plantas sembradas.</p>
+<p class="plantas-panel" th:if="${articulos.isEmpty()}">Tu bodega está vacía. Registra el primer artículo.</p>
+
+<!--
+  Bodega como galpón: cada artículo es un objeto sobre su estante, con su cantidad en una moneda.
+  Los dibujos están en /img/huerto/escena-objetos.svg (símbolos b-*). Las acciones (editar/eliminar) siguen siendo
+  el mismo enlace y el mismo formulario con CSRF de siempre; solo cambian de lugar. Estilos: css/bodega.css.
+-->
+<div class="bd-galpon" th:classappend="${articulos.isEmpty()} ? 'bd-vacio'">
+    <div class="bd-hud" th:unless="${articulos.isEmpty()}">
+        <span class="bd-total" th:with="unidades=${#aggregates.sum(articulos.![cantidad])}">
+            <span class="bd-total-moneda" aria-hidden="true">★</span>
+            <span><strong th:text="${unidades}">0</strong> unidades</span>
+        </span>
+        <span class="bd-total bd-total-art"><span><strong th:text="${#lists.size(articulos)}">0</strong> artículos</span></span>
+    </div>
+
+    <div class="bd-estantes">
+        <div th:replace="~{fragmentos/bodega :: estante('Herramientas', ${articulos.?[categoria.name() == 'HERRAMIENTA']})}"></div>
+        <div th:replace="~{fragmentos/bodega :: estante('Semillas', ${articulos.?[categoria.name() == 'SEMILLA']})}"></div>
+        <div th:replace="~{fragmentos/bodega :: estante('Material de siembra', ${articulos.?[categoria.name() == 'PLANTULA' or categoria.name() == 'ESQUEJE' or categoria.name() == 'ESTACA']})}"></div>
+        <div th:replace="~{fragmentos/bodega :: estante('Abonos y compost', ${articulos.?[categoria.name() == 'ABONO' or categoria.name() == 'COMPOST']})}"></div>
+    </div>
+
+    <svg class="bd-raton" aria-hidden="true"><use th:href="@{/img/huerto/escena-objetos.svg#raton}"/></svg>
+</div>
+
 </section></body></html>

@@ -15,7 +15,7 @@ class GamificacionReglasTest {
                     new PropiedadesGamificacion.Etapa("Brote", 10),
                     new PropiedadesGamificacion.Etapa("Planta joven", 30),
                     new PropiedadesGamificacion.Etapa("Huerto floreciente", 60))),
-            null, null, null);
+            null, null, null, null);
 
     @Test
     void losNivelesIndividualesRespetanLosUmbrales() {
@@ -65,7 +65,7 @@ class GamificacionReglasTest {
         RecompensaIndividualRepository movimientos = Mockito.mock(RecompensaIndividualRepository.class);
         GamificacionServicio gamificacion = new GamificacionServicio(
                 new PropiedadesGamificacion(10, 20, 5, 50, 150, 100, List.of()),
-                null, movimientos, null);
+                null, movimientos, null, null);
 
         Mockito.when(movimientos.totalPuntos(1L)).thenReturn(25L);
         Mockito.when(movimientos.totalPuntos(2L)).thenReturn(100L);

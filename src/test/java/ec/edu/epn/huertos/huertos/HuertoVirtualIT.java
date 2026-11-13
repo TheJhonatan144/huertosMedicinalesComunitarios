@@ -51,6 +51,18 @@ class HuertoVirtualIT extends PruebaIntegracion {
         return id;
     }
 
+    /** Especie del catálogo (la crea el administrador) seleccionada y marcada como plantada en el huerto del gestor. */
+    private void delCatalogo(Escenario e, String nombreComun, String nombreCientifico) {
+        FichaEspecie ficha = new FichaEspecie();
+        ficha.setNombreComun(nombreComun);
+        ficha.setNombreCientifico(nombreCientifico);
+        Long especieId = catalogo.guardar(e.revisor().getId(), null, ficha, null).getId();
+        SiembraPlanta siembra = new SiembraPlanta();
+        siembra.setCantidad(1);
+        siembra.setPlantada(true);
+        catalogo.seleccionar(e.gestorUsuario().getId(), especieId, siembra);
+    }
+
     /** Cambia suelo y diseño conservando el resto de datos del huerto (evita el formulario completo de comunidad). */
     private void sueloYDiseno(Escenario e, String suelo, String diseno) {
         Huerto h = huertoRepository.findById(e.huerto().getId()).orElseThrow();
@@ -128,7 +140,7 @@ class HuertoVirtualIT extends PruebaIntegracion {
         HuertoVirtual v = virtual.paraGestor(gestor);
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Manzanilla", "Menta");
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::sprite)
-                .containsExactly(SpritePlanta.MANZANILLA, SpritePlanta.MENTA);
+                .containsExactly("manzanilla", "menta");
         assertThat(fragmento(e)).doesNotContain("Ruda no plantada");
 
         huertos.cambiarEstadoPlanta(gestor, menta, false);                       // desactivada: sale del dibujo
@@ -181,9 +193,38 @@ class HuertoVirtualIT extends PruebaIntegracion {
         plantada(e, "Manzanilla", 2);
         fabrica.registrarActividad(e, e.participantes());
         String html = fragmento(e);
-        assertThat(html).contains("class=\"hv-sprite\"").contains("Ilustración de Manzanilla")
+        assertThat(html).contains("class=\"hv-sprite\"").contains("alt=\"Ilustración de Manzanilla\"")
+                .contains("src=\"/img/huerto/plantas/manzanilla.svg\"")
                 .contains("visually-hidden").contains("con 1 planta: Manzanilla")
-                .doesNotContain("<img").doesNotContain("/evidencias/");
+                .doesNotContain("/evidencias/").doesNotContain(".jpg").doesNotContain(".png");
+        assertThat(ocurrencias(html, "<img")).isEqualTo(1);
+        // Sin dibujos incrustados en la página: los objetos de la escena son solo referencias <use> al archivo de objetos.
+        assertThat(html).as("sin sprites incrustados").doesNotContain("<path").doesNotContain("class=\"hv-hoja\"");
+    }
+
+    @Test
+    void conArchivoDibujaImgPorNombreCientificoYSinArchivoUsaLaGenerica() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        // Nombre común fuera de la tabla: la ilustración sale del nombre científico que trae PlantaVirtualLectura.
+        delCatalogo(e, "Menta piperita del barrio", "Mentha × piperita L.");
+        delCatalogo(e, "Romero", "Salvia rosmarinus Spenn.");
+
+        HuertoVirtual v = virtual.paraGestor(e.gestorUsuario().getId());
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Menta piperita del barrio", "Romero");
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::sprite).containsExactly("menta", SpritePlanta.GENERICA);
+
+        String html = fragmento(e);
+        java.util.regex.Matcher img = java.util.regex.Pattern.compile("<img[^>]*>").matcher(html);
+        assertThat(img.find()).isTrue();
+        String etiqueta = img.group();
+        assertThat(etiqueta).contains("class=\"hv-sprite\"").contains("src=\"/img/huerto/plantas/menta.svg\"")
+                .contains("alt=\"Ilustración de Menta piperita del barrio\"").contains("loading=\"lazy\"")
+                .contains("decoding=\"async\"").contains("width=\"300\"").contains("height=\"300\"");
+        assertThat(img.find()).as("solo la especie con archivo usa <img>").isFalse();
+        // Romero no tiene archivo: sprite genérico incrustado, con su texto alternativo y su etiqueta.
+        assertThat(html).contains("aria-label=\"Ilustración de Romero\"").contains("viewBox=\"0 0 120 120\"")
+                .doesNotContain("romero.svg");
+        assertThat(ocurrencias(html, "class=\"hv-etiqueta-madera\"")).isEqualTo(2);
     }
 
     @Test
@@ -258,5 +299,28 @@ class HuertoVirtualIT extends PruebaIntegracion {
         assertThat(v.puedeRegistrar()).isFalse();
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Menta");
         assertThat(virtual.paraComunidad(-1L)).isEmpty();
+    }
+
+    @Test
+    void laEscenaEnTierraMuestraMedallaCaminoAlRankingYObjetosDeLaFinca() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        plantada(e, "Menta", 1);
+        // Cualquier diseño de huerto usa la misma escena en tierra en esta primera versión.
+        sueloYDiseno(e, "ARENOSO", "PISO_MACETAS");
+        String html = fragmento(e);
+        assertThat(html).contains("hv-escena", "hv-etapa-0", "hv-medalla", "hv-camino", "hv-regadera", "hv-bomba",
+                "escena-objetos.svg#trofeo", "escena-objetos.svg#regadera", "Cada actividad aprobada suma")
+                .contains("hv-suelo-arenoso").contains("hv-composicion-piso");
+        // El camino al ranking dice algo útil: lidera o cuánto falta para alcanzar el siguiente puesto.
+        assertThat(html.replaceAll("\\s+", " ")).containsPattern("Lidera el ranking|Comparte el puesto #1|Faltan <strong>");
+        // La medalla y el camino son lectura: no aparecen botones ni formularios dentro de la escena.
+        assertThat(html).doesNotContain("<form").doesNotContain("<button");
+    }
+
+    @Test
+    void elHuertoVacioMuestraBrotesYNoMariposasHastaCrecer() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        String html = fragmento(e);
+        assertThat(html).contains("hv-brotes", "hv-etapa-0").doesNotContain("hv-sprite-caja");
     }
 }

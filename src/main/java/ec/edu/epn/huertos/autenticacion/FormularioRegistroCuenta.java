@@ -9,8 +9,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class FormularioRegistroCuenta {
-    @NotBlank(message = "Escribe tu nombre completo.")
-    @Size(max = 120, message = "El nombre admite hasta 120 caracteres.")
     private String nombreCompleto, nombreUsuario, correo, telefono, genero, talentosCertificados;
     private String nivelExperiencia = "APRENDIZ", clave, confirmarClave;
     private LocalDate fechaNacimiento;
@@ -55,6 +53,8 @@ public class FormularioRegistroCuenta {
     public String getConfirmarClave() { return confirmarClave; }
     public void setConfirmarClave(String v) { confirmarClave = v; }
 
+    @NotBlank(message = "Escribe tu nombre completo.")
+    @Size(max = 120, message = "El nombre admite hasta 120 caracteres.")
     public String getNombreCompleto() { return nombreCompleto; }
     public void setNombreCompleto(String v) { nombreCompleto = v; }
 }

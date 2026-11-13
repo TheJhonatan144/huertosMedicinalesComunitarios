@@ -8,6 +8,7 @@ import ec.edu.epn.huertos.huertos.Huerto;
 import ec.edu.epn.huertos.huertos.HuertoRepository;
 import ec.edu.epn.huertos.huertos.EspacioHuertoServicio;
 import ec.edu.epn.huertos.huertos.HuertoCerramientoServicio;
+import ec.edu.epn.huertos.misiones.MisionServicio;
 import java.util.List;
 import java.util.stream.Collectors;
 import jakarta.validation.Validator;
@@ -24,14 +25,15 @@ public class AltaComunidadServicio {
     private final AsignacionRevisorServicio asignaciones;
     private final EspacioHuertoServicio espacios;
     private final HuertoCerramientoServicio cerramientos;
+    private final MisionServicio misiones;
 
     public AltaComunidadServicio(ComunidadRepository comunidades, UsuarioRepository usuarios,
             IntegranteRepository integrantes, HuertoRepository huertos, Validator validador,
             AsignacionRevisorServicio asignaciones, EspacioHuertoServicio espacios,
-            HuertoCerramientoServicio cerramientos) {
+            HuertoCerramientoServicio cerramientos, MisionServicio misiones) {
         this.comunidades = comunidades; this.usuarios = usuarios; this.integrantes = integrantes;
         this.huertos = huertos; this.validador = validador; this.asignaciones = asignaciones;
-        this.espacios = espacios; this.cerramientos = cerramientos;
+        this.espacios = espacios; this.cerramientos = cerramientos; this.misiones = misiones;
     }
 
     @Transactional
@@ -56,6 +58,7 @@ public class AltaComunidadServicio {
                 f.getFuenteAgua().trim(), f.getAbonoNatural().trim(), f.getCerramiento(), f.getLatitud(), f.getLongitud()));
         espacios.sincronizar(huerto.getId(), f.getAreaM2(), f.getDisenos());
         cerramientos.sincronizar(huerto.getId(), f.getGruposCerramiento());
+        misiones.crearParaHuerto(huerto.getId());
         asignaciones.asignarAutomaticamente(comunidad.getId());
         usuario.cambiarRol(Rol.GESTOR_HUERTO);
     }

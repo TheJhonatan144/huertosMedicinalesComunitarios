@@ -1,4 +1,4 @@
-# Frontend de ALLPANA
+# Frontend de ALLPANA - Proyecto Calidad de Software GR05 2026-B
 
 Todo lo que se ve en el navegador vive aquí: las vistas Thymeleaf y los archivos estáticos.
 El backend (Java, configuración y migraciones) sigue en `src/main/`.

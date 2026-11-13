@@ -3,19 +3,26 @@
       th:replace="~{fragmentos/base :: pagina(${existente == null} ? 'Registrar actividad' : 'Editar actividad', ~{::section})}">
 <body>
 <section>
-    <h1 class="h3" th:text="${existente == null} ? 'Registrar actividad' : 'Editar actividad'">Registrar actividad</h1>
-    <form th:object="${form}" method="post" enctype="multipart/form-data" data-una-vez novalidate
-          th:action="${existente == null} ? @{/gestor/actividades} : @{/gestor/actividades/{id}/editar(id=${existente.id()})}">
-        <div class="alert alert-danger" role="alert" th:if="${#fields.hasGlobalErrors()}">
+    <h1 class="h3" th:text="${misionTitulo != null ? 'Misión: ' + misionTitulo : (existente == null ? 'Registrar actividad' : 'Editar actividad')}">Registrar actividad</h1>
+    <form th:object="${form}" method="post" enctype="multipart/form-data"
+      data-una-vez novalidate
+      th:action="${existente == null} ? @{/gestor/actividades} : @{/gestor/actividades/{id}/editar(id=${existente.id()})}">
+
+        <input type="hidden"
+             name="misionHuertoId"
+             th:if="${misionHuertoId != null}"
+             th:value="${misionHuertoId}">
+    <div class="alert alert-danger" role="alert" th:if="${#fields.hasGlobalErrors()}">
             <div th:each="e : ${#fields.globalErrors()}" th:text="${e}">Error</div>
         </div>
         <div class="row g-3">
             <div class="col-md-6">
                 <label for="tipo" class="form-label">Tipo de actividad</label>
-                <select id="tipo" class="form-select" th:field="*{tipo}" th:errorclass="is-invalid" required>
+                <select id="tipo" class="form-select" th:field="*{tipo}" th:errorclass="is-invalid" th:disabled="${misionHuertoId != null or misionVinculada == true}" required>
                     <option value="">Selecciona…</option>
                     <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.etiqueta()}">Riego manual</option>
                 </select>
+                <input type="hidden" th:if="${misionHuertoId != null or misionVinculada == true}" name="tipo" th:value="*{tipo}">
                 <div class="invalid-feedback" th:errors="*{tipo}"></div>
             </div>
             <div class="col-md-6">

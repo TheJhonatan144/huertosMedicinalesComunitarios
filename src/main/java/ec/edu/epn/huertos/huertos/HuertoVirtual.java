@@ -1,5 +1,6 @@
 package ec.edu.epn.huertos.huertos;
 
+import ec.edu.epn.huertos.gamificacion.PosicionRanking;
 import ec.edu.epn.huertos.gamificacion.ProgresoHuerto;
 import java.util.List;
 import java.util.Locale;
@@ -17,10 +18,21 @@ public record HuertoVirtual(
         List<PlantaVirtual> plantas,
         int totalPlantas,
         ProgresoHuerto progreso,
-        boolean puedeRegistrar) {
+        boolean puedeRegistrar,
+        PosicionRanking ranking) {
+
+    /** Sin datos de ranking (pruebas y vistas que no lo necesitan). */
+    public HuertoVirtual(String nombreHuerto, String codigoSuelo, String codigoDiseno, List<PlantaVirtual> plantas,
+                         int totalPlantas, ProgresoHuerto progreso, boolean puedeRegistrar) {
+        this(nombreHuerto, codigoSuelo, codigoDiseno, plantas, totalPlantas, progreso, puedeRegistrar, null);
+    }
 
     /** Planta dibujada: nombre común (etiqueta) y sprite ilustrado (nunca una foto real). */
     public record PlantaVirtual(String nombre, String sprite) {
+        /** true = se dibuja con su archivo {@code /img/huerto/plantas/<sprite>.svg}; false = sprite genérico incrustado. */
+        public boolean tieneArchivo() {
+            return sprite != null && !SpritePlanta.GENERICA.equals(sprite);
+        }
     }
 
     /** Los 6 suelos válidos de V8. */
@@ -92,6 +104,32 @@ public record HuertoVirtual(
     /** Columnas de la cuadrícula cuadrada: 1 planta → 1, 2–4 → 2, 5–9 → 3 (raíz cuadrada redondeada hacia arriba). */
     public int columnas() {
         return Math.max(1, (int) Math.ceil(Math.sqrt(plantas.size())));
+    }
+
+    /**
+     * Columnas de la escena: las plantas se acomodan en un máximo de dos hileras del surco (1 → 1, 2 → 2, 3–4 → 2,
+     * 5–6 → 3, 7–8 → 4, 9 → 5), de modo que cada planta se vea grande.
+     */
+    public int columnasEscena() {
+        int n = plantas.size();
+        return n <= 2 ? Math.max(1, n) : Math.min(5, (n + 1) / 2);
+    }
+
+    /**
+     * Etapa visual del huerto (0 a 3) según el progreso aprobado: 0 semilla, 1 brote, 2 planta joven, 3 huerto
+     * floreciente. Se reconoce por el nombre de la etapa y, si fuera otro (configurable), por el porcentaje.
+     */
+    public int etapaEscena() {
+        if (progreso == null) {
+            return 0;
+        }
+        String etapa = progreso.etapa() == null ? "" : progreso.etapa().toLowerCase(Locale.ROOT);
+        if (etapa.contains("florec")) return 3;
+        if (etapa.contains("joven")) return 2;
+        if (etapa.contains("brote")) return 1;
+        if (etapa.contains("semilla")) return 0;
+        int p = progreso.porcentaje();
+        return p >= 60 ? 3 : p >= 30 ? 2 : p >= 10 ? 1 : 0;
     }
 
     /** Hay más plantas elegibles que las dibujadas («Mostrando 2 de N»). */

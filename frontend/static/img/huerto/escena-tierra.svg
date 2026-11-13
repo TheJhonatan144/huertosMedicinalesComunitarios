@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 640" preserveAspectRatio="xMidYMin slice">
+  <!-- Fondo del huerto virtual "en tierra" de ALLPANA: cielo, sol, nubes, colinas, tractor, árboles, cerca y espantapájaros.
+       Todo el movimiento es CSS dentro del SVG (también corre cuando se usa como imagen de fondo). Sin fotos ni recursos externos. -->
+  <style>
+    .sol-rayos { transform-box: fill-box; transform-origin: center; animation: giro 60s linear infinite; }
+    .sol-brillo { transform-box: fill-box; transform-origin: center; animation: pulso 5s ease-in-out infinite; }
+    .nube-a { animation: deriva 70s linear infinite alternate; }
+    .nube-b { animation: deriva 95s linear infinite alternate-reverse; }
+    .nube-c { animation: deriva 55s linear infinite alternate; }
+    .tractor { animation: recorre 38s linear infinite alternate; }
+    .rueda { transform-box: fill-box; transform-origin: center; animation: giro 3s linear infinite; }
+    .espantapajaros { transform-box: fill-box; transform-origin: 50% 100%; animation: mece 6s ease-in-out infinite alternate; }
+    .ave { animation: vuela 26s linear infinite; }
+    .ave-b { animation-duration: 34s; animation-delay: -12s; }
+    .ala { transform-box: fill-box; transform-origin: 50% 100%; animation: aletea .5s ease-in-out infinite alternate; }
+    .arbol-copa { transform-box: fill-box; transform-origin: 50% 100%; animation: brisa 7s ease-in-out infinite alternate; }
+    @keyframes giro { to { transform: rotate(360deg); } }
+    @keyframes pulso { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .95; transform: scale(1.12); } }
+    @keyframes deriva { from { transform: translateX(-40px); } to { transform: translateX(70px); } }
+    @keyframes recorre { from { transform: translateX(0); } to { transform: translateX(300px); } }
+    @keyframes mece { from { transform: rotate(-2.2deg); } to { transform: rotate(2.2deg); } }
+    @keyframes vuela { from { transform: translate(-80px, 40px); } 50% { transform: translate(420px, 0); } to { transform: translate(900px, 30px); } }
+    @keyframes aletea { from { transform: scaleY(1); } to { transform: scaleY(.35); } }
+    @keyframes brisa { from { transform: rotate(-.8deg); } to { transform: rotate(.8deg); } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#29b6f6"/><stop offset=".55" stop-color="#81d4fa"/><stop offset="1" stop-color="#e1f5fe"/>
+    </linearGradient>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#fff59d" stop-opacity=".95"/><stop offset=".5" stop-color="#ffe082" stop-opacity=".35"/><stop offset="1" stop-color="#ffe082" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pasto" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9ccc65"/><stop offset=".5" stop-color="#7cb342"/><stop offset="1" stop-color="#558b2f"/>
+    </linearGradient>
+    <linearGradient id="colina1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5d6a7"/><stop offset="1" stop-color="#81c784"/></linearGradient>
+    <linearGradient id="colina2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c5e1a5"/><stop offset="1" stop-color="#9ccc65"/></linearGradient>
+    <linearGradient id="madera" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffcc66"/><stop offset=".6" stop-color="#f4b13e"/><stop offset="1" stop-color="#d98c1f"/></linearGradient>
+    <pattern id="surcos" width="48" height="48" patternUnits="userSpaceOnUse" patternTransform="skewX(-30)">
+      <rect width="24" height="48" fill="#b2d77f"/><rect x="24" width="24" height="48" fill="#a3cc6c"/>
+    </pattern>
+    <g id="nube">
+      <ellipse cx="0" cy="0" rx="64" ry="20" fill="#fff"/><circle cx="-28" cy="-14" r="22" fill="#fff"/><circle cx="6" cy="-24" r="28" fill="#fff"/><circle cx="38" cy="-12" r="20" fill="#fff"/>
+      <ellipse cx="0" cy="12" rx="56" ry="9" fill="#e3f2fd" opacity=".8"/>
+    </g>
+    <g id="poste">
+      <path d="M0 14 L9 0 L18 14 L18 92 L0 92 Z" fill="url(#madera)" stroke="#c77d14" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M4 18 V88" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <g id="mata">
+      <path d="M0 0 C-4 -16 -8 -22 -12 -26 C-6 -22 -2 -18 0 -8 C2 -20 6 -26 12 -30 C8 -22 4 -12 4 0 C8 -12 14 -18 20 -20 C14 -12 10 -4 10 0 Z" fill="#558b2f"/>
+    </g>
+  </defs>
+
+  <!-- Cielo, sol y nubes -->
+  <rect width="800" height="400" fill="url(#cielo)"/>
+  <g transform="translate(660 96)">
+    <circle class="sol-brillo" r="96" fill="url(#halo)"/>
+    <g class="sol-rayos" stroke="#ffd54f" stroke-width="5" stroke-linecap="round" opacity=".85">
+      <path d="M0 -56V-74M0 56V74M-56 0H-74M56 0H74M40 -40L52 -52M-40 40L-52 52M40 40L52 52M-40 -40L-52 -52"/>
+    </g>
+    <circle r="38" fill="#ffca28"/><circle r="38" fill="none" stroke="#ffb300" stroke-width="3"/>
+    <ellipse cx="-12" cy="-14" rx="14" ry="8" fill="#fff59d" opacity=".7" transform="rotate(-30)"/>
+  </g>
+  <g class="nube-a"><use href="#nube" transform="translate(130 86) scale(.9)"/></g>
+  <g class="nube-b"><use href="#nube" transform="translate(420 56) scale(.65)" opacity=".95"/></g>
+  <g class="nube-c"><use href="#nube" transform="translate(300 150) scale(.5)" opacity=".9"/></g>
+
+  <!-- Aves -->
+  <g class="ave" fill="#37474f"><g transform="translate(0 70)"><path class="ala" d="M0 0 Q9 -12 18 0 Q9 -5 0 0Z"/><path class="ala" d="M18 0 Q27 -12 36 0 Q27 -5 18 0Z"/></g></g>
+  <g class="ave ave-b" fill="#263238"><g transform="translate(0 120) scale(.8)"><path class="ala" d="M0 0 Q9 -12 18 0 Q9 -5 0 0Z"/><path class="ala" d="M18 0 Q27 -12 36 0 Q27 -5 18 0Z"/></g></g>
+
+  <!-- Colinas y campo con surcos -->
+  <path d="M0 250 C120 210 240 232 360 244 C500 258 640 214 800 238 L800 400 L0 400 Z" fill="url(#colina1)"/>
+  <path d="M0 292 C140 252 300 282 440 274 C580 266 700 250 800 270 L800 400 L0 400 Z" fill="url(#colina2)"/>
+  <path d="M0 292 C140 252 300 282 440 274 C580 266 700 250 800 270 L800 400 L0 400 Z" fill="url(#surcos)" opacity=".55"/>
+
+  <!-- Tractor -->
+  <g class="tractor"><g transform="translate(60 258)">
+    <rect x="0" y="0" width="46" height="18" rx="4" fill="#e53935"/><rect x="26" y="-15" width="20" height="16" rx="3" fill="#c62828"/>
+    <rect x="30" y="-12" width="12" height="9" rx="2" fill="#b3e5fc"/><rect x="2" y="-5" width="16" height="6" rx="2" fill="#ef5350"/>
+    <circle class="rueda" cx="36" cy="22" r="12" fill="#37474f"/><circle cx="36" cy="22" r="5" fill="#ffd54f"/>
+    <circle class="rueda" cx="8" cy="25" r="8" fill="#37474f"/><circle cx="8" cy="25" r="3" fill="#ffd54f"/>
+  </g></g>
+
+  <!-- Árboles del fondo -->
+  <g>
+    <rect x="708" y="232" width="14" height="70" fill="#8d5a2b"/>
+    <g class="arbol-copa">
+      <circle cx="715" cy="220" r="56" fill="#2e7d32"/><circle cx="676" cy="240" r="40" fill="#388e3c"/><circle cx="756" cy="238" r="42" fill="#388e3c"/>
+      <circle cx="702" cy="196" r="34" fill="#43a047"/><circle cx="738" cy="206" r="30" fill="#4caf50"/>
+      <circle cx="694" cy="214" r="6" fill="#ff7043"/><circle cx="730" cy="232" r="6" fill="#ff7043"/><circle cx="752" cy="206" r="5" fill="#ff7043"/>
+    </g>
+    <rect x="70" y="262" width="10" height="44" fill="#8d5a2b"/>
+    <g class="arbol-copa"><circle cx="75" cy="252" r="34" fill="#43a047"/><circle cx="52" cy="268" r="24" fill="#4caf50"/><circle cx="100" cy="268" r="24" fill="#4caf50"/></g>
+  </g>
+
+  <!-- Espantapájaros detrás de la cerca -->
+  <g class="espantapajaros">
+    <rect x="296" y="236" width="8" height="150" fill="#8d5a2b"/>
+    <rect x="236" y="262" width="128" height="10" rx="5" fill="#8d5a2b"/>
+    <path d="M276 262 L324 262 L330 318 L270 318 Z" fill="#fb8c00"/>
+    <path d="M276 262 L300 280 L324 262" fill="none" stroke="#e65100" stroke-width="3"/>
+    <path d="M232 262 l-10 -8 M232 268 l-12 0 M232 274 l-10 8 M368 262 l10 -8 M368 268 l12 0 M368 274 l10 8" stroke="#fdd835" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="300" cy="244" r="19" fill="#ffe0b2" stroke="#e0a96d" stroke-width="2"/>
+    <circle cx="293" cy="241" r="2.6" fill="#37474f"/><circle cx="307" cy="241" r="2.6" fill="#37474f"/>
+    <path d="M293 251 Q300 257 307 251" fill="none" stroke="#c0392b" stroke-width="2.4" stroke-linecap="round"/>
+    <ellipse cx="300" cy="228" rx="34" ry="6" fill="#6d4c41"/><path d="M280 228 Q282 202 300 200 Q318 202 320 228 Z" fill="#8d6e63"/>
+    <rect x="280" y="220" width="40" height="6" fill="#d84315"/>
+    <path d="M272 318 L270 340 M300 318 V346 M328 318 L330 340" stroke="#fdd835" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Pasto delantero -->
+  <rect y="352" width="800" height="288" fill="url(#pasto)"/>
+  <path d="M0 352 C200 340 400 360 600 346 C700 340 760 348 800 346 V360 H0 Z" fill="#aed581" opacity=".7"/>
+
+  <!-- Cerca de madera -->
+  <g>
+    <rect x="0" y="312" width="800" height="12" fill="url(#madera)" stroke="#c77d14" stroke-width="1.2"/>
+    <rect x="0" y="342" width="800" height="12" fill="url(#madera)" stroke="#c77d14" stroke-width="1.2"/>
+    <use href="#poste" x="6" y="278"/><use href="#poste" x="46" y="278"/><use href="#poste" x="86" y="278"/><use href="#poste" x="126" y="278"/>
+    <use href="#poste" x="166" y="278"/><use href="#poste" x="206" y="278"/><use href="#poste" x="246" y="278"/><use href="#poste" x="286" y="278"/>
+    <use href="#poste" x="326" y="278"/><use href="#poste" x="366" y="278"/><use href="#poste" x="406" y="278"/><use href="#poste" x="446" y="278"/>
+    <use href="#poste" x="486" y="278"/><use href="#poste" x="526" y="278"/><use href="#poste" x="566" y="278"/><use href="#poste" x="606" y="278"/>
+    <use href="#poste" x="646" y="278"/><use href="#poste" x="686" y="278"/><use href="#poste" x="726" y="278"/><use href="#poste" x="766" y="278"/>
+  </g>
+
+  <!-- Matas de pasto al pie de la cerca -->
+  <g>
+    <use href="#mata" x="30" y="374"/><use href="#mata" x="120" y="378"/><use href="#mata" x="210" y="372"/><use href="#mata" x="330" y="378"/>
+    <use href="#mata" x="450" y="372"/><use href="#mata" x="560" y="378"/><use href="#mata" x="660" y="372"/><use href="#mata" x="760" y="378"/>
+  </g>
+  <g>
+    <circle cx="70" cy="372" r="5" fill="#fff"/><circle cx="70" cy="372" r="2.2" fill="#ffca28"/>
+    <circle cx="396" cy="376" r="5" fill="#f48fb1"/><circle cx="396" cy="376" r="2.2" fill="#ffca28"/>
+    <circle cx="610" cy="374" r="5" fill="#fff"/><circle cx="610" cy="374" r="2.2" fill="#ffca28"/>
+    <circle cx="730" cy="376" r="5" fill="#ce93d8"/><circle cx="730" cy="376" r="2.2" fill="#ffca28"/>
+  </g>
+</svg>
