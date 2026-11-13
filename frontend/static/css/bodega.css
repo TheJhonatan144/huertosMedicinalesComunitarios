@@ -1,0 +1,223 @@
+/*
+ * Bodega como galpón (pantalla "Bodega"): estantes de madera, objetos ilustrados y cantidades en monedas.
+ * Prefijo bd-. Solo CSS/SVG. Los colores de madera son propios de la escena; el resto sale de paleta.css.
+ */
+
+.bd-galpon {
+    position: relative;
+    isolation: isolate;
+    margin-top: 1rem;
+    padding: clamp(104px, 16vw, 168px) clamp(.75rem, 3vw, 2rem) 78px;
+    border: 3px solid #fff;
+    border-radius: 22px;
+    overflow: hidden;
+    background:
+        url("/img/huerto/galpon-arriba.svg") top center / 100% auto no-repeat,
+        repeating-linear-gradient(90deg, #c47a3d 0 70px, #7b4519 70px 73px, #b96f33 73px 146px, #7b4519 146px 149px);
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--al-cafe, #3b2a18) 24%, transparent), 0 0 0 1px var(--al-borde, #e5e0dc);
+}
+/* Clavos de las tablas */
+.bd-galpon::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(circle at 50% 24px, rgb(255 255 255 / 22%) 0 2.5px, transparent 3px) 0 0 / 149px 200px,
+        radial-gradient(circle at 50% 160px, rgb(255 255 255 / 18%) 0 2.5px, transparent 3px) 0 0 / 149px 200px;
+    opacity: .7;
+}
+/* Piso de tablones */
+.bd-galpon::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 58px;
+    z-index: 0;
+    background:
+        repeating-linear-gradient(90deg, transparent 0 118px, rgb(0 0 0 / 28%) 118px 121px),
+        linear-gradient(180deg, #8a5a2b, #5e3a18);
+    border-top: 6px solid #4a2c10;
+}
+.bd-vacio { padding-bottom: 90px; min-height: 240px; }
+
+/* ---- Marcadores arriba a la derecha ---- */
+.bd-hud { position: absolute; top: 1rem; right: 1rem; z-index: 3; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
+.bd-total {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .25rem .9rem .25rem .3rem;
+    border-radius: 999px;
+    border: 2.5px solid #fff;
+    background: linear-gradient(180deg, #6d4c41, #3e2723);
+    color: #fff;
+    font-size: .85rem;
+    box-shadow: 0 4px 0 #1b0f0b, 0 8px 14px rgb(0 0 0 / 25%);
+}
+.bd-total strong { font-size: 1.05rem; color: #ffe082; }
+.bd-total-art { padding-left: .9rem; }
+.bd-total-moneda {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff3b0, #ffca28 55%, #ef9a00);
+    border: 2px solid #fff;
+    color: #8a5300;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* ---- Estantes ---- */
+.bd-estante { position: relative; z-index: 1; margin-bottom: 1.6rem; }
+.bd-placa {
+    display: inline-block;
+    margin: 0 0 .7rem;
+    padding: .2rem 1rem;
+    font-family: inherit !important;
+    font-size: .8rem !important;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: #4a2a08 !important;
+    background: linear-gradient(180deg, #f6c780, #e3a24a);
+    border: 2px solid #8a4f12;
+    border-radius: 10px;
+    box-shadow: 0 3px 0 rgb(0 0 0 / 30%);
+}
+.bd-fila {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: .5rem 1.3rem;
+    margin: 0;
+    padding: 0 .5rem 22px;
+    list-style: none;
+}
+/* Tabla del estante */
+.bd-fila::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    right: -8px;
+    bottom: 0;
+    height: 18px;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #dd9a44, #9a5e2c);
+    box-shadow: inset 0 2px 0 rgb(255 255 255 / 28%), 0 8px 10px rgb(0 0 0 / 32%);
+}
+
+.bd-objeto {
+    position: relative;
+    z-index: 1;
+    width: clamp(112px, 22vw, 148px);
+    text-align: center;
+}
+.bd-dibujo { position: relative; display: grid; place-items: end center; height: 108px; margin-bottom: -2px; }
+.bd-icono {
+    width: 84px;
+    height: 104px;
+    overflow: visible;
+    filter: drop-shadow(0 5px 2px rgb(0 0 0 / 32%));
+    transform-origin: 50% 100%;
+    transition: transform .45s cubic-bezier(.3, 1.6, .5, 1);
+}
+.bd-objeto:hover .bd-icono, .bd-objeto:focus-within .bd-icono { transform: translateY(-6px) rotate(-5deg) scale(1.12); animation: bd-sacude .6s ease-in-out; }
+@keyframes bd-sacude { 0%, 100% { rotate: 0deg; } 25% { rotate: -5deg; } 75% { rotate: 5deg; } }
+
+/* Cantidad en una moneda */
+.bd-cant {
+    position: absolute;
+    top: -2px;
+    right: 6px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    min-width: 2.3rem;
+    height: 2.3rem;
+    padding: 0 .4rem;
+    border-radius: 999px;
+    border: 2.5px solid #fff;
+    background: radial-gradient(circle at 35% 30%, #fff3b0, #ffca28 55%, #ef9a00);
+    color: #5d3a00;
+    font-weight: 900;
+    font-size: .98rem;
+    box-shadow: 0 3px 0 #b36b00, 0 6px 10px rgb(0 0 0 / 28%);
+    transition: transform .35s cubic-bezier(.3, 1.6, .5, 1);
+}
+.bd-objeto:hover .bd-cant { transform: scale(1.18) rotate(8deg); }
+
+.bd-nombre {
+    display: grid;
+    place-items: center;
+    min-height: 2.9em;
+    margin-top: .4rem;
+    padding: .12rem .5rem;
+    font-size: .8rem;
+    font-weight: 700;
+    color: #4a2a08;
+    background: linear-gradient(180deg, #f6c780, #e3a24a);
+    border: 2px solid #8a4f12;
+    border-radius: 8px;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 28%);
+    overflow-wrap: anywhere;
+}
+.bd-cat { display: block; margin-top: .2rem; font-size: .66rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgb(0 0 0 / 55%); }
+.bd-sin-existencias {
+    display: inline-block;
+    margin-top: .2rem;
+    padding: 0 .55rem;
+    border-radius: 999px;
+    background: #eceff1;
+    color: #546e7a;
+    font-size: .66rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+.bd-agotado .bd-icono { filter: grayscale(.85) opacity(.7) drop-shadow(0 5px 2px rgb(0 0 0 / 25%)); }
+.bd-agotado .bd-cant { background: radial-gradient(circle at 35% 30%, #fafafa, #cfd8dc 55%, #90a4ae); color: #455a64; box-shadow: 0 3px 0 #607d8b, 0 6px 10px rgb(0 0 0 / 22%); }
+
+/* Acciones: aparecen al pasar el cursor o al enfocar (siempre visibles en pantallas táctiles) */
+.bd-acciones {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: .3rem;
+    margin-top: .4rem;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity .25s ease, transform .25s ease;
+}
+.bd-objeto:hover .bd-acciones, .bd-objeto:focus-within .bd-acciones { opacity: 1; transform: none; }
+@media (hover: none) { .bd-acciones { opacity: 1; transform: none; } }
+.bd-acciones .btn { padding: .1rem .6rem; font-size: .72rem; background: #fff; }
+.bd-acciones .btn-outline-success { color: var(--al-verde-oscuro, #006b04); }
+
+/* Ratoncito que cruza el piso */
+.bd-raton {
+    position: absolute;
+    left: -70px;
+    bottom: 8px;
+    z-index: 2;
+    width: 56px;
+    height: 34px;
+    pointer-events: none;
+    animation: bd-corre 22s linear infinite;
+}
+@keyframes bd-corre { 0% { left: -70px; } 55% { left: 105%; } 100% { left: 105%; } }
+
+@media (max-width: 575.98px) {
+    .bd-hud { top: .6rem; right: .6rem; }
+    .bd-total-art { display: none; }
+    .bd-fila { justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .bd-galpon *, .bd-galpon::before, .bd-galpon::after { animation: none !important; transition: none !important; }
+    .bd-raton { display: none; }
+}

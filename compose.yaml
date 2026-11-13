@@ -32,9 +32,12 @@ services:
       DB_USUARIO: ${DB_USUARIO:-huertos}
       DB_CLAVE: ${DB_CLAVE:?Define DB_CLAVE en el archivo .env}
       DEMO_CLAVE: ${DEMO_CLAVE:-Demo-2026!}
+      ADMIN_TECNICO_USUARIO: ${ADMIN_TECNICO_USUARIO:-}
+      ADMIN_TECNICO_NOMBRE: ${ADMIN_TECNICO_NOMBRE:-}
+      ADMIN_TECNICO_CLAVE: ${ADMIN_TECNICO_CLAVE:-}
       EVIDENCIAS_DIR: /datos/evidencias
     ports:
-      - "${APP_PUERTO:-8080}:8080"
+      - "${APP_PUERTO:-8081}:8080"
     volumes:
       - evidencias:/datos/evidencias
 

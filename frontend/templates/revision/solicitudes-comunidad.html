@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina('Solicitudes comunitarias', ~{::section})}">
+<body><section>
+    <h1 class="h3">Solicitudes comunitarias</h1>
+    <p class="text-muted">Revisa solicitudes de creación y eliminación enviadas por gestores. El rechazo requiere una explicación.</p>
+    <div th:if="${solicitudes.isEmpty()}" class="alert alert-info">No hay solicitudes pendientes.</div>
+    <article class="card mb-3" th:each="s : ${solicitudes}">
+        <div class="card-body">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+                <h2 class="h5" th:text="${s.tipo() == T(ec.edu.epn.huertos.comunidades.dominio.TipoSolicitudComunidad).CREAR ? 'Crear comunidad' : 'Eliminar comunidad'}">Solicitud</h2>
+                <span class="text-muted small" th:text="${#temporals.format(s.creadaEn(), 'dd/MM/yyyy HH:mm')}">Fecha</span>
+            </div>
+            <p><strong>Comunidad:</strong> <span th:text="${s.nombreComunidad()}">Nombre</span></p>
+            <p><strong>Solicitante:</strong> <span th:text="${s.solicitante()}">Nombre</span></p>
+            <p th:if="${s.motivoSolicitud() != null}"><strong>Motivo de eliminación:</strong> <span th:text="${s.motivoSolicitud()}">Motivo</span></p>
+            <div th:if="${s.tipo().name() == 'CREAR'}" class="alert alert-light border">
+                <p>Al aprobarla, se crearán la comunidad y su huerto, y quien solicitó quedará como gestor.</p>
+                <pre class="mb-0 text-wrap" th:text="${s.detalleCreacion()}">Detalle del alta</pre>
+            </div>
+            <div th:if="${s.tipo().name() == 'ELIMINAR'}" class="alert alert-warning">
+                Al aprobarla se eliminarán permanentemente la comunidad, su huerto, actividades, evidencias, fotografías y puntos. Las cuentas de sus integrantes conservarán su identidad.
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <form th:action="@{/revision/solicitudes-comunidad/{id}/aprobar(id=${s.id()})}" method="post">
+                    <button class="btn btn-huerto" type="submit" data-confirmar="¿Aprobar esta solicitud?">Aprobar</button>
+                </form>
+                <form th:action="@{/revision/solicitudes-comunidad/{id}/rechazar(id=${s.id()})}" method="post" class="d-flex flex-grow-1 gap-2" style="max-width: 48rem">
+                    <label class="visually-hidden" th:for="|motivo-${s.id()}|">Motivo del rechazo</label>
+                    <input class="form-control" th:id="|motivo-${s.id()}|" name="motivo" maxlength="2000" required placeholder="Motivo del rechazo">
+                    <button class="btn btn-outline-danger" type="submit">Rechazar</button>
+                </form>
+            </div>
+        </div>
+    </article>
+</section></body></html>

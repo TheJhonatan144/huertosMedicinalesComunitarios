@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 210" preserveAspectRatio="xMidYMin slice">
+  <!-- Parte alta del galpón de la bodega de ALLPANA: techo de paja, viga, telarañas y una araña que baja. Ilustración propia. -->
+  <style>
+    .arana { transform-box: fill-box; transform-origin: 50% 0; animation: baja 7s ease-in-out infinite alternate; }
+    .hilo { transform-box: fill-box; transform-origin: 50% 0; animation: hilo 7s ease-in-out infinite alternate; }
+    @keyframes baja { from { transform: translateY(0); } to { transform: translateY(46px); } }
+    @keyframes hilo { from { transform: scaleY(1); } to { transform: scaleY(2.6); } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+  <defs>
+    <linearGradient id="paja" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe082"/><stop offset="1" stop-color="#f2b73a"/></linearGradient>
+  </defs>
+
+  <!-- Techo de paja -->
+  <rect width="800" height="78" fill="url(#paja)"/>
+  <g stroke="#d99a22" stroke-width="3" stroke-linecap="round" opacity=".75">
+    <path d="M0 14h800M0 30h800M0 46h800M0 62h800" stroke-dasharray="26 18 40 14 18 22"/>
+  </g>
+  <g stroke="#fff3c4" stroke-width="2" stroke-linecap="round" opacity=".7">
+    <path d="M12 8l12 18M60 6l10 22M140 10l14 20M220 8l10 20M310 6l12 22M400 10l10 20M490 8l14 20M580 6l10 22M670 10l12 20M750 8l10 18"/>
+  </g>
+  <path d="M0 78 Q20 90 40 78 T80 78 T120 78 T160 78 T200 78 T240 78 T280 78 T320 78 T360 78 T400 78 T440 78 T480 78 T520 78 T560 78 T600 78 T640 78 T680 78 T720 78 T760 78 T800 78 V70 H0Z" fill="#d89a24"/>
+  <rect y="82" width="800" height="14" fill="#7b4a22"/>
+  <rect y="82" width="800" height="4" fill="#a8693a"/>
+
+  <!-- Telarañas de las esquinas -->
+  <g fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.6" stroke-linecap="round">
+    <path d="M800 96 Q748 108 726 160 M800 96 Q770 130 730 130 M800 96 L736 196 M800 96 L792 188"/>
+    <path d="M790 112 Q772 118 764 138 M776 130 Q760 138 752 160 M764 150 Q752 158 744 178"/>
+    <path d="M0 96 Q40 120 50 190 M0 96 L48 170 M0 96 L14 200"/>
+    <path d="M10 110 Q24 118 28 140 M22 126 Q34 136 34 158"/>
+  </g>
+  <!-- Araña que baja -->
+  <g transform="translate(690 100)">
+    <line class="hilo" x1="0" y1="0" x2="0" y2="20" stroke="#fff" stroke-opacity=".8" stroke-width="1.5"/>
+    <g class="arana"><g transform="translate(0 20)">
+      <ellipse cx="0" cy="6" rx="8" ry="6.5" fill="#37474f"/><circle cx="0" cy="-2" r="4.5" fill="#263238"/>
+      <path d="M-7 4 l-9 -6 M-8 7 l-10 0 M-7 10 l-9 6 M7 4 l9 -6 M8 7 l10 0 M7 10 l9 6" stroke="#37474f" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="-1.6" cy="-3" r="1" fill="#ef5350"/><circle cx="1.6" cy="-3" r="1" fill="#ef5350"/>
+    </g></g>
+  </g>
+</svg>

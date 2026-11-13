@@ -15,7 +15,7 @@ Cada fila indica su **tipo**:
 | RB05 | El progreso/efecto solo procede de una evidencia **aprobada** (según el encargo) | Aprobada | Implementada y verificada |
 | RB09 | Una actividad pendiente o rechazada no genera puntos ni progreso (según el encargo) | Aprobada | Implementada y verificada |
 | RB06 | Valores de recompensa, incrementos de progreso y umbrales de nivel | **Pendiente** (no aprobada) | Configurables (`app.gamificacion.*`), marcados «de demostración» |
-| D-01 | Máximo 25 integrantes activos por comunidad, incluido el gestor; una baja libera cupo | Regla obligatoria del encargo (identificador RB no verificado) | Implementada y verificada (servicio + trigger) |
+| D-01 | Cupo de integrantes activos incluido el gestor: persona 1, familia 10, condominio 20 y barrio 25; una baja libera cupo | Regla obligatoria del encargo (identificador RB no verificado) | Implementada y verificada (servicio + trigger) |
 | D-02 | Lista de participantes fijada al registrar; no se agregan, quitan ni sustituyen | Regla obligatoria del encargo | Implementada y verificada (trigger) |
 | D-03 | Actividad editable solo mientras esté pendiente, sin tocar participantes | Regla obligatoria del encargo | Implementada y verificada |
 | D-04 | Rechazo exige observaciones; reenvío conserva envíos, revisiones y observaciones | Regla obligatoria del encargo | Implementada y verificada |
@@ -24,6 +24,8 @@ Cada fila indica su **tipo**:
 | D-07 | Niveles Aprendiz, Oficial, Maestro; Maestro sin cupo máximo | Regla obligatoria del encargo (umbrales: ver RB06) | Implementada y verificada (reglas puras) |
 | D-08 | Revisor solo de comunidades asignadas y sin autorrevisión | Regla obligatoria del encargo | Implementada y verificada |
 | D-09 | Sin duplicación de recompensas por reintentos, dobles clics, reenvíos o revisiones concurrentes | Regla obligatoria del encargo | Implementada y verificada con PostgreSQL real |
+| D-10 | Cada comunidad tiene un único administrador MSP responsable; cada administrador puede tener varias comunidades. Las nuevas asignaciones se distribuyen automáticamente entre administradores activos con menor carga y las reasignaciones son controladas | Regla funcional acordada por el equipo | Implementada (índice único y asignación automática) |
+| D-11 | «Plantada» es el estado real de una planta y no tiene límite. El tope es solo del dibujo del huerto virtual: la parcela es un cuadrado con cuadrícula de hasta 3×3 y muestra como máximo nueve plantas con plantada = true y activa = true, ordenadas por el nombre común de su especie, y si hay más indica «Mostrando 9 de N plantadas» (antes el tope era de dos; ampliado a petición del equipo para ver la parcela cuadrada) Plantada y activa son independientes; la bodega nunca determina qué está plantado | Acordada por el equipo al integrar el catálogo | Implementada (HuertoVirtualIT) |
 
 ## Contradicción RF10 vs RB05/RB09 (registrada, no corregida en la fuente)
 
@@ -57,10 +59,10 @@ Cada fila indica su **tipo**:
 | S-02 | Oficial desde 50 puntos, Maestro desde 150; etapas del huerto en 0/10/30/60 de progreso; meta 100 | idem |
 | S-03 | Fotografía: 5 MiB máx., 8000 px por lado, 25 MP | `app.almacenamiento` |
 | S-04 | Cuentas conocidas con contraseña `Demo-2026!` solo con el perfil `demo` | `application-demo.yml`, `.env.example` |
-| S-05 | Un huerto por comunidad; un usuario en una sola comunidad | Modelo de datos |
+| S-05 | Un huerto por comunidad; una sola pertenencia comunitaria activa por usuario. Las pertenencias inactivas se conservan para el historial. Las cuentas nuevas empiezan sin rol comunitario | Modelo de datos y migraciones V6–V7 |
 | S-06 | Tipos de actividad: riego manual, siembra, deshierbe, abonado orgánico, cosecha, mantenimiento | `TipoActividad` |
 | S-07 | Las fotografías las ven solo el gestor de la comunidad y el revisor asignado (los participantes no) | `EvidenciaServicio` |
 
 ## Fechas
 
-No se elabora cronograma con la fecha del 13 de noviembre de 2026 porque su vigencia no fue confirmada con el equipo. Las fases del [avance](avance.md) se organizan por entregables.
+No se elabora cronograma con la fecha del 13 de noviembre de 2026 porque su vigencia no fue confirmada con el equipo. El seguimiento anterior por entregables se conserva en el [archivo histórico de avance](historico/avance.md).

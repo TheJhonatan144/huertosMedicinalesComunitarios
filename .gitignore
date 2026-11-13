@@ -1,6 +1,6 @@
 target/
 .env
-datos/
+/datos/
 *.log
 .idea/
 *.iml
@@ -9,4 +9,5 @@ datos/
 .project
 .settings/
 .factorypath
+.claude
 HELP.md

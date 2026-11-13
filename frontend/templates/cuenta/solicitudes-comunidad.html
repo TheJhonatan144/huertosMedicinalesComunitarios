@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina('Mis solicitudes', ~{::section})}">
+<body><section>
+    <h1 class="h3">Mis solicitudes comunitarias</h1>
+    <p class="text-muted">El Ministerio de Salud revisará las solicitudes antes de ejecutar la creación o eliminación.</p>
+    <div th:if="${param.creacionEnviada}" class="alert alert-success">Tu solicitud de creación fue enviada. La comunidad se creará después de su aprobación.</div>
+    <div th:if="${solicitudes.isEmpty()}" class="alert alert-info">Todavía no tienes solicitudes.</div>
+    <div class="table-responsive" th:unless="${solicitudes.isEmpty()}">
+        <table class="table align-middle">
+            <thead><tr><th>Tipo</th><th>Comunidad</th><th>Fecha</th><th>Estado</th><th>Respuesta</th></tr></thead>
+            <tbody><tr th:each="s : ${solicitudes}">
+                <td th:text="${s.tipo().name() == 'CREAR' ? 'Creación' : 'Eliminación'}">Creación</td>
+                <td th:text="${s.nombreComunidad()}">Comunidad</td>
+                <td th:text="${#temporals.format(s.creadaEn(), 'dd/MM/yyyy HH:mm')}">Fecha</td>
+                <td th:text="${s.estado().name() == 'PENDIENTE' ? 'Pendiente' : (s.estado().name() == 'APROBADA' ? 'Aprobada' : 'Rechazada')}">Pendiente</td>
+                <td th:text="${s.motivoRechazo() != null ? s.motivoRechazo() : (s.estado().name() == 'APROBADA' ? 'Aprobada por el Ministerio' : '—')}">Respuesta</td>
+            </tr></tbody>
+        </table>
+    </div>
+    <a class="btn btn-outline-success" th:href="@{/cuenta}">Volver a mi cuenta</a>
+</section></body></html>

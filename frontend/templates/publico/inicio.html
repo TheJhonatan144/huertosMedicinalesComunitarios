@@ -1,0 +1,216 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{fragmentos/base :: pagina('Cultivar nos une', ~{::section})}"
+>
+  <body>
+    <section class="pub-page al-inicio">
+      <link rel="stylesheet" th:href="@{/css/publico.css}" />
+      <link rel="stylesheet" th:href="@{/css/portada.css(v='20261111')}" />
+
+      <!-- ===== Portada a pantalla completa: fotografía de la Amazonía ecuatoriana al atardecer ===== -->
+      <header class="al-portada" id="portada" data-seccion="Inicio">
+        <div class="al-escena">
+          <picture>
+            <source
+              type="image/webp"
+              th:srcset="|@{/img/portada/amazonia-800.webp} 800w, @{/img/portada/amazonia-1280.webp} 1280w, @{/img/portada/amazonia-1920.webp} 1920w, @{/img/portada/amazonia-2880.webp} 2880w|"
+              sizes="100vw"
+            />
+            <img
+              class="al-foto"
+              th:src="@{/img/portada/amazonia-1920.jpg}"
+              alt="Vista aérea de un río que serpentea entre la selva amazónica al atardecer, con el sol sobre el horizonte"
+              width="1920"
+              height="1076"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </picture>
+          <div class="al-resplandor" aria-hidden="true"></div>
+        </div>
+        <div class="al-velo" aria-hidden="true"></div>
+
+        <nav class="al-indice" aria-label="Secciones de la portada">
+          <ol>
+            <li><a href="#portada" class="activo"><span>Inicio</span></a></li>
+            <li><a href="#valores"><span>Lo que nos mueve</span></a></li>
+            <li><a href="#como-funciona"><span>Así crecemos</span></a></li>
+            <li><a href="#comunidades"><span>Comunidades</span></a></li>
+            <li><a href="#unete"><span>Súmate</span></a></li>
+          </ol>
+        </nav>
+
+        <div class="al-portada-texto">
+          <p class="al-antetitulo"><span class="al-linea" aria-hidden="true"></span>HUERTOS MEDICINALES COMUNITARIOS · ECUADOR</p>
+          <h1 class="al-titulo">
+            <span class="al-titulo-linea"><span>De la tierra nace</span></span>
+            <span class="al-titulo-linea"><span>lo que <em>nos une.</em></span></span>
+          </h1>
+          <p class="al-bajada">
+            Pequeños huertos. Saberes que se comparten. Comunidades que crecen
+            cuidando la vida a su alrededor.
+          </p>
+          <div class="al-acciones">
+            <a class="al-boton" th:href="@{/mapa}">Descubrir los huertos <span aria-hidden="true">↗</span></a>
+            <a class="al-enlace" href="#como-funciona">Así crecemos juntos <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+
+        <div class="al-portada-pie">
+          <div class="al-dato">
+            <span class="al-dato-numero" th:text="${huertos}" th:attr="data-contar=${huertos}">0</span>
+            <span>comunidades en el mapa<br /><strong>Una misma raíz: cuidar.</strong></span>
+          </div>
+          <div class="al-nota">
+            <span aria-hidden="true">✳</span>
+            <span>Cultivamos plantas.<br /><strong>También comunidad.</strong></span>
+          </div>
+        </div>
+
+        <svg class="al-ola al-ola-fondo-pagina" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+          <path class="al-ola-fondo" d="M0 52 C 180 20 360 20 540 44 C 720 68 900 78 1080 54 C 1260 30 1350 30 1440 40 L1440 90 L0 90 Z" />
+          <path d="M0 62 C 200 34 380 40 560 60 C 740 80 920 84 1100 64 C 1260 46 1360 44 1440 54 L1440 90 L0 90 Z" />
+        </svg>
+        <a class="al-desliza" href="#valores" aria-label="Ir a la siguiente sección">
+          <span>Desliza</span><span class="al-desliza-raya" aria-hidden="true"></span>
+        </a>
+      </header>
+
+      <!-- ===== 01 · Lo que nos mueve ===== -->
+      <section class="al-seccion al-s-valores" id="valores" data-seccion="Lo que nos mueve">
+        <div class="al-seccion-dentro">
+          <ul class="al-tarjetas">
+            <li class="al-tarjeta" data-revelar style="--orden: 1">
+              <span class="al-tarjeta-icono" aria-hidden="true">
+                <svg viewBox="0 0 48 48"><path d="M8 12c6-2 11-1 16 3v24c-5-4-10-5-16-3z"/><path d="M40 12c-6-2-11-1-16 3v24c5-4 10-5 16-3z"/><path class="al-icono-brote" d="M24 15c0-5 3-8 7-9-1 4-3 7-7 9z"/></svg>
+              </span>
+              <h3>Saberes compartidos</h3>
+              <p>Cada comunidad registra sus plantas medicinales y el conocimiento que las acompaña, para que nada se pierda.</p>
+            </li>
+            <li class="al-tarjeta" data-revelar style="--orden: 2">
+              <span class="al-tarjeta-icono" aria-hidden="true">
+                <svg viewBox="0 0 48 48"><path d="M8 38c5-3 11-4 16-4s11 1 16 4"/><path d="M24 34V20"/><path class="al-icono-brote" d="M24 22c-6 0-10-4-11-10 6 0 10 4 11 10z"/><path class="al-icono-brote" d="M24 26c5 0 9-3 10-8-5 0-9 3-10 8z"/></svg>
+              </span>
+              <h3>Cuidado de la tierra</h3>
+              <p>Siembras, riegos y cosechas se registran como actividades con evidencia: el trabajo diario se hace visible.</p>
+            </li>
+            <li class="al-tarjeta" data-revelar style="--orden: 3">
+              <span class="al-tarjeta-icono" aria-hidden="true">
+                <svg viewBox="0 0 48 48"><circle cx="16" cy="17" r="5"/><circle cx="32" cy="17" r="5"/><path d="M6 36c1-6 5-10 10-10s9 4 10 10"/><path d="M22 36c1-6 5-10 10-10s9 4 10 10"/><path class="al-icono-brote" d="M24 12c0-4 2-6 5-7-1 3-2 5-5 7z"/></svg>
+              </span>
+              <h3>Aprendizaje en comunidad</h3>
+              <p>Gestores y participantes cultivan juntos; cada actividad aprobada suma puntos y hace crecer el huerto de todos.</p>
+            </li>
+          </ul>
+        </div>
+        <svg class="al-ola al-ola-blanco" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+          <path class="al-ola-fondo" d="M0 52 C 180 20 360 20 540 44 C 720 68 900 78 1080 54 C 1260 30 1350 30 1440 40 L1440 90 L0 90 Z" />
+          <path d="M0 62 C 200 34 380 40 560 60 C 740 80 920 84 1100 64 C 1260 46 1360 44 1440 54 L1440 90 L0 90 Z" />
+        </svg>
+      </section>
+
+      <!-- ===== 02 · Así crecemos ===== -->
+      <section class="al-seccion al-s-crecemos" id="como-funciona" data-seccion="Así crecemos">
+        <div class="al-seccion-dentro">
+          <div class="al-crecemos-cabecera" data-revelar>
+            <p class="pub-eyebrow">DE LA ACCIÓN AL CRECIMIENTO</p>
+            <h2>Cada cuidado cuenta.</h2>
+            <p class="pub-intro">El progreso tiene raíces reales: el trabajo de las personas.</p>
+          </div>
+          <ol class="al-linea-tiempo">
+            <li class="al-paso" data-revelar style="--orden: 1">
+              <span class="al-paso-nodo" aria-hidden="true"></span>
+              <span class="al-paso-num">01</span>
+              <h3>Nos encontramos</h3>
+              <p>Explora el mapa y conoce los huertos y las comunidades que les dan vida.</p>
+            </li>
+            <li class="al-paso" data-revelar style="--orden: 2">
+              <span class="al-paso-nodo" aria-hidden="true"></span>
+              <span class="al-paso-num">02</span>
+              <h3>Cultivamos y compartimos</h3>
+              <p>El gestor registra una actividad con sus participantes y una evidencia.</p>
+            </li>
+            <li class="al-paso" data-revelar style="--orden: 3">
+              <span class="al-paso-nodo" aria-hidden="true"></span>
+              <span class="al-paso-num">03</span>
+              <h3>El esfuerzo florece</h3>
+              <p>Solo después de una revisión y aprobación se suman puntos y progreso al huerto.</p>
+            </li>
+          </ol>
+        </div>
+        <svg class="al-ola al-ola-sauce" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+          <path class="al-ola-fondo" d="M0 52 C 180 20 360 20 540 44 C 720 68 900 78 1080 54 C 1260 30 1350 30 1440 40 L1440 90 L0 90 Z" />
+          <path d="M0 62 C 200 34 380 40 560 60 C 740 80 920 84 1100 64 C 1260 46 1360 44 1440 54 L1440 90 L0 90 Z" />
+        </svg>
+      </section>
+
+      <!-- ===== 03 · Comunidades ===== -->
+      <section class="al-seccion al-s-comunidades" id="comunidades" data-seccion="Comunidades">
+        <div class="al-seccion-dentro">
+          <div class="al-comunidades-rejilla">
+            <div class="al-comunidades-texto" data-revelar>
+              <p class="pub-eyebrow">CRECEMOS EN COMUNIDAD</p>
+              <h2>Esfuerzos que inspiran</h2>
+              <p class="pub-intro">Conoce el progreso de las comunidades.</p>
+              <a class="al-enlace-flecha" th:href="@{/ranking}">Ver ranking completo <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="al-comunidades-lista">
+              <ol th:unless="${ranking.isEmpty()}">
+                <li th:each="f, e : ${ranking}" data-revelar th:style="'--orden: ' + ${e.count}">
+                  <span class="al-rank-pos" th:text="${f.posicion()}">1</span>
+                  <a th:href="@{/comunidades/{id}(id=${f.comunidadId()})}" th:text="${f.nombre()}">Comunidad</a>
+                  <strong th:text="${f.puntos()} + ' pts'">0 pts</strong>
+                  <span class="al-rank-flecha" aria-hidden="true">↗</span>
+                </li>
+              </ol>
+              <p class="al-comunidades-vacio" th:if="${ranking.isEmpty()}" data-revelar>
+                Las primeras historias de crecimiento están por comenzar.
+              </p>
+            </div>
+          </div>
+        </div>
+        <svg class="al-ola al-ola-cafe" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+          <path class="al-ola-fondo" d="M0 52 C 180 20 360 20 540 44 C 720 68 900 78 1080 54 C 1260 30 1350 30 1440 40 L1440 90 L0 90 Z" />
+          <path d="M0 62 C 200 34 380 40 560 60 C 740 80 920 84 1100 64 C 1260 46 1360 44 1440 54 L1440 90 L0 90 Z" />
+        </svg>
+      </section>
+
+      <!-- ===== 04 · Súmate: micro-interacciones narrativas (raíz que crece con el scroll, hojas que esquivan el cursor) ===== -->
+      <section class="al-seccion al-s-sumate" id="unete" data-seccion="Súmate">
+        <div class="al-sumate-luz" aria-hidden="true"></div>
+        <th:block th:replace="~{fragmentos/arbol-sumate :: arbol}"></th:block>
+        <div class="al-hojas" aria-hidden="true">
+          <span class="al-hoja" style="--x: 8%; --y: 22%; --r: -20deg; --t: 1"></span>
+          <span class="al-hoja" style="--x: 18%; --y: 70%; --r: 35deg; --t: 1.3"></span>
+          <span class="al-hoja al-hoja-b" style="--x: 30%; --y: 12%; --r: 70deg; --t: .8"></span>
+          <span class="al-hoja al-hoja-c" style="--x: 62%; --y: 80%; --r: -45deg; --t: 1.1"></span>
+          <span class="al-hoja" style="--x: 78%; --y: 18%; --r: 15deg; --t: .9"></span>
+          <span class="al-hoja al-hoja-b" style="--x: 90%; --y: 58%; --r: -70deg; --t: 1.2"></span>
+          <span class="al-hoja al-hoja-c" style="--x: 46%; --y: 90%; --r: 120deg; --t: .7"></span>
+          <span class="al-hoja" style="--x: 70%; --y: 42%; --r: 200deg; --t: .6"></span>
+        </div>
+        <div class="al-seccion-dentro al-sumate-dentro">
+          <p class="pub-eyebrow" data-revelar>TU HISTORIA TAMBIÉN PUEDE ECHAR RAÍCES</p>
+          <h2 class="al-sumate-titulo" data-revelar>
+            <span class="al-palabra" style="--i: 0">Un</span> <span class="al-palabra" style="--i: 1">pequeño</span>
+            <span class="al-palabra" style="--i: 2">comienzo.</span> <span class="al-palabra al-palabra-acento" style="--i: 3">Muchas</span>
+            <span class="al-palabra al-palabra-acento" style="--i: 4">posibilidades.</span>
+          </h2>
+          <p class="al-sumate-bajada" data-revelar>Conoce el proyecto y encuentra tu lugar para participar.</p>
+          <div class="al-iman" data-revelar>
+            <a
+              class="al-sumate-boton"
+              th:href="${usuarioActual == null} ? @{/registro} : @{/panel}"
+              ><span class="al-sumate-boton-texto" th:text="${usuarioActual == null} ? 'Crear mi cuenta' : 'Ir a mi panel'">Crear mi cuenta</span
+              ><span class="al-sumate-boton-brote" aria-hidden="true">↗</span></a
+            >
+          </div>
+        </div>
+      </section>
+
+      <script th:src="@{/js/portada.js(v='20261110e')}" defer></script>
+    </section>
+  </body>
+</html>

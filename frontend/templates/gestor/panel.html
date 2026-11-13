@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Mi comunidad', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3" th:text="${comunidad.nombre}">Comunidad</h1>
+    <p class="text-muted">Panel del gestor de huerto · <span th:text="${huerto.nombre}">Huerto</span></p>
+    <div th:if="${eliminacionPendiente}" class="alert alert-warning" role="status">
+        La solicitud de eliminación espera la aprobación del Ministerio. La comunidad está en modo de solo lectura; si la solicitud se rechaza, podrás volver a administrarla.
+        <a th:href="@{/cuenta/solicitudes-comunidad}">Ver mis solicitudes</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3"><div class="card tarjeta-huerto h-100"><div class="card-body">
+            <div class="small text-muted">Integrantes activos · <span th:text="${comunidad.tipoComunidad}">BARRIO</span></div>
+            <div class="fs-3" th:text="${activos} + ' / ' + ${cupo}">1 / 25</div>
+            <a th:href="@{/gestor/integrantes}">Administrar</a>
+        </div></div></div>
+        <div class="col-6 col-lg-3"><div class="card tarjeta-huerto h-100"><div class="card-body">
+            <div class="small text-muted">Puntos comunitarios</div>
+            <div class="fs-3" th:text="${puntosComunitarios}">0</div>
+            <a th:href="@{/ranking}">Ver ranking</a>
+        </div></div></div>
+        <div class="col-6 col-lg-3"><div class="card tarjeta-huerto h-100"><div class="card-body">
+            <div class="small text-muted">Mis puntos individuales</div>
+            <div class="fs-3" th:text="${misPuntos.puntos()}">0</div>
+            <span class="small">Nivel <strong th:text="${misPuntos.nivel().etiqueta()}">Aprendiz</strong></span>
+            <div th:replace="~{fragmentos/componentes :: progresoNivel(${misPuntos})}"></div>
+        </div></div></div>
+        <div class="col-6 col-lg-3"><div class="card tarjeta-huerto h-100"><div class="card-body">
+            <div class="small text-muted">Actividades</div>
+            <div class="small">Pendientes: <strong th:text="${pendientes}">0</strong></div>
+            <div class="small">Rechazadas: <strong th:text="${rechazadas}">0</strong></div>
+            <div class="small">Aprobadas: <strong th:text="${aprobadas}">0</strong></div>
+        </div></div></div>
+    </div>
+
+    <h2 class="h5">Progreso del huerto virtual</h2>
+    <div th:replace="~{fragmentos/componentes :: progreso(${progreso})}"></div>
+
+    <div class="mt-4" th:replace="~{fragmentos/huerto-virtual :: parcela(${huertoVirtual}, false)}"></div>
+
+    <!-- Espacios del huerto (modelo de Mayerli: varios diseños por huerto). El suelo y las plantas ya los muestra el huerto virtual. -->
+    <h2 class="h5 mt-4">Espacios del huerto</h2>
+    <p class="small mb-1" th:text="${huerto.areaM2} + ' m² · área total'">1 m² · área total</p>
+    <ul class="small mb-0"><li th:each="espacio : ${espaciosHuerto}" th:text="${espacio.nombre} + ' · ' + ${espacio.areaM2} + ' m²'"></li></ul>
+
+    <div class="mt-4 d-flex flex-wrap gap-2" th:if="${!eliminacionPendiente}">
+        <a class="btn btn-huerto" th:href="@{/gestor/actividades/nueva}">Registrar actividad</a>
+        <a class="btn btn-outline-success" th:href="@{/gestor/actividades}">Ver actividades</a>
+        <a class="btn btn-outline-success" th:href="@{/gestor/plantas}">Plantas</a>
+        <a class="btn btn-outline-success" th:href="@{/gestor/huerto}">Editar datos del huerto</a>
+    </div>
+</section>
+</body>
+</html>

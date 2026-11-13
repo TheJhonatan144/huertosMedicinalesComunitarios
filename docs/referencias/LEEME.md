@@ -1,9 +1,9 @@
-# Documentos de referencia
+# Documentos fundamentales de ALLPANA
 
-Coloca aquí los tres documentos del proyecto para completar la trazabilidad con los identificadores reales (RF, RNF, RB):
+El equipo identifica tres documentos fuente para la entrega V1:
 
-- `Documento_de_cambios_arquitectura_Huertos_Medicinales.docx`
-- `Propuesta_Alcance_V1_Huertos_Medicinales_Comunitarios_actualizada.docx`
-- `Requerimientos_Huertos_Medicinales_Comunitarios.xlsx`
+- **Diseño:** `Informe_diseno_Allpana` (nombre indicado por el equipo; falta integrar aquí el archivo final y confirmar su extensión).
+- **Requisitos:** `Requisitos Huertos Medicinales Comunitarios.pdf`.
+- **Casos de prueba:** `Casos de prueba.pdf` (TDD e incremento del proyecto).
 
-Al momento de la implementación inicial esta carpeta estaba vacía (ver [pendientes](../pendientes.md)).
+Las copias de requisitos y casos de prueba fueron localizadas en Descargas, no dentro del repositorio. Copiar aquí las versiones aprobadas por el equipo antes de publicar para que queden disponibles con el proyecto. El documento de diseño también debe incorporarse aquí una vez confirmado su archivo final.

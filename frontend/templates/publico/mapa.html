@@ -1,0 +1,196 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{fragmentos/base :: pagina('Explora los huertos', ~{::section})}"
+>
+  <body>
+    <section class="pub-page" id="explorador">
+      <link rel="stylesheet" th:href="@{/vendor/leaflet/leaflet.css}" /><link
+        rel="stylesheet"
+        th:href="@{/css/publico.css}"
+      />
+      <header class="pub-heading">
+        <div>
+          <p class="pub-eyebrow">ECUADOR · TERRITORIOS QUE CUIDAN</p>
+          <h1>Un país de pequeños <em>grandes huertos.</em></h1>
+          <p class="pub-intro">
+            Cada punto es una comunidad que cultiva, comparte y crece. Encuentra
+            su historia.
+          </p>
+        </div>
+        <a class="pub-text-link" th:href="@{/}">Conoce el proyecto ↗</a>
+      </header>
+      <div class="pub-explorer">
+        <aside class="pub-sidebar" aria-labelledby="lista-titulo">
+          <div class="pub-sidebar-top">
+            <div class="pub-line">
+              <h2 id="lista-titulo">Explorar comunidades</h2>
+              <span
+                class="pub-count"
+                id="total-huertos"
+                th:text="${huertos.size()}"
+                >0</span
+              >
+            </div>
+            <form
+              id="mapa-filtros"
+              hidden
+              role="search"
+              aria-label="Filtrar comunidades"
+            >
+              <label class="pub-field-label" for="buscar-huerto"
+                >Buscar por nombre o lugar</label
+              >
+              <div class="pub-search">
+                <span aria-hidden="true">⌕</span
+                ><input
+                  id="buscar-huerto"
+                  type="search"
+                  placeholder="Una comunidad, un cantón…"
+                  maxlength="150"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="pub-filter-grid">
+                <div>
+                  <label class="pub-field-label" for="provincia"
+                    >Provincia</label
+                  ><select id="provincia">
+                    <option value="">Todas las provincias</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="pub-field-label" for="etapa">Etapa</label
+                  ><select id="etapa">
+                    <option value="">Todas las etapas</option>
+                  </select>
+                </div>
+              </div>
+              <div class="pub-line pub-filter-foot">
+                <span
+                  id="mapa-resultados"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                ></span
+                ><button id="limpiar-filtros" type="button" class="pub-reset">
+                  Limpiar filtros
+                </button>
+              </div>
+            </form>
+            <noscript
+              ><p class="small">
+                Puedes explorar todas las fichas en esta lista. Activa
+                JavaScript para usar el mapa y los filtros.
+              </p></noscript
+            >
+          </div>
+          <div class="pub-results" id="lista-huertos">
+            <article
+              class="pub-garden"
+              th:each="h : ${huertos}"
+              th:attr="data-id=${h.comunidadId()},data-nombre=${h.comunidad()},data-huerto=${h.huerto()},data-provincia=${h.provincia()},data-canton=${h.canton()},data-etapa=${h.etapa()},data-lat=${h.latitud()},data-lng=${h.longitud()}"
+            >
+              <div class="pub-line">
+                <span class="pub-place" th:text="${h.provincia()}"
+                  >Provincia</span
+                ><span class="pub-stage"
+                  >● <span th:text="${h.etapa()}">Semilla</span></span
+                >
+              </div>
+              <h3>
+                <a
+                  class="pub-garden-link"
+                  th:href="@{/comunidades/{id}(id=${h.comunidadId()})}"
+                  th:text="${h.comunidad()}"
+                  >Comunidad</a
+                >
+              </h3>
+              <p
+                class="pub-garden-name"
+                th:text="${h.huerto() != null ? h.huerto() : 'Huerto por registrar'}"
+              >
+                Huerto
+              </p>
+              <p
+                class="pub-location"
+                th:text="${h.canton()} + ', ' + ${h.provincia()}"
+              >
+                Ubicación
+              </p>
+              <div class="pub-line pub-garden-foot">
+                <span
+                  ><strong th:text="${h.puntosComunitarios()}">0</strong> puntos
+                  comunitarios</span
+                ><button
+                  type="button"
+                  class="pub-locate"
+                  hidden
+                  th:attr="aria-label='Ubicar ' + ${h.comunidad()} + ' en el mapa'"
+                >
+                  Ubicar ↗
+                </button>
+              </div>
+            </article>
+            <div class="pub-empty" th:if="${huertos.isEmpty()}">
+              <span aria-hidden="true">🌱</span>
+              <h3>Todo empieza con una semilla.</h3>
+              <p>
+                Aún no hay comunidades para mostrar. Cuando se registre una,
+                aparecerá aquí.
+              </p>
+            </div>
+            <div class="pub-empty" id="sin-resultados" hidden>
+              <span aria-hidden="true">⌕</span>
+              <h3>Busquemos por otro camino.</h3>
+              <p>
+                No hay comunidades que coincidan. Prueba otro nombre o limpia
+                los filtros.
+              </p>
+            </div>
+          </div>
+        </aside>
+        <div class="pub-map-panel">
+          <div class="pub-map-bar">
+            <span
+              ><span class="pub-live-dot" aria-hidden="true"></span> Mapa de
+              comunidades</span
+            ><button id="ver-todos" type="button" hidden>
+              Ver resultados ↗
+            </button>
+          </div>
+          <div
+            id="mapa"
+            role="region"
+            aria-label="Mapa interactivo de los huertos de Ecuador"
+            aria-describedby="mapa-ayuda"
+          >
+            <div class="pub-map-placeholder">
+              El mapa interactivo necesita JavaScript. Las fichas están
+              disponibles en la lista.
+            </div>
+          </div>
+          <div
+            id="mapa-aviso"
+            class="pub-map-notice"
+            role="status"
+            hidden
+          ></div>
+          <div class="pub-map-caption">
+            <span id="mapa-ayuda"
+              >Selecciona una hoja para descubrir su comunidad. Usa + y − para
+              acercarte.</span
+            ><span class="pub-map-key">● Huerto comunitario</span>
+          </div>
+        </div>
+      </div>
+      <p class="pub-bottom-note">
+        Un mapa para descubrir y aprender. Las evidencias y los datos de
+        contacto de las personas se mantienen privados.
+      </p>
+      <script th:src="@{/vendor/leaflet/leaflet.js}"></script>
+      <script th:src="@{/js/mapa.js}"></script>
+    </section>
+  </body>
+</html>

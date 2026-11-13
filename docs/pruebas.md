@@ -1,12 +1,19 @@
 # Pruebas
 
+## Estado vigente de la suite
+
+**177 pruebas: 66 rápidas y 111 de integración, sin fallos, errores ni omisiones.** La integración pasó también con otra semilla sobre la misma base temporal. La guía vigente es [src/test/README.md](../src/test/README.md), y los criterios, cambios y alcance se documentan en [calidad-pruebas.md](calidad-pruebas.md).
+
+Los resultados de 63 y 169 pruebas registrados más abajo corresponden a ejecuciones históricas anteriores a esta reorganización. No representan el tamaño actual de la suite.
+
 ## Cómo ejecutarlas
 
 ```powershell
-.\mvnw.cmd test          # JDK 21 + Docker en ejecución (Testcontainers levanta PostgreSQL 17-alpine real)
+.\mvnw.cmd test          # rápidas; JDK 21, sin Docker
+.\mvnw.cmd verify        # añade integración; PostgreSQL real con Testcontainers por defecto
 ```
 
-`maven-surefire-plugin` está configurado para ejecutar `*Test` (unitarias) y `*IT` (integración) con `mvn test`.
+Surefire ejecuta `*Test` en `test`; Failsafe ejecuta `*IT` en `integration-test` y comprueba el resultado en `verify`.
 Las pruebas de integración usan **una instancia real de PostgreSQL** (no H2 ni simulaciones) con las mismas migraciones Flyway que producción,
 y **hilos reales** para la concurrencia. Cada prueba crea datos con nombres únicos.
 
@@ -16,15 +23,19 @@ y **hilos reales** para la concurrencia. Cada prueba crea datos con nombres úni
 
 | Clase | Pruebas | Qué demuestra |
 |---|---|---|
-| `CupoComunidadIT` | 7 | Máx. 25 activos (BD rechaza el 26.º), bajas liberan cupo, reactivaciones y altas concurrentes (4 hilos) no superan el cupo, permisos del gestor |
+| `CupoComunidadIT` | 8 | Cupo por tipo (condominio 20, barrio 25), BD rechaza integrantes sobre el límite, regreso tras baja con nueva invitación aceptada, aceptaciones y altas concurrentes (4 hilos) no superan el cupo, permisos del gestor |
 | `ActividadServicioIT` | 12 | Registro con participantes/foto, 0 puntos mientras está pendiente, participantes ajenos/inactivos rechazados, lista inmutable (también por SQL), edición solo pendiente, reenvío con historial |
-| `RevisionServicioIT` | 13 | Misma recompensa para seleccionados, puntos individuales ≠ comunitarios, rechazo con observaciones, decisión repetida sin duplicar, **8 hilos y 2 revisores aprobando a la vez → 1 recompensa**, aprobar vs. rechazar simultáneos (5 rondas), reenvíos concurrentes, revisor no asignado/rol incorrecto/autorrevisión, ranking y empates, restricciones y triggers de BD |
-| `SeguridadWebIT` | 10 | Acceso público, privacidad de fichas, redirección al login, permisos por rol, aislamiento entre comunidades, privacidad de fotos, CSRF, login/hash |
+| `RevisionServicioIT` | 13 | Misma recompensa para seleccionados, puntos individuales ≠ comunitarios, rechazo con observaciones, decisión repetida sin duplicar, **8 hilos del revisor asignado aprobando a la vez → 1 recompensa**, aprobar vs. rechazar simultáneos (5 rondas), reenvíos concurrentes, revisor no asignado/rol incorrecto/autorrevisión, ranking y empates, restricciones y triggers de BD |
+| `SeguridadWebIT` | 13 | Acceso público, privacidad de fichas, permisos por rol, aislamiento entre comunidades, privacidad de fotos, CSRF, login/hash; archivo mantiene sesión y muestra historial; baja no ofrece reactivación |
 | `RecorridoPrincipalIT` | 1 | Recorrido HTTP completo: visitante → registro → rechazo (sin y con observaciones) → reenvío → aprobación doble → puntos/ranking/historial |
 | `PlantasIT` | 3 | Gestión de plantas, ficha pública solo con activas, aislamiento y validación |
 | `ValidadorImagenTest` | 10 | PNG/JPEG reales; texto con extensión `.jpg`, GIF, firma PNG + basura, PNG truncado, vacío, tamaño, dimensiones; saneo del nombre |
 | `AlmacenamientoLocalTest` | 4 | Nombre interno seguro, sin restos temporales, sobrevive a una instancia nueva, rechaza recorrido de directorios |
 | `GamificacionReglasTest` | 3 | Umbrales de niveles, Maestro sin tope, etapas del huerto (valores de demostración) |
+
+## Verificación dirigida más reciente (2026-11-06)
+
+`CupoComunidadIT` y `SeguridadWebIT`: **20 pruebas, 0 fallos, 0 errores**, ejecutadas con PostgreSQL 17 mediante Testcontainers. El resultado completo de 63 pruebas de la tabla anterior corresponde a la ejecución del 2026-10-23.
 
 ## Verificaciones manuales realizadas (no automatizadas)
 
@@ -39,7 +50,7 @@ Contra la aplicación **en ejecución** (local y en contenedor) con `curl` y ses
 
 ## Hallazgos de las pruebas
 
-El recorrido HTTP real encontró un error de un trigger (ver [avance](avance.md)) que las pruebas posteriores ya cubren.
+El recorrido HTTP real encontró un error de un trigger (ver [registro histórico de avance](historico/avance.md)) que las pruebas posteriores ya cubren.
 
 ## Lo que NO se verificó (no se afirma)
 
@@ -50,3 +61,7 @@ El recorrido HTTP real encontró un error de un trigger (ver [avance](avance.md)
 - **Cumplimiento normativo** (protección de datos, accesibilidad u otras normas): no evaluado.
 - Fotografías grandes reales de teléfonos (p. ej. 12–50 MP): no probadas; los límites son provisionales.
 - Ejecución en Linux/macOS: solo probado en Windows 11 con Docker Desktop.
+
+## Verificación de la reorganización por capas (2026-11-12)
+
+169 pruebas, cero fallos, errores u omisiones con el POM real, Java 21 y PostgreSQL 17 temporal, sin excluir clases. Incluye ocho reglas arquitectónicas. Véanse [cambios y alcance](cambios-arquitectura.md) y [evidencia](verificacion-arquitectura.txt). La configuración Testcontainers por defecto se conserva; esta ejecución utilizó el modo PostgreSQL externo de PruebaIntegracion.

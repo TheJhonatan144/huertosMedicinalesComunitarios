@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragmentos/base :: pagina('Invitaciones', ~{::section})}">
+<body><section>
+    <h1 class="h3">Invitaciones a comunidades</h1>
+    <div th:if="${error}" class="alert alert-warning" role="alert" th:text="${error}"></div>
+    <p class="text-muted" th:if="${invitaciones.isEmpty()}">No tienes invitaciones pendientes.</p>
+    <div class="row g-3" th:unless="${invitaciones.isEmpty()}">
+        <div class="col-md-6" th:each="i : ${invitaciones}"><article class="card h-100">
+            <div class="card-body"><h2 class="h5" th:text="${i.comunidad()}">Comunidad</h2>
+                <p th:if="${i.tipo().name() == 'PARTICIPANTE'}">Invitación de <strong th:text="${i.invitador()}">Gestor</strong> para participar como integrante.</p>
+                <p th:if="${i.tipo().name() == 'TRASPASO_GESTOR'}">El gestor <strong th:text="${i.invitador()}">Gestor</strong> te propone asumir la gestión de esta comunidad.</p>
+                <div class="d-flex gap-2">
+                    <form th:action="@{/cuenta/invitaciones/{id}/aceptar(id=${i.id()})}" method="post"><button class="btn btn-huerto" type="submit">Aceptar</button></form>
+                    <form th:action="@{/cuenta/invitaciones/{id}/rechazar(id=${i.id()})}" method="post"><button class="btn btn-outline-secondary" type="submit">Rechazar</button></form>
+                </div>
+            </div>
+        </article></div>
+    </div>
+</section></body></html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Misiones del huerto', ~{::section})}">
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-1">Misiones del huerto</h1>
+            <p class="text-muted mb-0">Completa las tareas en orden. Algunas se habilitan cuando terminas sus requisitos.</p>
+        </div>
+        <a class="btn btn-outline-secondary" th:href="@{/gestor/actividades}">Volver a actividades</a>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4" th:each="m : ${misiones}">
+            <article class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between gap-2 mb-2">
+                        <span class="badge text-bg-light" th:text="${m.tipo()}">Mantenimiento</span>
+                        <span class="badge" th:classappend="${m.estado().name() == 'DISPONIBLE' ? ' text-bg-success' : (m.estado().name() == 'COMPLETADA' ? ' text-bg-primary' : ' text-bg-secondary')}"
+                              th:text="${m.estado()}">BLOQUEADA</span>
+                    </div>
+                    <h2 class="h5" th:text="${m.titulo()}">Título</h2>
+                    <p class="text-muted" th:text="${m.descripcion()}">Descripción</p>
+                    <p class="small mb-3">Puntos individuales: <strong th:text="${m.puntosIndividuales()}">5</strong><br>
+                        Puntos comunitarios: <strong th:text="${m.puntosComunitarios()}">5</strong></p>
+                    <div class="mt-auto">
+                        <a class="btn btn-sm btn-huerto" th:if="${m.estado().name() == 'DISPONIBLE' and m.actividadId() == null}"
+                           th:href="@{/gestor/misiones/{id}/hacer(id=${m.id()})}">Hacer ahora</a>
+                        <a class="btn btn-sm btn-outline-success" th:if="${m.estado().name() == 'DISPONIBLE' and m.actividadId() != null}"
+                           th:href="@{/gestor/actividades/{id}(id=${m.actividadId()})}">Corregir y reenviar</a>
+                        <span class="text-muted small" th:if="${m.estado().name() == 'BLOQUEADA'}">Completa primero las misiones anteriores.</span>
+                        <span class="text-success small" th:if="${m.estado().name() == 'COMPLETADA'}">Misión completada.</span>
+                        <span class="text-muted small" th:if="${m.estado().name() == 'EN_REVISION'}">Evidencia pendiente de revisión.</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+</body>
+</html>
