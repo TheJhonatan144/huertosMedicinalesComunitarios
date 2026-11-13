@@ -4,7 +4,7 @@ Cadena: **requisito o referencia provisional → historia de usuario → criteri
 
 > **Vinculación con RF/RNF/RB: pendiente.** La matriz de requisitos no estaba disponible ([pendientes](pendientes.md)). Los identificadores `HU-P` y `CA-P`
 > son **temporales**. Solo se anotan las referencias que el encargo menciona explícitamente (RB05, RB06, RB09, RF10, RF24, RF25).
-> «Resultado observado» refleja lo ejecutado el 2026-10-23 (ver [pruebas](pruebas.md)); lo que no se ejecutó se indica como tal.
+> «Resultado observado» refleja lo ejecutado el 2026-10-23 (ver [registro de pruebas vigente](../pruebas.md)); lo que no se ejecutó se indica como tal.
 
 ## Historias de usuario provisionales
 

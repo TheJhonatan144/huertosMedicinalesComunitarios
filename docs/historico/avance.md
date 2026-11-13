@@ -10,7 +10,7 @@ Organizado por **entregables** (sin fechas: la fecha del 13/11/2026 no está con
 | 3. Actividades y evidencias | Formularios, lista fija, edición pendiente, fotos persistentes, estados | Hecha y verificada | `ActividadServicioIT`, `ValidadorImagenTest`, `AlmacenamientoLocalTest` |
 | 4. Revisión y recompensas | Bandeja, aprobar/rechazar, observaciones, reenvío, historial, concurrencia | Hecha y verificada | `RevisionServicioIT`, `RecorridoPrincipalIT` |
 | 5. Consulta pública y progreso | Mapa, fichas, progreso, ranking, lista alternativa | Hecha; **mapa/UX sin revisión en navegador** | `SeguridadWebIT`, `GamificacionReglasTest`; recorrido curl |
-| 6. Verificación y entrega | Pruebas, documentación, recorrido completo | Hecha (ver [pruebas](pruebas.md)) | Suite automatizada + recorrido HTTP real + Docker |
+| 6. Verificación y entrega | Pruebas, documentación, recorrido completo | Hecha (ver [pruebas vigentes](../pruebas.md)) | Suite automatizada + recorrido HTTP real + Docker |
 
 ## Hallazgos de la fase 0
 

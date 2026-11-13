@@ -42,7 +42,7 @@ por un proceso autorizado; el prototipo no afirma integración real con el MSP.
 
 Visitante (sin cuenta) · Gestor de huerto · Participante · Administrador del Ministerio de Salud. Cada cuenta comunitaria tiene un solo rol activo;
 la cuenta del Ministerio es institucional y no pertenece a comunidades ni participa en el ranking.
-Correspondencia con constantes técnicas en [arquitectura](arquitectura.md#roles).
+Correspondencia con constantes técnicas en la [arquitectura actual](../arquitectura.md#roles).
 
 ## Limitaciones conocidas del prototipo
 

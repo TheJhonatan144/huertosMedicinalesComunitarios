@@ -50,7 +50,7 @@ management:
       probes:
         enabled: true
 
-# --- Parámetros del dominio (PROVISIONALES salvo indicación; ver docs/pendientes.md) ---
+# --- Parámetros del dominio (PROVISIONALES salvo indicación; ver docs/historico/pendientes.md) ---
 app:
   almacenamiento:
     directorio: ${EVIDENCIAS_DIR:./datos/evidencias}
