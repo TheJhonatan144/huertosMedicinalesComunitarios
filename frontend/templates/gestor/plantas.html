@@ -43,6 +43,9 @@
                                     <span th:text="|${p.cantidad} ${p.cantidad == 1 ? 'planta' : 'plantas'}|"></span>
                                     <span class="badge" th:classappend="${p.activa} ? 'text-bg-success' : 'text-bg-secondary'"
                                           th:text="${p.activa} ? 'Ficha activa' : 'Ficha inactiva'"></span>
+                                    <span class="badge text-bg-warning" th:if="${p.plantada and p.estadoRevision.name() == 'PENDIENTE'}">En revisión</span>
+                                    <span class="badge text-bg-success" th:if="${p.plantada and p.estadoRevision.name() == 'APROBADA'}">Aprobada</span>
+                                    <span class="badge text-bg-danger" th:if="${p.estadoRevision.name() == 'RECHAZADA'}">Rechazada</span>
                                 </div>
                             </div>
                         </div>

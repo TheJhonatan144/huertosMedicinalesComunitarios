@@ -5,6 +5,7 @@
 <section class="revision">
    <link rel="stylesheet" th:href="@{/css/revision.css}">
     <h1 class="h3">Bandeja de revisión</h1>
+    <a class="btn btn-outline-success btn-sm mb-3" th:href="@{/revision/siembras}">Revisar siembras de plantas</a>
     <p class="text-muted">Evidencias pendientes de las comunidades que tienes asignadas.</p>
     <h2 class="h5 mt-4">Mis comunidades asignadas <span class="badge text-bg-success" th:text="${cantidadComunidades}">0</span></h2>
     <div class="table-responsive" th:if="${!comunidadesAsignadas.isEmpty()}">
