@@ -26,7 +26,7 @@ public final class SpritePlanta {
     record Ilustracion(String clave, String cientifico, String... nombresComunes) {
     }
 
-    /** Tabla especie → ilustración. Una línea por especie. */
+    /** Tabla especie → ilustración. Una línea por especie (un sinónimo científico = otra línea con la misma clave). */
     static final List<Ilustracion> ILUSTRACIONES = List.of(
             new Ilustracion("achiote", "Bixa orellana", "achiote"),
             new Ilustracion("aguacate", "Persea americana", "aguacate"),
@@ -47,7 +47,19 @@ public final class SpritePlanta {
             new Ilustracion("llanten-hoja-estrecha", "Plantago lanceolata", "llantén de hoja estrecha"),
             new Ilustracion("marco", "Ambrosia arborescens", "marco"),
             new Ilustracion("taraxaco", "Taraxacum", "taraxaco", "diente de león"),
-            new Ilustracion("hierba-luisa", null, "hierba luisa"));
+            new Ilustracion("hierba-luisa", null, "hierba luisa"),
+            new Ilustracion("oregano", "Origanum vulgare", "orégano"),
+            new Ilustracion("orquidea", "Epidendrum quitensium", "orquídea ecuatoriana", "orquídea"),
+            new Ilustracion("ortiga", "Urtica urens", "ortiga menor", "ortiga"),
+            new Ilustracion("paico", "Dysphania ambrosioides", "paico"),
+            new Ilustracion("romero", "Salvia rosmarinus", "romero"),
+            new Ilustracion("romero", "Rosmarinus officinalis"),                 // sinónimo aceptado: misma clave, sin nombres comunes
+            new Ilustracion("tomillo", "Thymus vulgaris", "tomillo"),
+            new Ilustracion("toronjil", "Melissa officinalis", "toronjil"),
+            new Ilustracion("una-de-gato", "Uncaria tomentosa", "uña de gato"),
+            new Ilustracion("violeta", "Viola odorata", "violeta"),
+            new Ilustracion("yuca", "Manihot esculenta", "yuca"),
+            new Ilustracion("ruda", null, "ruda"));
 
     private static final Pattern MARCAS = Pattern.compile("\\p{M}+");
     private static final Map<String, String> POR_CIENTIFICO = new HashMap<>();
@@ -68,7 +80,7 @@ public final class SpritePlanta {
 
     /** Claves con archivo SVG propio (todas las de la tabla). */
     public static List<String> clavesConArchivo() {
-        return ILUSTRACIONES.stream().map(Ilustracion::clave).toList();
+        return ILUSTRACIONES.stream().map(Ilustracion::clave).distinct().toList();
     }
 
     /** Ilustración para una especie: primero por nombre científico, luego por nombre común; si nada coincide, genérica. */

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 /** Elección de la ilustración: nombre científico primero (género + epíteto), luego nombre común; si no, genérica. */
 class SpritePlantaTest {
 
-    /** Las 19 especies del catálogo con ilustración, con el nombre científico EXACTO de docs/catalogo/carga-bloque-0*.sql. */
+    /** Las 29 especies del catálogo con ilustración, con el nombre científico EXACTO de docs/catalogo/carga-bloque-0*.sql. */
     static final Map<String, String> CATALOGO = new LinkedHashMap<>();
 
     static {
@@ -32,15 +32,27 @@ class SpritePlantaTest {
         CATALOGO.put("Plantago lanceolata L.", "llanten-hoja-estrecha");
         CATALOGO.put("Ambrosia arborescens Mill.", "marco");
         CATALOGO.put("Taraxacum sect. Taraxacum F.H.Wigg.", "taraxaco");
+        CATALOGO.put("Origanum vulgare L.", "oregano");
+        CATALOGO.put("Salvia rosmarinus Spenn.", "romero");
+        CATALOGO.put("Epidendrum quitensium Rchb.f.", "orquidea");
+        CATALOGO.put("Thymus vulgaris L.", "tomillo");
+        CATALOGO.put("Melissa officinalis L.", "toronjil");
+        CATALOGO.put("Urtica urens L.", "ortiga");
+        CATALOGO.put("Viola odorata L.", "violeta");
+        CATALOGO.put("Dysphania ambrosioides (L.) Mosyakin & Clemants", "paico");
+        CATALOGO.put("Manihot esculenta Crantz", "yuca");
+        CATALOGO.put("Uncaria tomentosa (Willd. ex Schult.) DC.", "una-de-gato");
     }
 
     @Test
     void cadaEspecieDelCatalogoConArchivoDaSuClavePorNombreCientifico() {
-        assertThat(CATALOGO).hasSize(19);
+        assertThat(CATALOGO).hasSize(29);
         // Nombre común deliberadamente ajeno: la clave sale SOLO del nombre científico.
         CATALOGO.forEach((cientifico, clave) ->
                 assertThat(SpritePlanta.paraEspecie(cientifico, "Nombre local sin tabla")).as(cientifico).isEqualTo(clave));
-        assertThat(SpritePlanta.clavesConArchivo()).hasSize(20).containsAll(CATALOGO.values()).contains("hierba-luisa");
+        // 29 del catálogo + hierba luisa y ruda (solo por nombre común); el sinónimo de romero no agrega clave.
+        assertThat(SpritePlanta.clavesConArchivo()).hasSize(31).doesNotHaveDuplicates()
+                .containsAll(CATALOGO.values()).contains("hierba-luisa", "ruda").doesNotContain("sin-identificar-hojas-corazon");
     }
 
     @Test
@@ -53,6 +65,9 @@ class SpritePlantaTest {
         assertThat(SpritePlanta.nombreCientifico("Bixa orellana L.")).isEqualTo("bixa orellana");
         assertThat(SpritePlanta.paraEspecie("MENTHA SPICATA", null)).as("sin minúscula no hay epíteto").isEqualTo(SpritePlanta.GENERICA);
         assertThat(SpritePlanta.paraEspecie("Mentha x piperita", null)).isEqualTo("menta");
+        // Romero acepta el nombre aceptado actual y el sinónimo clásico.
+        assertThat(SpritePlanta.paraEspecie("Rosmarinus officinalis L.", "Nombre local")).isEqualTo("romero");
+        assertThat(SpritePlanta.paraEspecie("Salvia rosmarinus Spenn.", "Nombre local")).isEqualTo("romero");
         // Taraxacum es fila de solo género: cualquier especie del género es taraxaco.
         assertThat(SpritePlanta.paraEspecie("Taraxacum officinale F.H.Wigg.", null)).isEqualTo("taraxaco");
     }
@@ -76,15 +91,20 @@ class SpritePlantaTest {
         assertThat(SpritePlanta.paraNombre("llanten de hoja estrecha")).isEqualTo("llanten-hoja-estrecha");
         assertThat(SpritePlanta.paraNombre("Café arábigo")).isEqualTo("cafe");
         assertThat(SpritePlanta.paraNombre("Diente de león")).isEqualTo("taraxaco");
+        assertThat(SpritePlanta.paraNombre("Ruda")).as("no está en el catálogo: solo por nombre común").isEqualTo("ruda");
+        assertThat(SpritePlanta.paraNombre("Uña de gato")).isEqualTo("una-de-gato");
+        assertThat(SpritePlanta.paraNombre("Orquídea ecuatoriana")).isEqualTo("orquidea");
+        assertThat(SpritePlanta.paraNombre("Romero")).isEqualTo("romero");
         assertThat(SpritePlanta.paraEspecie("", "Menta")).isEqualTo("menta");
         assertThat(SpritePlanta.paraEspecie("Cymbopogon citratus (DC.) Stapf", "Hierba luisa")).isEqualTo("hierba-luisa");
     }
 
     @Test
     void especieDesconocidaUsaLaGenerica() {
-        assertThat(SpritePlanta.paraEspecie("Salvia rosmarinus Spenn.", "Romero")).isEqualTo(SpritePlanta.GENERICA);
-        assertThat(SpritePlanta.paraNombre("Romero")).isEqualTo(SpritePlanta.GENERICA);
-        assertThat(SpritePlanta.paraNombre("Ruda")).isEqualTo(SpritePlanta.GENERICA);
+        // Ajo sacha es la única especie del catálogo aún sin ilustración.
+        assertThat(SpritePlanta.paraEspecie("Mansoa alliacea (Lam.) A.H.Gentry", "Ajo sacha")).isEqualTo(SpritePlanta.GENERICA);
+        assertThat(SpritePlanta.paraEspecie("Salvia officinalis L.", "Salvia")).as("mismo género que romero, otra especie").isEqualTo(SpritePlanta.GENERICA);
+        assertThat(SpritePlanta.paraNombre("Anís")).isEqualTo(SpritePlanta.GENERICA);
         assertThat(SpritePlanta.paraNombre("Manzanilla común")).as("coincidencia exacta, no parcial").isEqualTo(SpritePlanta.GENERICA);
         assertThat(SpritePlanta.paraEspecie(null, null)).isEqualTo(SpritePlanta.GENERICA);
         assertThat(SpritePlanta.paraEspecie("", "")).isEqualTo(SpritePlanta.GENERICA);
