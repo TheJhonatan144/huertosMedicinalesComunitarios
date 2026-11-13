@@ -52,7 +52,9 @@ class IlustracionesPlantasTest {
         try (Stream<Path> archivos = Files.list(Path.of(url.toURI()))) {
             svgs = archivos.filter(p -> p.toString().endsWith(".svg")).sorted().toList();
         }
-        assertThat(svgs).hasSizeGreaterThanOrEqualTo(SpritePlanta.clavesConArchivo().size());
+        // La carpeta tiene exactamente un SVG por clave de la tabla: ni archivos sin registrar ni claves sin archivo.
+        assertThat(svgs).extracting(p -> p.getFileName().toString().replaceFirst("\\.svg$", ""))
+                .containsExactlyInAnyOrderElementsOf(SpritePlanta.clavesConArchivo());
         for (Path p : svgs) {
             String svg = Files.readString(p, StandardCharsets.UTF_8);
             String nombre = p.getFileName().toString();
