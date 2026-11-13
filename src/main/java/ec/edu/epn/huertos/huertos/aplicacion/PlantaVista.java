@@ -1,6 +1,9 @@
 package ec.edu.epn.huertos.huertos.aplicacion;
 
+import ec.edu.epn.huertos.evidencias.dominio.EstadoRevision;
 import ec.edu.epn.huertos.huertos.dominio.Planta;
+
+import java.time.Instant;
 
 /** La especie se resuelve explícitamente en aplicación, dentro de la transacción. */
 public record PlantaVista(
@@ -13,7 +16,10 @@ public record PlantaVista(
         int cantidad,
         boolean activa,
         boolean plantada,
-        EspecieVista especie) {
+        EspecieVista especie,
+        EstadoRevision estadoRevision,
+        Instant plantadaEn,
+        String observacionesRevision) {
     public static PlantaVista de(Planta p, EspecieVista e) {
         return new PlantaVista(
                 p.getId(),
@@ -25,7 +31,10 @@ public record PlantaVista(
                 p.getCantidad(),
                 p.isActiva(),
                 p.isPlantada(),
-                e);
+                e,
+                p.getEstadoRevision(),
+                p.getPlantadaEn(),
+                p.getObservacionesRevision());
     }
 
     public Long getId() {
@@ -66,5 +75,17 @@ public record PlantaVista(
 
     public boolean isPlantada() {
         return plantada;
+    }
+
+    public EstadoRevision getEstadoRevision() {
+        return estadoRevision;
+    }
+
+    public Instant getPlantadaEn() {
+        return plantadaEn;
+    }
+
+    public String getObservacionesRevision() {
+        return observacionesRevision;
     }
 }

@@ -143,3 +143,5 @@ Las pantallas siguen en `frontend/templates` y `frontend/static`; se empaquetan 
 - [Auditoría inicial de Develop](docs/auditoria/ANALISIS_INTEGRAL_Develop_9a7bd05.md) e [inventario del estado anterior](docs/auditoria/INVENTARIO_Develop_9a7bd05.md).
 
 La auditoría inicial describe Develop antes de refactorizar. El informe y la evidencia de verificación conservan el corte local anterior a su publicación; sus menciones a cambios sin commit ni push son históricas. La arquitectura vigente se describe en `docs/arquitectura.md`.
+
+La integración posterior de las nuevas funcionalidades de Develop se documenta en [integracion-develop.md](docs/integracion-develop.md). El PDF V1 conserva el corte anterior a esa integración.

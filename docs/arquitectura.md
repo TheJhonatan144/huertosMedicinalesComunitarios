@@ -70,6 +70,14 @@ Las lecturas resuelven la especie dentro de la transacción y construyen `Planta
 
 `Especie.regiones` conserva una `@ElementCollection` de enums propios: son valores del agregado, no otras entidades. No se permiten `ManyToOne`, `OneToOne`, `OneToMany` ni `ManyToMany` entre entidades.
 
+### Revisión de siembras integrada desde Develop
+
+`Planta` incorpora `estadoRevision`, `plantadaEn` y `observacionesRevision`. Al pasar a plantada inicia una revisión pendiente; aprobar conserva la fecha de siembra y rechazar retira la planta de la vista virtual sin eliminar la ficha. La relación con especie sigue siendo `especieId`, sin cascadas JPA.
+
+`huertos.aplicacion.RevisionSiembraServicio` autoriza al revisor asignado y decide bajo bloqueo pesimista. `huertos.presentacion.RevisionSiembraController` adapta las rutas `/revision/siembras`; utiliza records de aplicación. `PlantaVista` transporta el estado a las plantillas del gestor y `PlantaPlantadaVista` al huerto virtual. La revisión de una siembra no otorga las recompensas reservadas a las actividades aprobadas.
+
+La migración `V2026111102__revision_siembra_plantas.sql` se conserva sin alterar respecto de Develop. Las ilustraciones nuevas se integran con su selección y sus pruebas; el detalle de resolución está en [integración de Develop](integracion-develop.md).
+
 `DatosEspecie` es un valor de dominio. `FichaEspecie` lo construye antes de actualizar la entidad. `ArticuloBodega` recibe nombre, categoría y cantidad sin conocer `FormularioArticulo`.
 
 ## Frontera de lectura

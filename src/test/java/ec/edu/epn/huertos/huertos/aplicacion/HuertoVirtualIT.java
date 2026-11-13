@@ -274,15 +274,15 @@ class HuertoVirtualIT extends PruebaIntegracion {
         // Nombre común fuera de la tabla: la ilustración sale del nombre científico que trae
         // PlantaVirtualLectura.
         delCatalogo(e, "Menta piperita del barrio", "Mentha × piperita L.");
-        delCatalogo(e, "Romero", "Salvia rosmarinus Spenn.");
+        delCatalogo(e, "Ajo sacha", "Mansoa alliacea (Lam.) A.H.Gentry");
 
         HuertoVirtual v = virtual.paraGestor(e.gestorUsuario().getId());
         assertThat(v.plantas())
                 .extracting(HuertoVirtual.PlantaVirtual::nombre)
-                .containsExactly("Menta piperita del barrio", "Romero");
+                .containsExactly("Ajo sacha", "Menta piperita del barrio");
         assertThat(v.plantas())
                 .extracting(HuertoVirtual.PlantaVirtual::sprite)
-                .containsExactly("menta", SpritePlanta.GENERICA);
+                .containsExactly(SpritePlanta.GENERICA, "menta");
 
         String html = fragmento(e);
         java.util.regex.Matcher img = java.util.regex.Pattern.compile("<img[^>]*>").matcher(html);
@@ -297,12 +297,13 @@ class HuertoVirtualIT extends PruebaIntegracion {
                 .contains("width=\"300\"")
                 .contains("height=\"300\"");
         assertThat(img.find()).as("solo la especie con archivo usa <img>").isFalse();
-        // Romero no tiene archivo: sprite genérico incrustado, con su texto alternativo y su
-        // etiqueta.
+        // Ajo sacha (catálogo) no tiene archivo: sprite genérico incrustado, con su texto
+        // alternativo y su etiqueta.
         assertThat(html)
-                .contains("aria-label=\"Ilustración de Romero\"")
+                .contains("aria-label=\"Ilustración de Ajo sacha\"")
                 .contains("viewBox=\"0 0 120 120\"")
-                .doesNotContain("romero.svg");
+                .doesNotContain("ajo-sacha.svg")
+                .doesNotContain("ajo_sacha.svg");
         assertThat(ocurrencias(html, "class=\"hv-etiqueta-madera\"")).isEqualTo(2);
     }
 

@@ -9,7 +9,7 @@ Vista ilustrada del huerto (estilo juego sencillo, vista desde arriba) que **sol
 |---|---|---|
 | Tipo de suelo (color, textura y etiqueta) | `huerto.tipo_suelo` (V8) | Variante propia para ARCILLOSO, LIMOSO, ARENOSO, MARGOSO, GREDOSO y PANTANOSO. Vacío o desconocido → apariencia neutra gris y aviso «Falta registrar el tipo de suelo» |
 | Composición | `huerto.diseno` (13 códigos de V12) | Se agrupa por prefijo: `TIERRA_*` (hierba + marco de troncos), `VERTICAL_*` (panel con bolsillos), `COLGANTE_*` (viga y macetas que se mecen), `PISO_*` (macetas sobre baldosas). Código que no sea uno de los 13 → composición neutra. La etiqueta muestra el código concreto («En piso · gradas») |
-| Plantas | `planta` del huerto + su `especie` (`PlantaVirtualLectura`) | Elegible = `plantada = true` **y** `activa = true`. **No** usa `cantidad` ni bodega. Orden: nombre común de la especie ascendente (empate por id de planta). Se dibujan hasta **9** (cuadrícula 3×3) después de filtrar; si hay más: «Mostrando 9 de N» |
+| Plantas | `planta` del huerto + su `especie` (`PlantaVirtualLectura`, join explícito por `especieId`) | Elegible = `plantada = true`, `activa = true` y revisión distinta de `RECHAZADA`. Las pendientes también se muestran. **No** usa `cantidad` ni bodega. Orden: nombre común de la especie ascendente (empate por id de planta). Se dibujan hasta **9** (cuadrícula 3×3) después de filtrar; si hay más: «Mostrando 9 de N» |
 | Ilustración | `SpritePlanta`: nombre científico de la especie y, como respaldo, nombre común (ver «Ilustraciones de plantas») | Especie con archivo → `<img>` de `/img/huerto/plantas/<clave>.svg`; sin archivo → sprite **genérico** incrustado. Nunca se muestran fotos reales |
 | Progreso | `GamificacionServicio.progreso(comunidadId)` | Solo se lee. La vista no otorga puntos ni recalcula; solo las actividades aprobadas lo hacen crecer (regla existente) |
 
@@ -63,10 +63,24 @@ desde la base (`hv-planta` en `css/huerto-virtual.css`); con `prefers-reduced-mo
 | Llantén de hoja estrecha | *Plantago lanceolata* | `llanten-hoja-estrecha.svg` | 336 KB |
 | Marco | *Ambrosia arborescens* | `marco.svg` | 223 KB |
 | Taraxaco | *Taraxacum* (sect. Taraxacum) | `taraxaco.svg` | 213 KB |
+| Orégano | *Origanum vulgare* | `oregano.svg` | 210 KB |
+| Orquídea ecuatoriana | *Epidendrum quitensium* | `orquidea.svg` | 231 KB |
+| Ortiga menor | *Urtica urens* | `ortiga.svg` | 218 KB |
+| Paico | *Dysphania ambrosioides* | `paico.svg` | 279 KB |
+| Romero | *Salvia rosmarinus* (también *Rosmarinus officinalis*) | `romero.svg` | 381 KB |
+| Tomillo | *Thymus vulgaris* | `tomillo.svg` | 573 KB |
+| Toronjil | *Melissa officinalis* | `toronjil.svg` | 230 KB |
+| Uña de gato | *Uncaria tomentosa* | `una-de-gato.svg` | 157 KB |
+| Violeta | *Viola odorata* | `violeta.svg` | 230 KB |
+| Yuca | *Manihot esculenta* | `yuca.svg` | 189 KB |
 | Hierba luisa (no está en el catálogo; solo por nombre común) | — | `hierba-luisa.svg` | 101 KB |
+| Ruda (no está en el catálogo; solo por nombre común) | — | `ruda.svg` | 259 KB |
+
+Un sinónimo científico (como *Rosmarinus officinalis* para romero) se agrega como otra línea con la misma clave y sin
+nombres comunes.
 
 Tamaños tras optimizar con SVGO 4.1.0 (`--multipass --precision 1`, ejecutado con `npx`, sin agregarlo al proyecto):
-de 8,2 MB a 3,4 MB en total (−58 %). Se compararon en Edge original y optimizado píxel a píxel (1024 y 300 px): solo
+31 archivos, de 15,6 MB a 6,3 MB en total (−60 %). Se compararon en Edge original y optimizado píxel a píxel (1024 y 300 px): solo
 cambian bordes de 1 px por antialiasing, ninguna zona de relleno, así que se conservaron los optimizados. Comprimidos
 con gzip pesarían alrededor de un tercio (p. ej., `achiote.svg` 68 KB → 25 KB), pero la compresión HTTP no está
 activada en la aplicación.
@@ -79,16 +93,11 @@ activada en la aplicación.
 2. Agregar **una línea** a `SpritePlanta.ILUSTRACIONES`:
    `new Ilustracion("<clave>", "<Género epíteto>", "<nombre común>", ...)` (científico `null` si la especie no está en
    el catálogo).
-3. Correr `SpritePlantaTest` e `IlustracionesPlantasTest` (exigen que el archivo exista y sea seguro).
+3. Correr `SpritePlantaTest` e `IlustracionesPlantasTest`. Exigen que el archivo exista y sea seguro, y que la carpeta
+   tenga exactamente un SVG por clave: un archivo sin registrar en la tabla hace fallar la prueba.
 
-Especies del catálogo que aún usan el sprite genérico (11): Ajo sacha (*Mansoa alliacea*), Orégano
-(*Origanum vulgare*), Romero (*Salvia rosmarinus*), Orquídea ecuatoriana (*Epidendrum quitensium*), Tomillo
-(*Thymus vulgaris*), Toronjil (*Melissa officinalis*), Ortiga menor (*Urtica urens*), Violeta (*Viola odorata*), Paico
-(*Dysphania ambrosioides*), Yuca (*Manihot esculenta*) y Uña de gato (*Uncaria tomentosa*). En la carpeta ya hay SVG
-sin conectar con nombres `oregano`, `orquidea`, `ortiga`, `paico`, `romero`, `ruda`, `sin_identificar_hojas_corazon`,
-`tomillo`, `toronjil`, `una_de_gato`, `violeta` y `yuca` (12 archivos, sin optimizar): para usarlos basta renombrarlos a
-su clave final, revisarlos y agregar su línea a la tabla. `ruda` no está en el catálogo y
-`sin_identificar_hojas_corazon` no tiene especie asignada.
+Especie del catálogo que aún usa el sprite genérico: Ajo sacha (*Mansoa alliacea*). El archivo
+`sin_identificar_hojas_corazon.svg` no tiene especie asignada y se sacó del repositorio.
 
 ## Autorización y aislamiento
 
@@ -106,7 +115,7 @@ su clave final, revisarlos y agregar su línea a la tabla. `ruda` no está en el
 - Modificados: `GestorPanelController` (atributo `huertoVirtual`), `gestor/panel.html` (bloque reemplazado),
   `fragmentos/base.html` (enlace al CSS).
 - Pruebas: `HuertoVirtualIT`, `HuertoVirtualTest`, `PlantaVirtualLecturaIT`, `SpritePlantaTest`.
-- Sin migraciones nuevas. `PlantaRepository`, `Huerto` y `HuertoServicio` no se modificaron.
+- La incorporación posterior de revisión de siembras agrega `V2026111102__revision_siembra_plantas.sql`, consultas en `PlantaRepository` y metadatos en `Planta`. `RevisionSiembraServicio` está en aplicación y su controlador en presentación; las lecturas web utilizan DTO.
 - Las clases CSS usan el prefijo `hv-` para no chocar con `.huerto-virtual` y `.suelo-*` que ya existen en `app.css`.
 
 ## Cómo mostrarlo en otras pantallas (para sus dueños)
@@ -174,7 +183,7 @@ quedar desincronizada si se renombra la especie. Al integrar esa rama:
 - Las etiquetas de suelos y diseños de `HuertoVirtual` replican las de `GestorHuertoController` (allí son privadas); si
   cambian los códigos o etiquetas, hay que actualizar ambos lugares.
 - «Plantada» no tiene límite al guardar; el tope de 9 es solo del dibujo («Mostrando 9 de N»).
-- Hay ilustración propia para 20 especies (tabla de arriba); el resto usa la genérica.
+- Hay ilustración propia para 31 especies (29 del catálogo, más hierba luisa y ruda); el resto usa la genérica.
 
 ## Cómo probarlo a mano
 
