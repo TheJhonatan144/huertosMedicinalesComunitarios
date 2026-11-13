@@ -3,6 +3,8 @@ package ec.edu.epn.huertos.actividades;
 import ec.edu.epn.huertos.autenticacion.UsuarioAutenticado;
 import ec.edu.epn.huertos.compartido.Fechas;
 import ec.edu.epn.huertos.compartido.ReglaNegocioException;
+import ec.edu.epn.huertos.huertos.HuertoServicio;
+import ec.edu.epn.huertos.misiones.MisionServicio;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,10 +23,15 @@ public class GestorActividadController {
 
     private final ActividadServicio actividades;
     private final DetalleActividadServicio detalles;
+    private final HuertoServicio huertos;
+    private final MisionServicio misiones;
 
-    public GestorActividadController(ActividadServicio actividades, DetalleActividadServicio detalles) {
+    public GestorActividadController(ActividadServicio actividades, DetalleActividadServicio detalles,
+                                     HuertoServicio huertos, MisionServicio misiones) {
         this.actividades = actividades;
         this.detalles = detalles;
+        this.huertos = huertos;
+        this.misiones = misiones;
     }
 
     @GetMapping("/gestor/actividades")
@@ -33,21 +40,54 @@ public class GestorActividadController {
         return "gestor/actividades";
     }
 
+    @GetMapping("/gestor/misiones")
+    String misiones(@AuthenticationPrincipal UsuarioAutenticado usuario, Model model) {
+        Long huertoId = huertos.huertoDeGestor(usuario.getId()).getId();
+        model.addAttribute("misiones", misiones.listarParaHuerto(huertoId));
+        return "gestor/misiones";
+    }
+
+    @GetMapping("/gestor/misiones/{id}/hacer")
+    String hacerMision(@PathVariable Long id, @AuthenticationPrincipal UsuarioAutenticado usuario, Model model) {
+        Long huertoId = huertos.huertoDeGestor(usuario.getId()).getId();
+        MisionServicio.MisionVista mision = misiones.detalleDisponible(id, huertoId);
+        if (mision.estado() != ec.edu.epn.huertos.misiones.EstadoMision.DISPONIBLE)
+            throw new ReglaNegocioException("Esta misión todavía no está disponible.");
+        if (mision.actividadId() != null)
+            return "redirect:/gestor/actividades/" + mision.actividadId();
+        FormularioActividad form = new FormularioActividad();
+        form.setFecha(Fechas.hoy());
+        form.setTipo(ec.edu.epn.huertos.actividades.TipoActividad.valueOf(mision.tipo()));
+        form.setDescripcion(mision.descripcion());
+        prepararFormulario(model, usuario, form, null);
+        model.addAttribute("misionHuertoId", id);
+        model.addAttribute("misionTitulo", mision.titulo());
+        return "gestor/actividad-form";
+    }
+
     @GetMapping("/gestor/actividades/nueva")
     String nueva(@AuthenticationPrincipal UsuarioAutenticado usuario, Model model) {
         FormularioActividad form = new FormularioActividad();
         form.setFecha(Fechas.hoy());
+
         prepararFormulario(model, usuario, form, null);
+
+        model.addAttribute("misionVinculada", false);
+        model.addAttribute("misionHuertoId", null);
+
         return "gestor/actividad-form";
     }
+
+
 
     @PostMapping("/gestor/actividades")
     String crear(@Valid @ModelAttribute("form") FormularioActividad form, BindingResult resultado,
                  @RequestParam(name = "foto", required = false) MultipartFile foto,
+                 @RequestParam(name = "misionHuertoId", required = false) Long misionHuertoId,
                  @AuthenticationPrincipal UsuarioAutenticado usuario, Model model, RedirectAttributes flash) {
         if (!resultado.hasErrors()) {
             try {
-                Long id = actividades.registrar(usuario.getId(), form, foto);
+                Long id = actividades.registrar(usuario.getId(), form, foto, misionHuertoId);
                 flash.addFlashAttribute("mensaje", "Actividad registrada. Quedó pendiente de revisión.");
                 return "redirect:/gestor/actividades/" + id;
             } catch (ReglaNegocioException e) {
@@ -55,6 +95,12 @@ public class GestorActividadController {
             }
         }
         prepararFormulario(model, usuario, form, null);
+        model.addAttribute("misionVinculada", false);
+        if (misionHuertoId != null) {
+            model.addAttribute("misionHuertoId", misionHuertoId);
+            model.addAttribute("misionTitulo", misiones.detalleDisponible(misionHuertoId,
+                    huertos.huertoDeGestor(usuario.getId()).getId()).titulo());
+        }
         return "gestor/actividad-form";
     }
 
@@ -63,6 +109,7 @@ public class GestorActividadController {
         Actividad actividad = actividades.actividadDeGestor(usuario.getId(), id);
         DetalleActividad detalle = detalles.construir(actividad);
         model.addAttribute("detalle", detalle);
+        model.addAttribute("misionVinculada", actividad.getMisionHuertoId() != null);
         FormularioActividad form = new FormularioActividad();
         form.setTipo(detalle.tipo());
         form.setDescripcion(detalle.descripcion());
@@ -81,6 +128,7 @@ public class GestorActividadController {
         form.setDescripcion(actividad.getDescripcion());
         form.setFecha(actividad.getFechaActividad());
         prepararFormulario(model, usuario, form, detalles.construir(actividad));
+        model.addAttribute("misionVinculada", actividad.getMisionHuertoId() != null);
         return "gestor/actividad-form";
     }
 
@@ -97,7 +145,9 @@ public class GestorActividadController {
                 resultado.reject("regla", e.getMessage());
             }
         }
-        prepararFormulario(model, usuario, form, detalles.construir(actividades.actividadDeGestor(usuario.getId(), id)));
+        Actividad actividad = actividades.actividadDeGestor(usuario.getId(), id);
+        prepararFormulario(model, usuario, form, detalles.construir(actividad));
+        model.addAttribute("misionVinculada", actividad.getMisionHuertoId() != null);
         return "gestor/actividad-form";
     }
 
@@ -125,6 +175,7 @@ public class GestorActividadController {
         model.addAttribute("tipos", TipoActividad.values());
         model.addAttribute("hoy", Fechas.hoy());
         model.addAttribute("existente", existente);
+        model.addAttribute("misionHuertoId", null);
         if (existente == null) {
             model.addAttribute("elegibles", actividades.participantesElegibles(usuario.getId()));
         }

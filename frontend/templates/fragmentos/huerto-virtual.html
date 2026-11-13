@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  Huerto virtual 2D "en tierra" (primera versión: una sola escena para todos los diseños).
+  Uso: <section th:replace="~{fragmentos/huerto-virtual :: parcela(${huertoVirtual}, true)}"></section>
+  Segundo parámetro: true = incluye la barra de progreso (leída de GamificacionServicio); false = la omite
+  (el panel del gestor ya la muestra arriba). Solo ILUSTRACIONES SVG, nunca fotos reales. Datos: HuertoVirtualServicio.
+
+  Gamificación: la escena "crece" con la etapa del huerto (hv-etapa-0..3: semilla, brote, planta joven, huerto
+  floreciente) y la medalla muestra el puesto en el ranking comunitario; debajo, el «camino» dice cuánto falta para subir.
+  Nada aquí otorga puntos: solo lee lo que ya calculó GamificacionServicio.
+
+  Plantas: especie con archivo → <img> de /img/huerto/plantas/<clave>.svg (nunca SVG incrustado, por peso y seguridad);
+  sin archivo → sprite genérico incrustado. La clave la elige SpritePlanta (tabla especie → archivo).
+  Objetos de la escena: /img/huerto/escena-objetos.svg. Fondo: /img/huerto/escena-tierra.svg (ver huerto-virtual.css).
+  Clases con prefijo hv- para no chocar con .huerto-virtual / .suelo-* de app.css.
+-->
+<section th:fragment="parcela(hv, conProgreso)" class="hv-huerto card tarjeta-huerto"
+         th:classappend="'hv-suelo-' + ${hv.claveSuelo()} + ' hv-composicion-' + ${hv.composicion()} + ' hv-etapa-' + ${hv.etapaEscena()}">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3">
+            <h2 class="h5 mb-0">Huerto virtual</h2>
+            <span class="small text-muted" th:text="${hv.nombreHuerto()}">Huerto</span>
+        </div>
+
+        <p class="visually-hidden" th:text="${hv.descripcionTextual()}">Descripción del huerto virtual</p>
+
+        <div class="hv-escena" aria-hidden="true">
+            <!-- Marcadores del juego: etapa del huerto y puesto en el ranking -->
+            <div class="hv-hud">
+                <span class="hv-chip-etapa" th:if="${hv.progreso() != null}">
+                    <svg class="hv-ico"><use th:href="@{/img/huerto/escena-objetos.svg#brote}"/></svg>
+                    <span th:text="${hv.progreso().etapa()}">Semilla</span>
+                </span>
+                <span class="hv-medalla" th:if="${hv.ranking() != null}"
+                      th:classappend="${hv.ranking().posicion() == 1} ? 'hv-medalla-oro' : (${hv.ranking().posicion() == 2} ? 'hv-medalla-plata' : (${hv.ranking().posicion() == 3} ? 'hv-medalla-bronce' : 'hv-medalla-hoja'))">
+                    <svg class="hv-ico-trofeo"><use th:href="@{/img/huerto/escena-objetos.svg#trofeo}"/></svg>
+                    <span class="hv-medalla-puesto">#<span th:text="${hv.ranking().posicion()}">1</span></span>
+                </span>
+            </div>
+
+            <!-- Vida que aparece al crecer el huerto -->
+            <div class="hv-vida">
+                <svg class="hv-mariposa hv-mariposa-1"><use th:href="@{/img/huerto/escena-objetos.svg#mariposa}"/></svg>
+                <svg class="hv-mariposa hv-mariposa-2"><use th:href="@{/img/huerto/escena-objetos.svg#mariposa}"/></svg>
+                <svg class="hv-abeja hv-abeja-1"><use th:href="@{/img/huerto/escena-objetos.svg#abeja}"/></svg>
+                <svg class="hv-abeja hv-abeja-2"><use th:href="@{/img/huerto/escena-objetos.svg#abeja}"/></svg>
+                <span class="hv-brillos"><i></i><i></i><i></i><i></i><i></i></span>
+            </div>
+
+            <div class="hv-parcela">
+                <!-- Objetos de la finca: regadera con gotas y bomba de agua -->
+                <div class="hv-regadera">
+                    <svg class="hv-regadera-dibujo"><use th:href="@{/img/huerto/escena-objetos.svg#regadera}"/></svg>
+                    <span class="hv-gotas"><i></i><i></i><i></i><i></i><i></i></span>
+                </div>
+                <div class="hv-bomba">
+                    <svg class="hv-bomba-dibujo"><use th:href="@{/img/huerto/escena-objetos.svg#bomba}"/></svg>
+                    <span class="hv-gotas hv-gotas-bomba"><i></i><i></i><i></i></span>
+                </div>
+
+                <div class="hv-area hv-textura">
+                    <div class="hv-slots" th:classappend="'hv-cols-' + ${hv.columnas()} + ' hv-esc-' + ${hv.columnasEscena()}"
+                         th:unless="${hv.plantas().isEmpty()}">
+                        <figure class="hv-slot" th:each="p, estado : ${hv.plantas()}" th:style="'--i:' + ${estado.index}">
+                            <div class="hv-cuerpo">
+                                <div class="hv-sprite-caja">
+                                    <img th:if="${p.tieneArchivo()}" class="hv-sprite"
+                                         th:src="@{/img/huerto/plantas/{c}.svg(c=${p.sprite()})}"
+                                         th:alt="'Ilustración de ' + ${p.nombre()}" width="300" height="300"
+                                         loading="lazy" decoding="async">
+                                    <th:block th:unless="${p.tieneArchivo()}"><th:block th:replace="~{fragmentos/huerto-virtual :: sprite-generica(${p.nombre()})}"></th:block></th:block>
+                                </div>
+                                <div class="hv-maceta"><span class="hv-tierra hv-textura"></span></div>
+                            </div>
+                            <figcaption class="hv-etiqueta-madera">
+                                <span th:text="${p.nombre()}">Planta</span>
+                                <span class="badge text-bg-warning ms-1" th:if="${p.estadoRevision() == 'PENDIENTE'}">En revisión</span>
+                                <span class="badge text-bg-success ms-1" th:if="${p.estadoRevision() == 'APROBADA'}">Aprobada</span>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <div class="hv-brotes" th:if="${hv.plantas().isEmpty()}">
+                        <svg><use th:href="@{/img/huerto/escena-objetos.svg#brote}"/></svg>
+                        <svg><use th:href="@{/img/huerto/escena-objetos.svg#brote}"/></svg>
+                        <svg><use th:href="@{/img/huerto/escena-objetos.svg#brote}"/></svg>
+                    </div>
+                </div>
+
+                <!-- Flores al frente de la parcela: aparecen desde la etapa «planta joven» -->
+                <div class="hv-flores">
+                    <svg class="hv-flor-1"><use th:href="@{/img/huerto/escena-objetos.svg#flor-roja}"/></svg>
+                    <svg class="hv-flor-2"><use th:href="@{/img/huerto/escena-objetos.svg#flor-amarilla}"/></svg>
+                    <svg class="hv-flor-3"><use th:href="@{/img/huerto/escena-objetos.svg#flor-azul}"/></svg>
+                    <svg class="hv-flor-4"><use th:href="@{/img/huerto/escena-objetos.svg#flor-roja}"/></svg>
+                    <svg class="hv-flor-5"><use th:href="@{/img/huerto/escena-objetos.svg#flor-amarilla}"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="hv-vacia" th:if="${hv.plantas().isEmpty()}">
+            <div class="fs-2" aria-hidden="true">🌱</div>
+            <p class="mb-1 fw-semibold">Tu parcela está lista y esperando plantas.</p>
+            <p class="mb-0 small" th:if="${hv.puedeRegistrar()}">
+                Marca tus plantas como plantadas para verlas crecer aquí.
+                <a th:href="@{/gestor/plantas}">Ir a mis plantas</a>
+            </p>
+            <p class="mb-0 small" th:unless="${hv.puedeRegistrar()}">Esta comunidad aún no tiene plantas plantadas.</p>
+        </div>
+        <p class="small text-muted mt-2 mb-0" th:if="${hv.hayMasPlantas()}">
+            Mostrando <span th:text="${hv.plantas().size()}">2</span> de <span th:text="${hv.totalPlantas()}">3</span>
+            plantadas.
+        </p>
+
+        <!-- Camino al ranking: lo que falta para subir (se calcula con el mismo orden del ranking público) -->
+        <div class="hv-camino" th:if="${hv.ranking() != null}" th:with="r=${hv.ranking()}">
+            <div class="hv-camino-puesto"
+                 th:classappend="${r.posicion() == 1} ? 'hv-camino-oro' : (${r.posicion() == 2} ? 'hv-camino-plata' : (${r.posicion() == 3} ? 'hv-camino-bronce' : ''))">
+                <span class="hv-camino-num">#<span th:text="${r.posicion()}">2</span></span>
+                <span class="hv-camino-de">de <span th:text="${r.total()}">5</span> <span th:text="${r.total() == 1} ? 'comunidad' : 'comunidades'">comunidades</span></span>
+            </div>
+            <div class="hv-camino-cuerpo">
+                <p class="hv-camino-titulo mb-1" th:if="${r.esUnica()}">Lidera el ranking: aún es la única comunidad con puntos en juego.</p>
+                <p class="hv-camino-titulo mb-1" th:if="${!r.esUnica() and r.vaPrimera() and r.ventajaPuntos() != null}">
+                    Lidera el ranking con <strong><span th:text="${r.ventajaPuntos()}">40</span> pts</strong> de ventaja.
+                </p>
+                <p class="hv-camino-titulo mb-1" th:if="${!r.esUnica() and r.vaPrimera() and r.ventajaPuntos() == null}">
+                    Comparte el puesto #1: una actividad aprobada más la deja al frente.
+                </p>
+                <p class="hv-camino-titulo mb-1" th:unless="${r.vaPrimera()}">
+                    Faltan <strong><span th:text="${r.faltanPuntos()}">20</span> pts</strong>
+                    (<span th:text="${r.actividadesParaSubir()}">1</span>
+                    <span th:text="${r.actividadesParaSubir() == 1} ? 'actividad aprobada' : 'actividades aprobadas'">actividad aprobada</span>)
+                    para alcanzar el puesto #<span th:text="${r.posicionSiguiente()}">1</span> de
+                    <strong th:text="${r.nombreSiguiente()}">Comunidad</strong>.
+                </p>
+                <div class="progress" role="progressbar" aria-label="Avance hacia el siguiente puesto del ranking"
+                     th:attr="aria-valuenow=${r.porcentajeHaciaSiguiente()},aria-valuemin=0,aria-valuemax=100">
+                    <div class="progress-bar" th:style="'width:' + ${r.porcentajeHaciaSiguiente()} + '%'"></div>
+                </div>
+                <p class="small text-muted mt-1 mb-0">
+                    Cada actividad aprobada suma <span th:text="${r.puntosPorActividad()}">20</span> puntos a la comunidad.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex flex-wrap align-items-center gap-2">
+            <span class="hv-etiqueta-suelo">
+                <span class="hv-muestra hv-textura" aria-hidden="true"></span>
+                <span th:text="${hv.etiquetaSuelo()}">Suelo limoso</span>
+            </span>
+            <span class="small text-muted" th:text="'Diseño: ' + ${hv.etiquetaDiseno()}">Diseño: En tierra · surcos</span>
+        </div>
+
+        <div class="mt-3" th:if="${conProgreso}">
+            <div class="small fw-semibold mb-1">Progreso del huerto (solo actividades aprobadas)</div>
+            <div th:replace="~{fragmentos/componentes :: progreso(${hv.progreso()})}"></div>
+        </div>
+
+        <div class="hv-aviso small mt-3" th:unless="${hv.sueloRegistrado()}" role="note">
+            <strong>Falta registrar el tipo de suelo.</strong> Mientras tanto se muestra una apariencia neutra.
+            <a th:if="${hv.puedeRegistrar()}" th:href="@{/gestor/huerto}">Completar datos del huerto</a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Sprite genérico incrustado: solo para especies sin archivo propio (.hv-hoja y .hv-flor se animan con CSS) ===== -->
+
+<svg th:fragment="sprite-generica(nombre)" class="hv-sprite" viewBox="0 0 120 120" role="img"
+     th:attr="aria-label='Ilustración de ' + ${nombre}">
+    <ellipse cx="60" cy="108" rx="30" ry="6" fill="#000" opacity=".12"/>
+    <g class="hv-hoja" style="--d:0s"><path d="M60 108 C40 96 28 76 30 54 C50 62 62 84 60 108Z" fill="#4c9b45"/></g>
+    <g class="hv-hoja" style="--d:.7s"><path d="M60 108 C80 96 92 76 90 54 C70 62 58 84 60 108Z" fill="#58a84e"/></g>
+    <g class="hv-hoja" style="--d:1.4s"><path d="M60 108 C50 84 50 56 60 30 C70 56 70 84 60 108Z" fill="#3f8a3a"/></g>
+    <g class="hv-flor" style="--d:.5s"><circle cx="60" cy="26" r="5" fill="#f2c94c"/></g>
+</svg>
+</body>
+</html>

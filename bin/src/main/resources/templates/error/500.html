@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Error', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Ocurrió un problema</h1>
+    <p>No pudimos completar la operación. Inténtalo de nuevo en unos minutos; tus datos no se perdieron.</p>
+    <a class="btn btn-huerto" th:href="@{/}">Volver al inicio</a>
+</section>
+</body>
+</html>

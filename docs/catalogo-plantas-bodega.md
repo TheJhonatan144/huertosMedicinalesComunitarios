@@ -45,7 +45,9 @@ Los identificadores son ilustrativos. El renderizador del huerto virtual queda a
 
 ## Preparación del contenido inicial
 
-La revisión y los archivos para el primer bloque de diez están en [catalogo/primera-carga.md](catalogo/primera-carga.md). El objetivo inicial son los 29 nombres del documento 01, por bloques. El contenido real se prepara como una carga manual, fuera de Flyway; no se incorpora al arrancar. Las fotografías siguen pendientes y se conservan los registros existentes.
+Al iniciar la aplicación, Flyway aplica una vez la migración `V2026110901`. Los tres bloques aportan 30 fichas documentadas y 30 fotografías con crédito, almacenadas en PostgreSQL. El perfil `demo` agrega las fichas ilustrativas de Hierba luisa y Ruda cuando crea los huertos de ejemplo. Con Docker se usa el arranque habitual `docker compose up -d --build`.
+
+En bases existentes, la carga conserva las fichas documentadas, las fotos ya registradas y las siembras. Si hay una identificación ambigua o una ficha con datos previos que requieren revisión, la migración omite esa ficha y continúa. Los scripts manuales de los bloques conservan sus comprobaciones para esos casos.
 
 V5 añade observaciones de altitud, criterio del ciclo y contexto de cualidad tradicional, junto con las opciones fresca y variable. Los datos parciales de altitud se conservan como observaciones; no se fuerzan mínimos y máximos nacionales a partir de puntos de colecta. No modifica siembras ni cantidades.
 

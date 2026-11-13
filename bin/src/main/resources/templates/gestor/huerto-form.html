@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Datos del huerto', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Datos del huerto</h1>
+    <form th:action="@{/gestor/huerto}" th:object="${form}" method="post" data-una-vez novalidate>
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" id="nombre" class="form-control" th:field="*{nombre}" th:errorclass="is-invalid" maxlength="120" required>
+            <div class="invalid-feedback" th:errors="*{nombre}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea id="descripcion" class="form-control" rows="4" th:field="*{descripcion}" th:errorclass="is-invalid" maxlength="2000" required></textarea>
+            <div class="invalid-feedback" th:errors="*{descripcion}"></div>
+        </div>
+        <button class="btn btn-huerto" type="submit">Guardar</button>
+        <a class="btn btn-link" th:href="@{/gestor}">Cancelar</a>
+    </form>
+</section>
+</body>
+</html>

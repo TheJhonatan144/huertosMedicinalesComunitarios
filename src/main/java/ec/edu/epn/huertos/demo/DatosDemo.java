@@ -13,8 +13,10 @@ import ec.edu.epn.huertos.huertos.Huerto;
 import ec.edu.epn.huertos.huertos.HuertoRepository;
 import ec.edu.epn.huertos.huertos.Planta;
 import ec.edu.epn.huertos.huertos.PlantaRepository;
+import ec.edu.epn.huertos.huertos.EspecieRepository;
 import ec.edu.epn.huertos.huertos.EspacioHuertoServicio;
 import ec.edu.epn.huertos.huertos.HuertoCerramientoServicio;
+import ec.edu.epn.huertos.misiones.MisionServicio;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,15 +47,18 @@ public class DatosDemo implements ApplicationRunner {
     private final AsignacionRevisorRepository asignaciones;
     private final HuertoRepository huertos;
     private final PlantaRepository plantas;
+    private final EspecieRepository especies;
     private final EspacioHuertoServicio espacios;
     private final HuertoCerramientoServicio cerramientos;
+    private final MisionServicio misiones;
     private final PasswordEncoder encoder;
     private final String clave;
 
     public DatosDemo(UsuarioRepository usuarios, ComunidadRepository comunidades, IntegranteRepository integrantes,
                      AsignacionRevisorRepository asignaciones, HuertoRepository huertos, PlantaRepository plantas,
+                     EspecieRepository especies,
                      PasswordEncoder encoder, EspacioHuertoServicio espacios,
-                     HuertoCerramientoServicio cerramientos,
+                     HuertoCerramientoServicio cerramientos, MisionServicio misiones,
                      @Value("${app.demo.clave}") String clave) {
         this.usuarios = usuarios;
         this.comunidades = comunidades;
@@ -61,8 +66,10 @@ public class DatosDemo implements ApplicationRunner {
         this.asignaciones = asignaciones;
         this.huertos = huertos;
         this.plantas = plantas;
+        this.especies = especies;
         this.espacios = espacios;
         this.cerramientos = cerramientos;
+        this.misiones = misiones;
         this.encoder = encoder;
         this.clave = clave;
     }
@@ -92,16 +99,15 @@ public class DatosDemo implements ApplicationRunner {
         espacios.sincronizar(huertoB.getId(), huertoB.getAreaM2(), List.of(huertoB.getDiseno()));
         cerramientos.sincronizar(huertoA.getId(), List.of("NATURAL"));
         cerramientos.sincronizar(huertoB.getId(), List.of("CONVENCIONAL"));
+        // Ruta de misiones de inicio: la migración solo cubre huertos que ya existían al migrar.
+        misiones.crearParaHuerto(huertoA.getId());
+        misiones.crearParaHuerto(huertoB.getId());
 
         // Plantas: nombres comunes ilustrativos; sin propiedades medicinales ni recomendaciones (pendiente de fuentes).
-        plantas.save(new Planta(huertoA.getId(), "Manzanilla", "Matricaria chamomilla",
-                "Texto ilustrativo de demostración. Contenido pendiente de fuentes validadas.", 12));
-        plantas.save(new Planta(huertoA.getId(), "Hierba luisa", "Cymbopogon citratus",
-                "Texto ilustrativo de demostración. Contenido pendiente de fuentes validadas.", 8));
-        plantas.save(new Planta(huertoB.getId(), "Menta", "Mentha spicata",
-                "Texto ilustrativo de demostración. Contenido pendiente de fuentes validadas.", 10));
-        plantas.save(new Planta(huertoB.getId(), "Ruda", "Ruta graveolens",
-                "Texto ilustrativo de demostración. Contenido pendiente de fuentes validadas.", 5));
+        sembrarEjemplo(huertoA, "Manzanilla", "Matricaria chamomilla L.", 12);
+        sembrarEjemplo(huertoA, "Hierba luisa", "Cymbopogon citratus", 8);
+        sembrarEjemplo(huertoB, "Hierbabuena", "Mentha spicata L.", 10);
+        sembrarEjemplo(huertoB, "Ruda", "Ruta graveolens", 5);
 
         // Comunidad A: gestor + 4 participantes (uno de baja para demostrar la regla de selección).
         Usuario gestorA = crear("gestor_a", "Gestora Demo A", Rol.GESTOR_HUERTO);
@@ -126,6 +132,15 @@ public class DatosDemo implements ApplicationRunner {
         crear("admin_tecnico", "Administrador Técnico Demo", Rol.ADMIN_TECNICO);
 
         log.info("Perfil demo: datos sintéticos cargados (2 comunidades, 11 cuentas de demostración).");
+    }
+
+    private void sembrarEjemplo(Huerto huerto, String nombreComun, String nombreCientifico, int cantidad) {
+        var especie = especies.findFirstByNombreCientificoIgnoreCaseOrderById(nombreCientifico);
+        String descripcion = "Registro ilustrativo de demostración.";
+        Planta planta = especie.map(e -> new Planta(huerto.getId(), e, cantidad, false))
+                .orElseGet(() -> new Planta(huerto.getId(), nombreComun, nombreCientifico, descripcion, cantidad));
+        planta.actualizar(planta.getNombreComun(), planta.getNombreCientifico(), descripcion, cantidad);
+        plantas.save(planta);
     }
 
     private Usuario crear(String nombreUsuario, String nombreCompleto, Rol rol) {

@@ -1,0 +1,419 @@
+/*
+ * Huerto virtual 2D "en tierra" de ALLPANA. Primera versión: una sola escena para todos los diseños de huerto
+ * (los demás diseños —macetas, vertical, colgante…— quedan para una versión posterior).
+ * Solo CSS/SVG, sin librerías. Prefijo hv- para no chocar con .huerto-virtual/.suelo-* de app.css.
+ */
+
+.hv-huerto {
+    --hv-madera: #d9902a;
+    --hv-madera-osc: #8a4f12;
+    --hv-crece: .78;          /* tamaño de las plantas: crece con la etapa del huerto */
+    /* Suelo (variables por tipo de suelo); el neutro es tierra cálida, nunca gris */
+    --hv-suelo-a: #8a5a2f;
+    --hv-suelo-b: #a36e3c;
+    --hv-suelo-c: #62401f;
+    --hv-textura-a: 22px 22px;
+    --hv-textura-b: 31px 31px;
+}
+.hv-etapa-0 { --hv-crece: .82; }
+.hv-etapa-1 { --hv-crece: .9; }
+.hv-etapa-2 { --hv-crece: .98; }
+.hv-etapa-3 { --hv-crece: 1.06; }
+
+/* ---- Tipos de suelo (los 6 de V8): color y textura propios, siempre con tierra viva ---- */
+.hv-suelo-arcilloso { --hv-suelo-a: #b5643a; --hv-suelo-b: #cc7a4b; --hv-suelo-c: #84431f; }
+.hv-suelo-limoso    { --hv-suelo-a: #7d5532; --hv-suelo-b: #96683d; --hv-suelo-c: #5a3a1e; --hv-textura-a: 40px 40px; --hv-textura-b: 55px 55px; }
+.hv-suelo-arenoso   { --hv-suelo-a: #d9ad62; --hv-suelo-b: #ecc783; --hv-suelo-c: #b88a3e; --hv-textura-a: 9px 9px; --hv-textura-b: 14px 14px; }
+.hv-suelo-margoso   { --hv-suelo-a: #5a3a24; --hv-suelo-b: #724a2e; --hv-suelo-c: #d8c7a6; --hv-textura-a: 26px 26px; --hv-textura-b: 37px 37px; }
+.hv-suelo-gredoso   { --hv-suelo-a: #a38a52; --hv-suelo-b: #bca46a; --hv-suelo-c: #7f6a3a; }
+.hv-suelo-pantanoso { --hv-suelo-a: #4a5a2c; --hv-suelo-b: #62763a; --hv-suelo-c: #5fa3b8; --hv-textura-a: 48px 48px; --hv-textura-b: 33px 33px; }
+
+.hv-textura {
+    background-color: var(--hv-suelo-a);
+    background-image:
+        radial-gradient(var(--hv-suelo-c) 1.8px, transparent 2.6px),
+        radial-gradient(var(--hv-suelo-b) 2.6px, transparent 3.8px);
+    background-size: var(--hv-textura-a), var(--hv-textura-b);
+    background-position: 0 0, 11px 9px;
+}
+.hv-suelo-arcilloso .hv-textura {
+    background-image:
+        linear-gradient(115deg, transparent 47%, var(--hv-suelo-c) 48% 49%, transparent 50%),
+        linear-gradient(25deg, transparent 62%, var(--hv-suelo-c) 63% 64%, transparent 65%),
+        radial-gradient(var(--hv-suelo-b) 2.6px, transparent 3.8px);
+    background-size: 90px 90px, 70px 70px, var(--hv-textura-b);
+}
+.hv-suelo-gredoso .hv-textura {
+    background-image:
+        repeating-linear-gradient(8deg, transparent 0 14px, var(--hv-suelo-c) 14px 16px, transparent 16px 30px),
+        radial-gradient(var(--hv-suelo-b) 2.4px, transparent 3.4px);
+    background-size: auto, var(--hv-textura-a);
+}
+.hv-suelo-pantanoso .hv-textura {
+    background-image:
+        radial-gradient(ellipse 18px 9px, rgba(95, 163, 184, .85) 60%, transparent 65%),
+        radial-gradient(var(--hv-suelo-b) 2.8px, transparent 3.8px);
+    background-size: var(--hv-textura-a), var(--hv-textura-b);
+}
+
+/* ================= Escena ================= */
+.hv-escena {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    aspect-ratio: 1 / .95;                 /* altura mínima; crece si hay muchas plantas */
+    padding: 46% 14% 8% 4%;                /* arriba: cielo y cerca; derecha: espacio para la bomba de agua */
+    border-radius: 22px;
+    overflow: hidden;
+    background: #558b2f url("/img/huerto/escena-tierra.svg") top center / 100% auto no-repeat;
+    border: 3px solid #fff;
+    box-shadow: 0 14px 34px color-mix(in srgb, var(--al-cafe, #3b2a18) 22%, transparent), 0 0 0 1px var(--al-borde, #e5e0dc);
+}
+
+/* ---- Marcadores del juego ---- */
+.hv-hud {
+    position: absolute;
+    inset: 3% 3% auto 3%;
+    z-index: 6;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: .5rem;
+    pointer-events: none;
+}
+.hv-chip-etapa {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .3rem .85rem .3rem .55rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #81c784, #2e7d32);
+    border: 2.5px solid #fff;
+    color: #fff;
+    font-weight: 800;
+    font-size: clamp(.7rem, 2.2vw, .9rem);
+    text-shadow: 0 1px 0 rgb(0 0 0 / 28%);
+    box-shadow: 0 4px 0 #1b5e20, 0 8px 14px rgb(0 0 0 / 22%);
+}
+.hv-ico { width: 1.4em; height: 1.3em; flex: 0 0 auto; }
+.hv-medalla {
+    display: inline-flex;
+    align-items: center;
+    gap: .2rem;
+    padding: .1rem .9rem .1rem .35rem;
+    border-radius: 999px;
+    border: 2.5px solid #fff;
+    font-weight: 900;
+    font-size: clamp(.85rem, 2.6vw, 1.15rem);
+    animation: hv-medalla-late 3.2s ease-in-out infinite;
+    transform-origin: 100% 0;
+}
+.hv-ico-trofeo { width: 2.1em; height: 2.1em; flex: 0 0 auto; filter: drop-shadow(0 2px 0 rgb(0 0 0 / 22%)); }
+.hv-medalla-puesto { color: #4e342e; text-shadow: 0 1px 0 rgb(255 255 255 / 55%); }
+.hv-medalla-oro    { background: linear-gradient(180deg, #ffe082, #ffb300); box-shadow: 0 4px 0 #c77800, 0 8px 14px rgb(0 0 0 / 22%); }
+.hv-medalla-plata  { background: linear-gradient(180deg, #f5f7fa, #b0bec5); box-shadow: 0 4px 0 #78909c, 0 8px 14px rgb(0 0 0 / 22%); }
+.hv-medalla-bronce { background: linear-gradient(180deg, #ffcc9a, #d98846); box-shadow: 0 4px 0 #9a5a1d, 0 8px 14px rgb(0 0 0 / 22%); }
+.hv-medalla-hoja   { background: linear-gradient(180deg, #dcedc8, #9ccc65); box-shadow: 0 4px 0 #5f8f2c, 0 8px 14px rgb(0 0 0 / 22%); }
+@keyframes hv-medalla-late { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.07) rotate(-2deg); } }
+
+/* ---- Vida que aparece al crecer el huerto ---- */
+.hv-vida { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.hv-mariposa, .hv-abeja { position: absolute; display: none; }
+.hv-mariposa { width: clamp(22px, 6%, 40px); height: auto; aspect-ratio: 44 / 36; }
+.hv-abeja { width: clamp(20px, 5%, 34px); height: auto; aspect-ratio: 44 / 34; }
+.hv-mariposa-1 { left: 22%; top: 36%; animation: hv-revolotea 7s ease-in-out infinite; }
+.hv-mariposa-2 { right: 26%; top: 44%; animation: hv-revolotea 9s ease-in-out -3s infinite reverse; }
+.hv-abeja-1 { left: 48%; top: 40%; animation: hv-zumba 6s ease-in-out infinite; }
+.hv-abeja-2 { right: 14%; top: 52%; animation: hv-zumba 8s ease-in-out -2s infinite reverse; }
+.hv-etapa-1 .hv-mariposa-1, .hv-etapa-2 .hv-mariposa, .hv-etapa-3 .hv-mariposa { display: block; }
+.hv-etapa-3 .hv-abeja { display: block; }
+.hv-brillos { display: none; position: absolute; inset: 0; }
+.hv-etapa-3 .hv-brillos { display: block; }
+.hv-brillos i {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fff59d;
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    animation: hv-destella 2.6s ease-in-out infinite;
+}
+.hv-brillos i:nth-child(1) { left: 18%; top: 50%; animation-delay: 0s; }
+.hv-brillos i:nth-child(2) { left: 40%; top: 58%; animation-delay: .7s; width: 14px; height: 14px; }
+.hv-brillos i:nth-child(3) { left: 62%; top: 48%; animation-delay: 1.4s; }
+.hv-brillos i:nth-child(4) { left: 78%; top: 62%; animation-delay: .3s; width: 8px; height: 8px; }
+.hv-brillos i:nth-child(5) { left: 30%; top: 40%; animation-delay: 1.9s; width: 8px; height: 8px; }
+@keyframes hv-revolotea {
+    0%, 100% { transform: translate(0, 0) rotate(-8deg); }
+    25% { transform: translate(40px, -26px) rotate(10deg); }
+    50% { transform: translate(86px, 8px) rotate(-6deg); }
+    75% { transform: translate(34px, 24px) rotate(8deg); }
+}
+@keyframes hv-zumba {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(30px, -14px); }
+    40% { transform: translate(-10px, -30px); }
+    60% { transform: translate(44px, -6px); }
+    80% { transform: translate(14px, 12px); }
+}
+@keyframes hv-destella { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(45deg); } }
+
+/* ---- Parcela de tierra ---- */
+.hv-parcela { position: relative; flex: 1; display: flex; min-width: 0; }
+.hv-area {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding: 4% 3% 3%;
+    border-radius: 34px 34px 22px 22px / 20px 20px 22px 22px;
+    box-shadow:
+        inset 0 6px 0 rgb(255 255 255 / 14%),
+        inset 0 -10px 18px rgb(0 0 0 / 30%),
+        0 0 0 5px #6b4423,
+        0 10px 0 5px #4e3016,
+        0 20px 26px rgb(0 0 0 / 28%);
+}
+/* Surcos de la tierra */
+.hv-area::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: repeating-linear-gradient(180deg, transparent 0 36px, rgb(40 20 6 / 26%) 36px 40px, rgb(255 255 255 / 7%) 40px 44px);
+}
+.hv-slots {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(var(--hv-n, 2), minmax(0, 1fr));
+    gap: .15rem .4rem;
+    justify-items: center;
+    align-items: end;
+    align-content: center;
+    width: 100%;
+    min-height: 100%;
+}
+.hv-esc-1 { --hv-n: 1; --hv-tam: 215px; }
+.hv-esc-2 { --hv-n: 2; --hv-tam: 178px; }
+.hv-esc-3 { --hv-n: 3; --hv-tam: 140px; }
+.hv-esc-4 { --hv-n: 4; --hv-tam: 116px; }
+.hv-esc-5 { --hv-n: 5; --hv-tam: 100px; }
+
+.hv-slot { margin: 0; position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; min-width: 0; max-width: 100%; }
+.hv-cuerpo { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.hv-sprite-caja {
+    position: relative;
+    z-index: 1;
+    width: min(var(--hv-tam, 110px), 100%);
+    aspect-ratio: 1;
+    transform: scale(var(--hv-crece));
+    transform-origin: 50% 96%;
+    transition: transform .5s cubic-bezier(.3, 1.5, .5, 1);
+}
+.hv-sprite-caja::after {            /* sombra de la planta sobre la tierra */
+    content: "";
+    position: absolute;
+    left: 14%;
+    right: 14%;
+    bottom: -3%;
+    height: 9%;
+    border-radius: 50%;
+    background: rgb(30 14 4 / 38%);
+    filter: blur(3px);
+    z-index: -1;
+}
+.hv-sprite-caja .hv-sprite {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+    object-fit: contain;
+    filter: saturate(1.25) contrast(1.04) drop-shadow(0 3px 0 rgb(0 0 0 / 14%));
+    transform-origin: 50% 96%;
+    animation: hv-mece 5.5s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i, 0) * -.9s);
+}
+.hv-slot:hover .hv-sprite-caja { transform: translateY(-6px) scale(calc(var(--hv-crece) * 1.1)); }
+@keyframes hv-mece { from { transform: rotate(-1.8deg); } to { transform: rotate(1.8deg); } }
+
+.hv-maceta { display: none; }
+.hv-etiqueta-madera {
+    position: relative;
+    z-index: 2;
+    margin-top: .1rem;
+    padding: .08rem .65rem;
+    background: linear-gradient(180deg, #f6c780, #e3a24a);
+    color: #4a2a08;
+    border: 2px solid var(--hv-madera-osc);
+    border-radius: 8px;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 28%);
+    font-weight: 700;
+    font-size: clamp(.62rem, 1.7vw, .8rem);
+    text-align: center;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    transition: transform .3s cubic-bezier(.3, 1.5, .5, 1), background-color .3s ease;
+}
+.hv-slot:hover .hv-etiqueta-madera { transform: translateY(-3px) scale(1.06); background: linear-gradient(180deg, #ffe0a3, #f2b45a); }
+
+/* Brotes de la parcela vacía */
+.hv-brotes { position: relative; z-index: 1; display: flex; justify-content: space-evenly; align-items: flex-end; width: 100%; min-height: 100%; }
+.hv-brotes svg { width: clamp(34px, 12%, 64px); aspect-ratio: 44 / 40; animation: hv-mece 4s ease-in-out infinite alternate; transform-origin: 50% 90%; }
+.hv-brotes svg:nth-child(2) { animation-delay: -1.3s; }
+.hv-brotes svg:nth-child(3) { animation-delay: -2.4s; }
+
+/* ---- Regadera y bomba de agua ---- */
+.hv-regadera {
+    position: absolute;
+    z-index: 4;
+    right: 7%;
+    top: -17%;
+    width: clamp(54px, 17%, 120px);
+    aspect-ratio: 140 / 110;
+    transform-origin: 80% 70%;
+    animation: hv-riega 7s ease-in-out infinite;
+    pointer-events: none;
+}
+.hv-regadera-dibujo { width: 100%; height: 100%; display: block; filter: drop-shadow(0 4px 3px rgb(0 0 0 / 25%)); }
+@keyframes hv-riega { 0%, 55%, 100% { transform: rotate(-4deg); } 62%, 90% { transform: rotate(-26deg); } }
+.hv-gotas { position: absolute; left: 4%; top: 36%; width: 20%; height: 100px; pointer-events: none; }
+.hv-gotas i {
+    position: absolute;
+    top: 0;
+    width: 5px;
+    height: 10px;
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: linear-gradient(180deg, #e1f5fe, #29b6f6);
+    opacity: 0;
+    animation: hv-gota 7s ease-in infinite;
+}
+.hv-gotas i:nth-child(1) { left: 0; animation-delay: 4.4s; }
+.hv-gotas i:nth-child(2) { left: 20%; animation-delay: 4.55s; }
+.hv-gotas i:nth-child(3) { left: 42%; animation-delay: 4.7s; }
+.hv-gotas i:nth-child(4) { left: 62%; animation-delay: 4.85s; }
+.hv-gotas i:nth-child(5) { left: 82%; animation-delay: 5s; }
+@keyframes hv-gota { 0% { opacity: 0; transform: translateY(0); } 4% { opacity: 1; } 12% { opacity: 1; transform: translateY(70px); } 14%, 100% { opacity: 0; transform: translateY(80px); } }
+.hv-bomba {
+    position: absolute;
+    z-index: 4;
+    right: -17%;
+    bottom: -2%;
+    width: clamp(46px, 14%, 96px);
+    aspect-ratio: 120 / 180;
+    pointer-events: none;
+}
+.hv-bomba-dibujo { width: 100%; height: 100%; display: block; overflow: visible; }
+.hv-gotas-bomba { left: 2%; top: 68%; width: 10%; }
+.hv-gotas-bomba i { animation-name: hv-gota-bomba; animation-duration: 3.6s; }
+.hv-gotas-bomba i:nth-child(1) { animation-delay: 0s; }
+.hv-gotas-bomba i:nth-child(2) { animation-delay: 1.1s; }
+.hv-gotas-bomba i:nth-child(3) { animation-delay: 2.2s; }
+@keyframes hv-gota-bomba { 0% { opacity: 0; transform: translateY(0); } 8% { opacity: 1; } 40% { opacity: 1; transform: translateY(46px); } 46%, 100% { opacity: 0; transform: translateY(52px); } }
+
+/* ---- Flores al frente (desde «planta joven») ---- */
+.hv-flores { position: absolute; left: 2%; right: 2%; bottom: -7%; z-index: 3; display: none; pointer-events: none; }
+.hv-etapa-2 .hv-flores, .hv-etapa-3 .hv-flores { display: block; }
+.hv-flores svg { position: absolute; bottom: 0; width: clamp(16px, 5%, 30px); aspect-ratio: 36 / 56; transform-origin: 50% 100%; animation: hv-florece 1.2s cubic-bezier(.3, 1.6, .5, 1) both, hv-mece 4.5s ease-in-out infinite alternate; }
+.hv-flor-1 { left: 6%; animation-delay: .1s, 0s !important; }
+.hv-flor-2 { left: 30%; animation-delay: .25s, -1s !important; }
+.hv-flor-3 { left: 52%; animation-delay: .4s, -2s !important; }
+.hv-flor-4, .hv-flor-5 { display: none; }
+.hv-etapa-3 .hv-flor-4, .hv-etapa-3 .hv-flor-5 { display: block; }
+.hv-flor-4 { left: 70%; animation-delay: .55s, -.5s !important; }
+.hv-flor-5 { left: 88%; animation-delay: .7s, -1.5s !important; }
+@keyframes hv-florece { from { transform: scale(0); } to { transform: scale(1); } }
+
+/* ---- Estado vacío y aviso ---- */
+.hv-vacia {
+    text-align: center;
+    padding: 1.2rem 1rem;
+    margin-top: .9rem;
+    background: color-mix(in srgb, var(--al-sauce, #bbd88c) 22%, #fff);
+    color: #4a2a08;
+    border: 1px dashed var(--al-sauce, #bbd88c);
+    border-radius: 16px;
+}
+.hv-etiqueta-suelo {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .3rem .8rem .3rem .4rem;
+    background: linear-gradient(180deg, #f6c780, #e3a24a);
+    border: 2px solid var(--hv-madera-osc);
+    border-radius: 12px;
+    font-weight: 700;
+    color: #4a2a08;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 22%);
+}
+.hv-muestra { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--hv-madera-osc); }
+.hv-aviso {
+    background: #fff6dc;
+    border: 1px dashed var(--hv-madera);
+    border-radius: 10px;
+    padding: .5rem .75rem;
+    color: #5b3d17;
+}
+
+/* ---- Camino al ranking ---- */
+.hv-camino {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 20px;
+    border: 1px solid var(--al-sauce-medio, #d6e8bd);
+    background: linear-gradient(135deg, var(--al-sauce-claro, #eef6e1), #fff 70%);
+    box-shadow: 0 8px 22px color-mix(in srgb, var(--al-cafe, #3b2a18) 7%, transparent);
+}
+.hv-camino-puesto {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    width: 5.6rem;
+    height: 5.6rem;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #dcedc8, #9ccc65);
+    border: 4px solid #fff;
+    box-shadow: 0 5px 0 #5f8f2c, 0 10px 18px rgb(0 0 0 / 18%);
+    line-height: 1.05;
+    text-align: center;
+}
+.hv-camino-oro    { background: linear-gradient(180deg, #ffe082, #ffb300); box-shadow: 0 5px 0 #c77800, 0 10px 18px rgb(0 0 0 / 18%); }
+.hv-camino-plata  { background: linear-gradient(180deg, #f5f7fa, #b0bec5); box-shadow: 0 5px 0 #78909c, 0 10px 18px rgb(0 0 0 / 18%); }
+.hv-camino-bronce { background: linear-gradient(180deg, #ffcc9a, #d98846); box-shadow: 0 5px 0 #9a5a1d, 0 10px 18px rgb(0 0 0 / 18%); }
+.hv-camino-num { font-family: var(--al-serif, Georgia, serif); font-size: 1.85rem; font-weight: 800; color: #4e342e; }
+.hv-camino-de { font-size: .62rem; font-weight: 700; color: #5d4037; max-width: 4.2rem; }
+.hv-camino-cuerpo { flex: 1; min-width: 0; }
+.hv-camino-titulo { color: var(--al-titulo, #110102); }
+.hv-camino .progress { height: .85rem; background: #fff; border: 1px solid var(--al-sauce-medio, #d6e8bd); }
+.hv-camino .progress-bar { background: linear-gradient(90deg, #ffca28, #ff9800) !important; }
+
+/* ---- Celular ---- */
+@media (max-width: 575.98px) {
+    .hv-escena { padding: 46% 5% 9% 4%; border-width: 2px; border-radius: 16px; }
+    .hv-bomba { display: none; }
+    .hv-regadera { right: 2%; width: clamp(44px, 20%, 80px); }
+    .hv-area { box-shadow: inset 0 4px 0 rgb(255 255 255 / 14%), inset 0 -8px 14px rgb(0 0 0 / 28%), 0 0 0 3px #6b4423, 0 7px 0 3px #4e3016; }
+    .hv-esc-2 { --hv-tam: 100px; }
+    .hv-esc-3 { --hv-tam: 84px; }
+    .hv-esc-4 { --hv-n: 3; --hv-tam: 84px; }
+    .hv-esc-5 { --hv-n: 3; --hv-tam: 84px; }
+    .hv-camino { flex-direction: column; text-align: center; }
+    .hv-camino-cuerpo { width: 100%; }
+}
+
+/* ---- Animaciones de los sprites genéricos ---- */
+.hv-sprite .hv-hoja { transform-box: fill-box; transform-origin: 50% 100%; animation: hv-balanceo 4.8s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.hv-sprite .hv-flor { transform-box: fill-box; transform-origin: 50% 50%; animation: hv-flor 3.8s ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes hv-balanceo { 0%, 100% { transform: rotate(-2.6deg); } 50% { transform: rotate(2.6deg); } }
+@keyframes hv-flor     { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.07) rotate(5deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .hv-escena *, .hv-escena *::before, .hv-escena *::after, .hv-sprite .hv-hoja, .hv-sprite .hv-flor { animation: none !important; transition: none !important; }
+    .hv-gotas { display: none; }
+}

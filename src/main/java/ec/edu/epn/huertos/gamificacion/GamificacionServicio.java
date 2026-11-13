@@ -4,6 +4,7 @@ import ec.edu.epn.huertos.actividades.Actividad;
 import ec.edu.epn.huertos.actividades.ActividadParticipante;
 import ec.edu.epn.huertos.actividades.ActividadParticipanteRepository;
 import ec.edu.epn.huertos.evidencias.EstadoRevision;
+import ec.edu.epn.huertos.misiones.MisionServicio;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -20,14 +21,16 @@ public class GamificacionServicio {
     private final ActividadParticipanteRepository participantes;
     private final RecompensaIndividualRepository individuales;
     private final RecompensaComunitariaRepository comunitarias;
+    private final MisionServicio misiones;
 
     public GamificacionServicio(PropiedadesGamificacion config, ActividadParticipanteRepository participantes,
                                 RecompensaIndividualRepository individuales,
-                                RecompensaComunitariaRepository comunitarias) {
+                                RecompensaComunitariaRepository comunitarias, MisionServicio misiones) {
         this.config = config;
         this.participantes = participantes;
         this.individuales = individuales;
         this.comunitarias = comunitarias;
+        this.misiones = misiones;
     }
 
     /**
@@ -43,12 +46,17 @@ public class GamificacionServicio {
         if (comunitarias.existsByActividadId(actividad.getId())) {
             return false;
         }
+        MisionServicio.RecompensaMision mision = misiones == null ? null
+                : misiones.recompensa(actividad.getMisionHuertoId()).orElse(null);
+        int puntosIndividuales = mision == null ? config.puntosIndividualesPorActividad() : mision.puntosIndividuales();
+        int puntosComunitarios = mision == null ? config.puntosComunitariosPorActividad() : mision.puntosComunitarios();
+        int progreso = mision == null ? config.progresoPorActividad() : mision.progreso();
         for (ActividadParticipante p : participantes.findByActividadId(actividad.getId())) {
-            individuales.save(new RecompensaIndividual(actividad.getId(), p.getIntegranteId(),
-                    actividad.getComunidadId(), config.puntosIndividualesPorActividad()));
+            if (puntosIndividuales > 0) individuales.save(new RecompensaIndividual(actividad.getId(), p.getIntegranteId(),
+                    actividad.getComunidadId(), puntosIndividuales));
         }
         comunitarias.save(new RecompensaComunitaria(actividad.getId(), actividad.getComunidadId(),
-                config.puntosComunitariosPorActividad(), config.progresoPorActividad()));
+                puntosComunitarios, progreso));
         individuales.flush();
         return true;
     }
@@ -58,10 +66,21 @@ public class GamificacionServicio {
         long puntos = individuales.totalPuntos(integranteId);
         Nivel nivel = nivelPara(puntos);
         return switch (nivel) {
-            case APRENDIZ -> new ResumenPuntos(puntos, nivel, Nivel.OFICIAL, (int) (config.umbralOficial() - puntos));
-            case OFICIAL -> new ResumenPuntos(puntos, nivel, Nivel.MAESTRO, (int) (config.umbralMaestro() - puntos));
-            case MAESTRO -> new ResumenPuntos(puntos, nivel, null, null);
+            case APRENDIZ -> new ResumenPuntos(puntos, nivel, Nivel.OFICIAL,
+                    (int) (config.umbralOficial() - puntos), porcentajeNivel(puntos, 0, config.umbralOficial()));
+            case OFICIAL -> new ResumenPuntos(puntos, nivel, Nivel.MAESTRO,
+                    (int) (config.umbralMaestro() - puntos),
+                    porcentajeNivel(puntos, config.umbralOficial(), config.umbralMaestro()));
+            case MAESTRO -> new ResumenPuntos(puntos, nivel, null, null, 100);
         };
+    }
+
+    private int porcentajeNivel(long puntos, int desde, int hasta) {
+        if (hasta <= desde) {
+            return puntos >= hasta ? 100 : 0;
+        }
+        long avance = Math.max(0, puntos - desde);
+        return (int) Math.min(100, Math.round(avance * 100.0 / (hasta - desde)));
     }
 
     public Nivel nivelPara(long puntos) {
@@ -82,6 +101,7 @@ public class GamificacionServicio {
     }
 
     public ProgresoHuerto progresoPara(int progreso) {
+        progreso = Math.max(0, progreso);
         List<PropiedadesGamificacion.Etapa> etapas = config.etapas().stream()
                 .sorted(java.util.Comparator.comparingInt(PropiedadesGamificacion.Etapa::desde)).toList();
         String actual = etapas.isEmpty() ? "Semilla" : etapas.get(0).nombre();
@@ -115,5 +135,36 @@ public class GamificacionServicio {
             filas.add(new FilaRanking(posicion, c.comunidadId(), c.nombre(), c.provincia(), c.puntos()));
         }
         return filas;
+    }
+
+    /**
+     * Posición de una comunidad en el ranking y lo que le falta para subir. Vacío si la comunidad no aparece
+     * (inactiva o con eliminación pendiente). Solo lee: no otorga puntos ni cambia el orden.
+     */
+    @Transactional(readOnly = true)
+    public java.util.Optional<PosicionRanking> posicionEnRanking(Long comunidadId) {
+        List<FilaRanking> filas = ranking();
+        FilaRanking propia = filas.stream().filter(f -> f.comunidadId().equals(comunidadId)).findFirst().orElse(null);
+        if (propia == null) {
+            return java.util.Optional.empty();
+        }
+        int porActividad = Math.max(1, config.puntosComunitariosPorActividad());
+        // Comunidad más cercana por encima: la de menor puntaje que supere estrictamente al propio (la primera de su grupo si hay empate).
+        FilaRanking arriba = null;
+        for (FilaRanking f : filas) {
+            if (f.puntos() > propia.puntos() && (arriba == null || f.puntos() < arriba.puntos())) {
+                arriba = f;
+            }
+        }
+        if (arriba != null) {
+            long faltan = arriba.puntos() - propia.puntos();
+            int actividades = (int) Math.max(1, Math.ceil(faltan / (double) porActividad));
+            return java.util.Optional.of(new PosicionRanking(propia.posicion(), filas.size(), propia.puntos(),
+                    arriba.posicion(), arriba.nombre(), faltan, actividades, null, porActividad));
+        }
+        Long ventaja = filas.stream().filter(f -> f.puntos() < propia.puntos()).mapToLong(FilaRanking::puntos).max()
+                .stream().boxed().findFirst().map(segundo -> propia.puntos() - segundo).orElse(null);
+        return java.util.Optional.of(new PosicionRanking(propia.posicion(), filas.size(), propia.puntos(), null, null,
+                null, null, ventaja, porActividad));
     }
 }

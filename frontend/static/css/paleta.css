@@ -1,0 +1,122 @@
+/*
+ * Paleta ALLPANA. Se carga en todas las páginas (fragmentos/base.html) antes de app.css.
+ *
+ * Cómo usarla:
+ *   1. En CSS, usa los ROLES (--al-fondo, --al-primario, --al-acento…) y no los colores sueltos: así, si mañana
+ *      cambia la paleta, solo se toca este archivo.
+ *   2. En HTML, para casos puntuales, usa las clases utilitarias del final (al-bg-*, al-texto-*, al-btn-*…).
+ *
+ * Contraste (WCAG AA sobre fondo claro): primario, acento, café y tinta sirven para texto.
+ * --al-helecho, --al-musgo y --al-sauce son decorativos sobre fondo claro (líneas, íconos, fondos);
+ * como texto solo sobre fondos oscuros (café o tinta).
+ */
+:root {
+    /* ---- Colores base de la paleta ---- */
+    --al-gris-polvo: #dbd0cd;   /* dust grey */
+    --al-sauce: #bbd88c;        /* willow green */
+    --al-oxido: #b7532c;        /* rusty spice */
+    --al-musgo: #a0af14;        /* lime moss */
+    --al-helecho: #66be00;      /* bright fern */
+    --al-verde: #008405;        /* green */
+    --al-cafe: #3b2a18;         /* dark coffee */
+    --al-tinta: #110102;        /* coffee bean */
+
+    /* ---- Tonos derivados (mezclas de la misma paleta) ---- */
+    --al-gris-polvo-claro: color-mix(in srgb, var(--al-gris-polvo) 30%, #fff);
+    --al-gris-polvo-medio: color-mix(in srgb, var(--al-gris-polvo) 60%, #fff);
+    --al-sauce-claro: color-mix(in srgb, var(--al-sauce) 28%, #fff);
+    --al-sauce-medio: color-mix(in srgb, var(--al-sauce) 55%, #fff);
+    --al-verde-oscuro: color-mix(in srgb, var(--al-verde) 78%, #000);
+    --al-oxido-oscuro: color-mix(in srgb, var(--al-oxido) 80%, #000);
+    --al-oxido-claro: color-mix(in srgb, var(--al-oxido) 14%, #fff);
+    --al-cafe-suave: color-mix(in srgb, var(--al-cafe) 72%, #fff);
+
+    /* ---- Roles: úsalos en los estilos ---- */
+    --al-fondo: color-mix(in srgb, var(--al-gris-polvo) 22%, #fff);
+    --al-superficie: #ffffff;
+    --al-superficie-suave: var(--al-sauce-claro);
+    --al-borde: var(--al-gris-polvo-medio);
+    --al-texto: var(--al-cafe);
+    --al-texto-suave: var(--al-cafe-suave);
+    --al-titulo: var(--al-tinta);
+
+    --al-primario: var(--al-verde);
+    --al-primario-hover: var(--al-verde-oscuro);
+    --al-sobre-primario: #ffffff;
+
+    --al-acento: var(--al-oxido);
+    --al-acento-hover: var(--al-oxido-oscuro);
+    --al-sobre-acento: #ffffff;
+
+    --al-destacado: var(--al-helecho);
+    --al-sobre-destacado: var(--al-tinta);
+
+    --al-oscuro: var(--al-cafe);
+    --al-sobre-oscuro: var(--al-gris-polvo);
+
+    --al-foco: color-mix(in srgb, var(--al-helecho) 55%, transparent);
+}
+
+/* ---- Fondos ---- */
+.al-bg-fondo { background-color: var(--al-fondo) !important; }
+.al-bg-superficie { background-color: var(--al-superficie) !important; }
+.al-bg-suave { background-color: var(--al-superficie-suave) !important; }
+.al-bg-gris { background-color: var(--al-gris-polvo) !important; }
+.al-bg-sauce { background-color: var(--al-sauce) !important; }
+.al-bg-verde { background-color: var(--al-verde) !important; color: var(--al-sobre-primario); }
+.al-bg-oxido { background-color: var(--al-oxido) !important; color: var(--al-sobre-acento); }
+.al-bg-cafe { background-color: var(--al-cafe) !important; color: var(--al-sobre-oscuro); }
+.al-bg-tinta { background-color: var(--al-tinta) !important; color: var(--al-sobre-oscuro); }
+
+/* ---- Texto ---- */
+.al-texto { color: var(--al-texto) !important; }
+.al-texto-suave { color: var(--al-texto-suave) !important; }
+.al-texto-verde { color: var(--al-verde) !important; }
+.al-texto-oxido { color: var(--al-oxido) !important; }
+.al-texto-cafe { color: var(--al-cafe) !important; }
+.al-texto-tinta { color: var(--al-tinta) !important; }
+.al-texto-sauce { color: var(--al-sauce) !important; }   /* solo sobre fondo oscuro */
+.al-texto-helecho { color: var(--al-helecho) !important; } /* solo sobre fondo oscuro */
+
+/* ---- Bordes ---- */
+.al-borde { border-color: var(--al-borde) !important; }
+.al-borde-verde { border-color: var(--al-verde) !important; }
+.al-borde-sauce { border-color: var(--al-sauce) !important; }
+
+/* ---- Botones ---- */
+.al-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .7rem 1.3rem;
+    border: 1.5px solid transparent;
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color .25s ease, color .25s ease, border-color .25s ease, transform .25s ease;
+}
+.al-btn:hover { transform: translateY(-1px); }
+.al-btn:focus-visible { outline: none; box-shadow: 0 0 0 .25rem var(--al-foco); }
+.al-btn-primario { background: var(--al-primario); color: var(--al-sobre-primario); }
+.al-btn-primario:hover { background: var(--al-primario-hover); color: var(--al-sobre-primario); }
+.al-btn-acento { background: var(--al-acento); color: var(--al-sobre-acento); }
+.al-btn-acento:hover { background: var(--al-acento-hover); color: var(--al-sobre-acento); }
+.al-btn-destacado { background: var(--al-destacado); color: var(--al-sobre-destacado); }
+.al-btn-destacado:hover { background: var(--al-sauce); color: var(--al-sobre-destacado); }
+.al-btn-borde { background: transparent; border-color: var(--al-primario); color: var(--al-primario); }
+.al-btn-borde:hover { background: var(--al-primario); color: var(--al-sobre-primario); }
+
+/* ---- Etiquetas ---- */
+.al-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .2rem .7rem;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 700;
+    background: var(--al-sauce-claro);
+    color: var(--al-verde-oscuro);
+}
+.al-chip-oxido { background: var(--al-oxido-claro); color: var(--al-oxido-oscuro); }
+.al-chip-cafe { background: var(--al-cafe); color: var(--al-sobre-oscuro); }

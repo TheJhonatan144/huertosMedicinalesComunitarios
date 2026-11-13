@@ -9,14 +9,95 @@ Vista ilustrada del huerto (estilo juego sencillo, vista desde arriba) que **sol
 |---|---|---|
 | Tipo de suelo (color, textura y etiqueta) | `huerto.tipo_suelo` (V8) | Variante propia para ARCILLOSO, LIMOSO, ARENOSO, MARGOSO, GREDOSO y PANTANOSO. Vacío o desconocido → apariencia neutra gris y aviso «Falta registrar el tipo de suelo» |
 | Composición | `huerto.diseno` (13 códigos de V12) | Se agrupa por prefijo: `TIERRA_*` (hierba + marco de troncos), `VERTICAL_*` (panel con bolsillos), `COLGANTE_*` (viga y macetas que se mecen), `PISO_*` (macetas sobre baldosas). Código que no sea uno de los 13 → composición neutra. La etiqueta muestra el código concreto («En piso · gradas») |
-| Plantas | `planta` del huerto | Elegible = `plantada = true` **y** `activa = true`. **No** usa `cantidad` ni bodega. Orden: nombre común ascendente (empate por id). Se dibujan hasta **2** después de filtrar; si hay más: «Mostrando 2 de N» |
-| Ilustración | `SpritePlanta` por nombre común: manzanilla, hierba luisa, menta; el resto usa un sprite **genérico** | Nunca se muestran fotos reales |
+| Plantas | `planta` del huerto + su `especie` (`PlantaVirtualLectura`) | Elegible = `plantada = true` **y** `activa = true`. **No** usa `cantidad` ni bodega. Orden: nombre común de la especie ascendente (empate por id de planta). Se dibujan hasta **9** (cuadrícula 3×3) después de filtrar; si hay más: «Mostrando 9 de N» |
+| Ilustración | `SpritePlanta`: nombre científico de la especie y, como respaldo, nombre común (ver «Ilustraciones de plantas») | Especie con archivo → `<img>` de `/img/huerto/plantas/<clave>.svg`; sin archivo → sprite **genérico** incrustado. Nunca se muestran fotos reales |
 | Progreso | `GamificacionServicio.progreso(comunidadId)` | Solo se lee. La vista no otorga puntos ni recalcula; solo las actividades aprobadas lo hacen crecer (regla existente) |
 
 Accesibilidad: el dibujo es `aria-hidden` y va acompañado de un párrafo `visually-hidden` con la descripción textual
 (suelo, diseño y plantas). Las animaciones (balanceo de hojas, flores, macetas colgantes) se detienen con
 `prefers-reduced-motion: reduce`. Sin plantas se muestra «Tu parcela está lista y esperando plantas» y, al gestor, un
 enlace a `/gestor/plantas` para marcarlas como plantadas.
+
+## Ilustraciones de plantas
+
+Las plantas se dibujan con ilustraciones SVG por especie en `frontend/static/img/huerto/plantas/<clave>.svg`
+(servidas en `/img/huerto/plantas/<clave>.svg`). Son **ilustraciones referenciales**, no una representación botánica
+exacta: sirven para reconocer la planta en el huerto virtual, no para identificarla.
+
+Origen: Ilustraciones del equipo — autor/herramienta: [COMPLETAR]
+
+Formato: `viewBox="0 0 1024 1024"`, fondo transparente, sin `<script>`, sin atributos `on*` y sin enlaces externos
+(lo comprueba `IlustracionesPlantasTest`). Se muestran con `<img>` (nunca SVG incrustado, por peso y seguridad), con
+`alt="Ilustración de <nombre común>"`, `loading="lazy"` y `decoding="async"`. Toda la planta se balancea unos grados
+desde la base (`hv-planta` en `css/huerto-virtual.css`); con `prefers-reduced-motion: reduce` queda quieta.
+
+### Cómo se elige la ilustración (`SpritePlanta`)
+
+1. **Nombre científico** de la especie del catálogo, normalizado: sin autor, sin tildes, sin «×» (o «x» híbrida) ni
+   «sect.»; se comparan **género y epíteto** («Mentha × piperita L.» → `mentha piperita`). Una fila con solo el género
+   (Taraxacum) vale para todo el género.
+2. Si no hay nombre científico o no coincide: **nombre común** normalizado (minúsculas, sin tildes ni espacios;
+   coincidencia exacta, no parcial).
+3. Si nada coincide: sprite **genérico** incrustado.
+
+### Tabla especie → archivo
+
+| Especie (catálogo) | Nombre científico | Archivo | Tamaño final |
+|---|---|---|---|
+| Achiote | *Bixa orellana* | `achiote.svg` | 68 KB |
+| Aguacate | *Persea americana* | `aguacate.svg` | 56 KB |
+| Albahaca | *Ocimum basilicum* | `albahaca.svg` | 34 KB |
+| Algodón | *Gossypium barbadense* | `algodon.svg` | 52 KB |
+| Café arábigo | *Coffea arabica* | `cafe.svg` | 67 KB |
+| Canela amazónica | *Mespilodaphne quixos* | `canela.svg` | 104 KB |
+| Ceibo costeño | *Ceiba trischistandra* | `ceibo.svg` | 225 KB |
+| Chilca | *Baccharis latifolia* | `chilca.svg` | 176 KB |
+| Escancel | *Iresine diffusa* | `escancel.svg` | 319 KB |
+| Guayusa | *Ilex guayusa* | `guayusa.svg` | 181 KB |
+| Jengibre | *Zingiber officinale* | `jengibre.svg` | 275 KB |
+| Manzanilla | *Matricaria chamomilla* | `manzanilla.svg` | 233 KB |
+| Matico | *Piper aduncum* | `matico.svg` | 161 KB |
+| Menta | *Mentha × piperita* | `menta.svg` | 253 KB |
+| Hierbabuena | *Mentha spicata* | `hierbabuena.svg` | 235 KB |
+| Llantén mayor | *Plantago major* | `llanten-mayor.svg` | 171 KB |
+| Llantén de hoja estrecha | *Plantago lanceolata* | `llanten-hoja-estrecha.svg` | 336 KB |
+| Marco | *Ambrosia arborescens* | `marco.svg` | 223 KB |
+| Taraxaco | *Taraxacum* (sect. Taraxacum) | `taraxaco.svg` | 213 KB |
+| Orégano | *Origanum vulgare* | `oregano.svg` | 210 KB |
+| Orquídea ecuatoriana | *Epidendrum quitensium* | `orquidea.svg` | 231 KB |
+| Ortiga menor | *Urtica urens* | `ortiga.svg` | 218 KB |
+| Paico | *Dysphania ambrosioides* | `paico.svg` | 279 KB |
+| Romero | *Salvia rosmarinus* (también *Rosmarinus officinalis*) | `romero.svg` | 381 KB |
+| Tomillo | *Thymus vulgaris* | `tomillo.svg` | 573 KB |
+| Toronjil | *Melissa officinalis* | `toronjil.svg` | 230 KB |
+| Uña de gato | *Uncaria tomentosa* | `una-de-gato.svg` | 157 KB |
+| Violeta | *Viola odorata* | `violeta.svg` | 230 KB |
+| Yuca | *Manihot esculenta* | `yuca.svg` | 189 KB |
+| Hierba luisa (no está en el catálogo; solo por nombre común) | — | `hierba-luisa.svg` | 101 KB |
+| Ruda (no está en el catálogo; solo por nombre común) | — | `ruda.svg` | 259 KB |
+
+Un sinónimo científico (como *Rosmarinus officinalis* para romero) se agrega como otra línea con la misma clave y sin
+nombres comunes.
+
+Tamaños tras optimizar con SVGO 4.1.0 (`--multipass --precision 1`, ejecutado con `npx`, sin agregarlo al proyecto):
+31 archivos, de 15,6 MB a 6,3 MB en total (−60 %). Se compararon en Edge original y optimizado píxel a píxel (1024 y 300 px): solo
+cambian bordes de 1 px por antialiasing, ninguna zona de relleno, así que se conservaron los optimizados. Comprimidos
+con gzip pesarían alrededor de un tercio (p. ej., `achiote.svg` 68 KB → 25 KB), pero la compresión HTTP no está
+activada en la aplicación.
+
+### Cómo agregar una ilustración
+
+1. Copiar el SVG (viewBox 1024×1024, fondo transparente, sin scripts ni enlaces) a
+   `frontend/static/img/huerto/plantas/<clave>.svg`. Clave en minúsculas, sin tildes, palabras separadas por guion.
+   Opcional: `npx svgo --multipass --precision 1 <archivo>` y comparar la apariencia antes de reemplazar.
+2. Agregar **una línea** a `SpritePlanta.ILUSTRACIONES`:
+   `new Ilustracion("<clave>", "<Género epíteto>", "<nombre común>", ...)` (científico `null` si la especie no está en
+   el catálogo).
+3. Correr `SpritePlantaTest` e `IlustracionesPlantasTest`. Exigen que el archivo exista y sea seguro, y que la carpeta
+   tenga exactamente un SVG por clave: un archivo sin registrar en la tabla hace fallar la prueba.
+
+Especie del catálogo que aún usa el sprite genérico: Ajo sacha (*Mansoa alliacea*). El archivo
+`sin_identificar_hojas_corazon.svg` no tiene especie asignada y se sacó del repositorio.
 
 ## Autorización y aislamiento
 
@@ -101,9 +182,8 @@ quedar desincronizada si se renombra la especie. Al integrar esa rama:
   `NULL` sin `DEFAULT` (migración y cambios en el formulario), fuera del alcance de esta vista.
 - Las etiquetas de suelos y diseños de `HuertoVirtual` replican las de `GestorHuertoController` (allí son privadas); si
   cambian los códigos o etiquetas, hay que actualizar ambos lugares.
-- `HuertoServicio.cambiarPlantada` limita a 2 las plantas `plantada = true` (contando inactivas), así que «Mostrando 2
-  de N» solo aparece con datos cargados por fuera del servicio. La vista limita igualmente.
-- Solo hay ilustración propia para manzanilla, hierba luisa y menta; el resto usa la genérica.
+- «Plantada» no tiene límite al guardar; el tope de 9 es solo del dibujo («Mostrando 9 de N»).
+- Hay ilustración propia para 31 especies (29 del catálogo, más hierba luisa y ruda); el resto usa la genérica.
 
 ## Cómo probarlo a mano
 

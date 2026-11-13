@@ -51,6 +51,18 @@ class HuertoVirtualIT extends PruebaIntegracion {
         return id;
     }
 
+    /** Especie del catálogo (la crea el administrador) seleccionada y marcada como plantada en el huerto del gestor. */
+    private void delCatalogo(Escenario e, String nombreComun, String nombreCientifico) {
+        FichaEspecie ficha = new FichaEspecie();
+        ficha.setNombreComun(nombreComun);
+        ficha.setNombreCientifico(nombreCientifico);
+        Long especieId = catalogo.guardar(e.revisor().getId(), null, ficha, null).getId();
+        SiembraPlanta siembra = new SiembraPlanta();
+        siembra.setCantidad(1);
+        siembra.setPlantada(true);
+        catalogo.seleccionar(e.gestorUsuario().getId(), especieId, siembra);
+    }
+
     /** Cambia suelo y diseño conservando el resto de datos del huerto (evita el formulario completo de comunidad). */
     private void sueloYDiseno(Escenario e, String suelo, String diseno) {
         Huerto h = huertoRepository.findById(e.huerto().getId()).orElseThrow();
@@ -128,7 +140,7 @@ class HuertoVirtualIT extends PruebaIntegracion {
         HuertoVirtual v = virtual.paraGestor(gestor);
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Manzanilla", "Menta");
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::sprite)
-                .containsExactly(SpritePlanta.MANZANILLA, SpritePlanta.MENTA);
+                .containsExactly("manzanilla", "menta");
         assertThat(fragmento(e)).doesNotContain("Ruda no plantada");
 
         huertos.cambiarEstadoPlanta(gestor, menta, false);                       // desactivada: sale del dibujo
@@ -140,25 +152,31 @@ class HuertoVirtualIT extends PruebaIntegracion {
     }
 
     @Test
-    void sePuedenMarcarMasDeDosPlantadasYElDibujoMuestraDosEnOrdenConElTotal() throws Exception {
+    void laParcelaDibujaTodasLasPlantadasEnCuadriculaYSoloCortaPasadasLasNueve() throws Exception {
         Escenario e = fabrica.escenario(1);
         Long gestor = e.gestorUsuario().getId();
-        // «plantada» es el estado real y no se limita: la tercera y la cuarta se aceptan por el mismo servicio.
         for (String n : List.of("Ruda", "Albahaca", "Menta")) plantada(e, n, 1);
         Long inactiva = plantada(e, "Aaa inactiva", 1);
         huertos.cambiarEstadoPlanta(gestor, inactiva, false);
         assertThat(huertos.plantasPlantadasDeGestor(gestor)).hasSize(4);
 
         HuertoVirtual v = virtual.paraGestor(gestor);
-        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Menta");
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Menta", "Ruda");
         assertThat(v.totalPlantas()).isEqualTo(3);
+        assertThat(v.columnas()).isEqualTo(2);
 
         String html = fragmento(e);
-        assertThat(ocurrencias(html, "class=\"hv-etiqueta-madera\"")).isEqualTo(2);
-        assertThat(ocurrencias(html, "class=\"hv-sprite\"")).isEqualTo(2);
-        assertThat(html).contains("Ilustración de Albahaca").contains("Ilustración de Menta")
-                .doesNotContain("Ilustración de Ruda").doesNotContain("Aaa inactiva");
-        assertThat(html.replaceAll("\\s+", " ")).contains("Mostrando <span>2</span> de <span>3</span> plantadas.");
+        assertThat(ocurrencias(html, "class=\"hv-etiqueta-madera\"")).isEqualTo(3);
+        assertThat(ocurrencias(html, "class=\"hv-sprite\"")).isEqualTo(3);
+        assertThat(html).contains("hv-cols-2").contains("Ilustración de Ruda").doesNotContain("Aaa inactiva")
+                .doesNotContain("Mostrando");
+
+        for (int i = 0; i < 7; i++) plantada(e, "Zeta " + i, 1);                // 10 activas plantadas en total
+        HuertoVirtual diez = virtual.paraGestor(gestor);
+        assertThat(diez.plantas()).hasSize(9);
+        assertThat(diez.totalPlantas()).isEqualTo(10);
+        assertThat(diez.columnas()).isEqualTo(3);
+        assertThat(fragmento(e).replaceAll("\\s+", " ")).contains("Mostrando <span>9</span> de <span>10</span> plantadas.");
     }
 
     @Test
@@ -175,9 +193,38 @@ class HuertoVirtualIT extends PruebaIntegracion {
         plantada(e, "Manzanilla", 2);
         fabrica.registrarActividad(e, e.participantes());
         String html = fragmento(e);
-        assertThat(html).contains("class=\"hv-sprite\"").contains("Ilustración de Manzanilla")
+        assertThat(html).contains("class=\"hv-sprite\"").contains("alt=\"Ilustración de Manzanilla\"")
+                .contains("src=\"/img/huerto/plantas/manzanilla.svg\"")
                 .contains("visually-hidden").contains("con 1 planta: Manzanilla")
-                .doesNotContain("<img").doesNotContain("/evidencias/");
+                .doesNotContain("/evidencias/").doesNotContain(".jpg").doesNotContain(".png");
+        assertThat(ocurrencias(html, "<img")).isEqualTo(1);
+        // Sin dibujos incrustados en la página: los objetos de la escena son solo referencias <use> al archivo de objetos.
+        assertThat(html).as("sin sprites incrustados").doesNotContain("<path").doesNotContain("class=\"hv-hoja\"");
+    }
+
+    @Test
+    void conArchivoDibujaImgPorNombreCientificoYSinArchivoUsaLaGenerica() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        // Nombre común fuera de la tabla: la ilustración sale del nombre científico que trae PlantaVirtualLectura.
+        delCatalogo(e, "Menta piperita del barrio", "Mentha × piperita L.");
+        delCatalogo(e, "Ajo sacha", "Mansoa alliacea (Lam.) A.H.Gentry");
+
+        HuertoVirtual v = virtual.paraGestor(e.gestorUsuario().getId());
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Ajo sacha", "Menta piperita del barrio");
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::sprite).containsExactly(SpritePlanta.GENERICA, "menta");
+
+        String html = fragmento(e);
+        java.util.regex.Matcher img = java.util.regex.Pattern.compile("<img[^>]*>").matcher(html);
+        assertThat(img.find()).isTrue();
+        String etiqueta = img.group();
+        assertThat(etiqueta).contains("class=\"hv-sprite\"").contains("src=\"/img/huerto/plantas/menta.svg\"")
+                .contains("alt=\"Ilustración de Menta piperita del barrio\"").contains("loading=\"lazy\"")
+                .contains("decoding=\"async\"").contains("width=\"300\"").contains("height=\"300\"");
+        assertThat(img.find()).as("solo la especie con archivo usa <img>").isFalse();
+        // Ajo sacha (catálogo) no tiene archivo: sprite genérico incrustado, con su texto alternativo y su etiqueta.
+        assertThat(html).contains("aria-label=\"Ilustración de Ajo sacha\"").contains("viewBox=\"0 0 120 120\"")
+                .doesNotContain("ajo-sacha.svg").doesNotContain("ajo_sacha.svg");
+        assertThat(ocurrencias(html, "class=\"hv-etiqueta-madera\"")).isEqualTo(2);
     }
 
     @Test
@@ -231,7 +278,7 @@ class HuertoVirtualIT extends PruebaIntegracion {
         plantada(e, "Menta", 1);
         Long ruda = plantada(e, "Ruda", 1);
         assertThat(virtual.paraGestor(gestor).plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre)
-                .containsExactly("Albahaca", "Menta");
+                .containsExactly("Albahaca", "Menta", "Ruda");
 
         // Se renombra la especie de «Ruda» en el catálogo; la columna planta.nombre_comun conserva «Ruda».
         Long especieId = huertos.plantaDeGestor(gestor, ruda).getEspecie().getId();
@@ -240,9 +287,8 @@ class HuertoVirtualIT extends PruebaIntegracion {
         catalogo.guardar(e.revisor().getId(), especieId, ficha, null);
 
         HuertoVirtual v = virtual.paraGestor(gestor);
-        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Anís");
-        assertThat(fragmento(e)).contains("Ilustración de Anís").doesNotContain("Ilustración de Ruda")
-                .doesNotContain("Ilustración de Menta");
+        assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Albahaca", "Anís", "Menta");
+        assertThat(fragmento(e)).contains("Ilustración de Anís").doesNotContain("Ilustración de Ruda");
     }
 
     @Test
@@ -253,5 +299,28 @@ class HuertoVirtualIT extends PruebaIntegracion {
         assertThat(v.puedeRegistrar()).isFalse();
         assertThat(v.plantas()).extracting(HuertoVirtual.PlantaVirtual::nombre).containsExactly("Menta");
         assertThat(virtual.paraComunidad(-1L)).isEmpty();
+    }
+
+    @Test
+    void laEscenaEnTierraMuestraMedallaCaminoAlRankingYObjetosDeLaFinca() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        plantada(e, "Menta", 1);
+        // Cualquier diseño de huerto usa la misma escena en tierra en esta primera versión.
+        sueloYDiseno(e, "ARENOSO", "PISO_MACETAS");
+        String html = fragmento(e);
+        assertThat(html).contains("hv-escena", "hv-etapa-0", "hv-medalla", "hv-camino", "hv-regadera", "hv-bomba",
+                "escena-objetos.svg#trofeo", "escena-objetos.svg#regadera", "Cada actividad aprobada suma")
+                .contains("hv-suelo-arenoso").contains("hv-composicion-piso");
+        // El camino al ranking dice algo útil: lidera o cuánto falta para alcanzar el siguiente puesto.
+        assertThat(html.replaceAll("\\s+", " ")).containsPattern("Lidera el ranking|Comparte el puesto #1|Faltan <strong>");
+        // La medalla y el camino son lectura: no aparecen botones ni formularios dentro de la escena.
+        assertThat(html).doesNotContain("<form").doesNotContain("<button");
+    }
+
+    @Test
+    void elHuertoVacioMuestraBrotesYNoMariposasHastaCrecer() throws Exception {
+        Escenario e = fabrica.escenario(1);
+        String html = fragmento(e);
+        assertThat(html).contains("hv-brotes", "hv-etapa-0").doesNotContain("hv-sprite-caja");
     }
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Mapa de huertos', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Mapa de huertos medicinales</h1>
+    <p class="text-muted">Selecciona un marcador para ver la comunidad. Si el mapa no carga, usa la lista inferior.</p>
+    <link rel="stylesheet" th:href="@{/vendor/leaflet/leaflet.css}">
+    <div id="mapa-aviso" class="alert alert-warning d-none" role="alert"></div>
+    <div id="mapa" th:attr="data-url=@{/api/publico/huertos}" role="region" aria-label="Mapa de Ecuador con los huertos"></div>
+
+    <h2 class="h5 mt-4">Lista de huertos</h2>
+    <p class="text-muted" th:if="${huertos.isEmpty()}">Todavía no hay huertos registrados.</p>
+    <div class="row g-3" th:unless="${huertos.isEmpty()}">
+        <div class="col-md-6" th:each="h : ${huertos}">
+            <div class="card tarjeta-huerto h-100">
+                <div class="card-body">
+                    <h3 class="h6 card-title mb-1">
+                        <a th:href="@{/comunidades/{id}(id=${h.comunidadId()})}" th:text="${h.comunidad()}">Comunidad</a>
+                    </h3>
+                    <p class="mb-1" th:text="${h.huerto()}">Huerto</p>
+                    <p class="small text-muted mb-0">
+                        <span th:text="${h.canton()} + ', ' + ${h.provincia()}">Cantón, Provincia</span> ·
+                        Etapa <strong th:text="${h.etapa()}">Semilla</strong> ·
+                        <span th:text="${h.puntosComunitarios()} + ' puntos'">0 puntos</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/vendor/leaflet/leaflet.js}"></script>
+    <script th:src="@{/js/mapa.js}"></script>
+</section>
+</body>
+</html>

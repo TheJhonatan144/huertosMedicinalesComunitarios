@@ -31,6 +31,9 @@ public class Actividad {
     @Column(name = "registrada_por", nullable = false)
     private Long registradaPor;
 
+    @Column(name = "mision_huerto_id")
+    private Long misionHuertoId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoActividad tipo;
@@ -68,6 +71,12 @@ public class Actividad {
         this.tipo = tipo;
         this.descripcion = descripcion;
         this.fechaActividad = fechaActividad;
+    }
+
+    public Actividad(Long comunidadId, Long huertoId, Long registradaPor, TipoActividad tipo, String descripcion,
+                     LocalDate fechaActividad, Long misionHuertoId) {
+        this(comunidadId, huertoId, registradaPor, tipo, descripcion, fechaActividad);
+        this.misionHuertoId = misionHuertoId;
     }
 
     /** Edición de los datos descriptivos; los participantes quedan fuera y no pueden cambiar. */
@@ -113,6 +122,8 @@ public class Actividad {
     public Long getRegistradaPor() {
         return registradaPor;
     }
+
+    public Long getMisionHuertoId() { return misionHuertoId; }
 
     public TipoActividad getTipo() {
         return tipo;

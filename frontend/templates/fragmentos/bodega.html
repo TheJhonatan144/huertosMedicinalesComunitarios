@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Estante de la bodega con sus objetos; no se dibuja si no tiene artículos. Estilos: css/bodega.css -->
+<div th:fragment="estante(titulo, lista)" th:unless="${lista.isEmpty()}" class="bd-estante">
+    <h2 class="bd-placa" th:text="${titulo}">Herramientas</h2>
+    <ul class="bd-fila">
+        <li th:each="a : ${lista}" class="bd-objeto" th:classappend="${a.cantidad == 0} ? 'bd-agotado'">
+            <div class="bd-dibujo">
+                <svg class="bd-icono" aria-hidden="true"><use th:href="@{/img/huerto/escena-objetos.svg} + '#b-' + ${#strings.toLowerCase(a.categoria.name())}"/></svg>
+                <span class="bd-cant" th:attr="aria-label='Cantidad: ' + ${a.cantidad}" th:text="${a.cantidad}">3</span>
+            </div>
+            <span class="bd-nombre" th:text="${a.nombre}">Pala</span>
+            <span class="bd-cat" th:text="${a.categoria.etiqueta()}">Herramienta o implemento</span>
+            <span class="bd-sin-existencias" th:if="${a.cantidad == 0}">Agotado</span>
+            <div class="bd-acciones">
+                <a class="btn btn-sm btn-outline-success" th:href="@{/gestor/bodega/{id}/editar(id=${a.id})}" th:attr="aria-label='Editar ' + ${a.nombre}">Editar</a>
+                <form class="d-inline" th:action="@{/gestor/bodega/{id}/eliminar(id=${a.id})}" method="post"><button class="btn btn-sm btn-outline-danger" type="submit" data-confirmar="¿Eliminar este artículo de bodega?" th:attr="aria-label='Eliminar ' + ${a.nombre}">Eliminar</button></form>
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

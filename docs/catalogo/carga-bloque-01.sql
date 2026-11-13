@@ -1,5 +1,5 @@
--- CARGA MANUAL: este archivo está fuera de Flyway y no se ejecuta al iniciar la aplicación.
--- Requiere V5. Para revisar sin guardar: BEGIN; ejecutar este archivo; ROLLBACK;
+-- Bloque 01: lo ejecuta la migración de carga inicial y también admite ejecución manual.
+-- Requiere V2026110802. Para revisar sin guardar: BEGIN; ejecutar este archivo; ROLLBACK;
 -- Para aplicar después de revisar: BEGIN; ejecutar este archivo; COMMIT;
 -- La unidad DO es atómica; no sobrescribe ni vincula especies a comunidades.
 DO $carga_catalogo$
@@ -245,6 +245,10 @@ $fichas_catalogo$::jsonb) AS datos(
   SELECT COUNT(*) INTO coincidencias FROM especie e
    WHERE lower(btrim(e.nombre_cientifico)) = lower(btrim(ficha.nombre_cientifico));
   IF coincidencias > 1 THEN
+   IF current_setting('huertos.carga_catalogo_automatica', true) = 'on' THEN
+    RAISE WARNING 'Identificación repetida en el catálogo: %. Revisa las fichas existentes.', ficha.nombre_cientifico;
+    CONTINUE;
+   END IF;
    RAISE EXCEPTION 'Identificación repetida en el catálogo: %. Revisa las fichas existentes.', ficha.nombre_cientifico;
   ELSIF coincidencias = 1 THEN
    omitidas := omitidas + 1;
@@ -254,6 +258,10 @@ $fichas_catalogo$::jsonb) AS datos(
   IF EXISTS (SELECT 1 FROM especie e
     WHERE lower(btrim(e.nombre_comun)) = lower(btrim(ficha.nombre_comun))
       AND NULLIF(btrim(e.nombre_cientifico), '') IS NULL) THEN
+   IF current_setting('huertos.carga_catalogo_automatica', true) = 'on' THEN
+    RAISE WARNING 'Ya existe % sin identificación científica. Revísala antes de cargar.', ficha.nombre_comun;
+    CONTINUE;
+   END IF;
    RAISE EXCEPTION 'Ya existe % sin identificación científica. Revísala antes de cargar.', ficha.nombre_comun;
   END IF;
   INSERT INTO especie(nombre_comun, nombre_cientifico, otros_nombres, familia_botanica,

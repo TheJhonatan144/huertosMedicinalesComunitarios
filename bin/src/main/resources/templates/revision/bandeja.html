@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Bandeja de revisión', ~{::section})}">
+<body>
+<section>
+    <h1 class="h3">Bandeja de revisión</h1>
+    <p class="text-muted">Evidencias pendientes de las comunidades que tienes asignadas.</p>
+    <p class="text-muted" th:if="${items.isEmpty()}">No tienes evidencias pendientes. ¡Todo al día!</p>
+    <div class="table-responsive" th:unless="${items.isEmpty()}">
+        <table class="table align-middle">
+            <caption class="visually-hidden">Evidencias pendientes</caption>
+            <thead><tr><th scope="col">Enviado</th><th scope="col">Comunidad</th><th scope="col">Actividad</th><th scope="col">Registró</th><th scope="col">Envío</th><th scope="col">Participantes</th><th scope="col"><span class="visually-hidden">Revisar</span></th></tr></thead>
+            <tbody>
+            <tr th:each="i : ${items}">
+                <td th:text="${i.enviadoEn()}">fecha</td>
+                <td th:text="${i.comunidad()}">Comunidad</td>
+                <td th:text="${i.tipo()}">Riego manual</td>
+                <td th:text="${i.registradaPor()}">Gestor</td>
+                <td><span th:text="${i.numeroEnvio()}">1</span> <span class="badge text-bg-warning" th:if="${i.numeroEnvio() > 1}">Reenvío</span></td>
+                <td th:text="${i.participantes()}">1</td>
+                <td class="text-end"><a class="btn btn-sm btn-huerto" th:href="@{/revision/envios/{id}(id=${i.envioId()})}">Revisar</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

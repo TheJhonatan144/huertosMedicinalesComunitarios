@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/base :: pagina('Revisar evidencia', ~{::section})}">
+<body>
+<section th:with="a=${revision.actividad()}">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/revision}">Bandeja</a></li>
+        <li class="breadcrumb-item active" aria-current="page" th:text="'Actividad #' + ${a.id()}">Actividad</li>
+    </ol></nav>
+    <h1 class="h3"><span th:text="${a.tipo().etiqueta()}">Riego</span> · <span th:text="${a.comunidad()}">Comunidad</span></h1>
+    <p class="mb-1" th:text="${a.descripcion()}">Descripción</p>
+    <p class="small text-muted">Fecha: <span th:text="${a.fecha()}">01/01/2026</span> · Registró <span th:text="${a.registradaPor()}">Gestor</span> · Huerto <span th:text="${a.huerto()}">Huerto</span></p>
+
+    <h2 class="h5">Participantes seleccionados (reciben la misma recompensa si se aprueba)</h2>
+    <ul class="list-inline">
+        <li class="list-inline-item badge text-bg-light fw-normal fs-6" th:each="p : ${a.participantes()}" th:text="${p.nombre()}">Nombre</li>
+    </ul>
+
+    <h2 class="h5 mt-3">Evidencia fotográfica (envío <span th:text="${revision.numeroEnvio()}">1</span>)</h2>
+    <img class="foto-evidencia" th:src="@{/evidencias/envios/{id}/foto(id=${revision.envioId()})}" alt="Fotografía enviada como evidencia de la actividad">
+
+    <div class="mt-4" th:if="${revision.estadoEnvio().name() == 'PENDIENTE'}">
+        <form th:action="@{/revision/envios/{id}/decision(id=${revision.envioId()})}" method="post" data-una-vez>
+            <div class="mb-3">
+                <label for="observaciones" class="form-label">Observaciones (obligatorias para rechazar)</label>
+                <textarea id="observaciones" name="observaciones" class="form-control" rows="3" maxlength="2000"></textarea>
+            </div>
+            <button class="btn btn-success" type="submit" name="decision" value="APROBADA"
+                    data-confirmar="¿Aprobar esta evidencia? Se asignarán puntos y progreso.">Aprobar</button>
+            <button class="btn btn-danger" type="submit" name="decision" value="RECHAZADA">Rechazar con observaciones</button>
+        </form>
+    </div>
+    <div class="alert alert-info mt-4" th:unless="${revision.estadoEnvio().name() == 'PENDIENTE'}">
+        Este envío ya fue revisado: <span th:replace="~{fragmentos/componentes :: estado(${revision.estadoEnvio()})}"></span>
+    </div>
+
+    <h2 class="h5 mt-4">Historial de envíos</h2>
+    <div class="card mb-2" th:each="e : ${a.envios()}">
+        <div class="card-body py-2">
+            <div class="d-flex justify-content-between">
+                <strong th:text="'Envío ' + ${e.numero()} + ' · ' + ${e.enviadoEn()}">Envío 1</strong>
+                <span th:replace="~{fragmentos/componentes :: estado(${e.estado()})}"></span>
+            </div>
+            <div class="small" th:if="${e.comentario() != null}">Comentario del gestor: <span th:text="${e.comentario()}"></span></div>
+            <div class="observacion mt-1 small" th:if="${e.observaciones() != null}">
+                Observaciones (<span th:text="${e.revisor()}">revisor</span>): <span th:text="${e.observaciones()}"></span>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

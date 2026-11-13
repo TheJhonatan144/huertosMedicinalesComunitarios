@@ -1,0 +1,537 @@
+/*
+ * Sistema visual base de Huertos Medicinales Comunitarios.
+ * Bootstrap provee la estructura; estas variables y componentes definen
+ * la identidad compartida por las pantallas.
+ */
+:root {
+    color-scheme: light;
+
+    --huerto: var(--al-verde);
+    --huerto-oscuro: var(--al-verde-oscuro);
+    --huerto-profundo: var(--al-cafe);
+    --huerto-suave: var(--al-sauce-claro);
+    --huerto-hoja: var(--al-sauce-medio);
+
+    --tierra: var(--al-oxido);
+    --tierra-suave: var(--al-oxido-claro);
+    --sol: var(--al-musgo);
+
+    --fondo: var(--al-fondo);
+    --superficie: var(--al-superficie);
+    --texto: var(--al-texto);
+    --texto-suave: var(--al-texto-suave);
+    --borde: var(--al-borde);
+    --exito: var(--al-verde);
+    --aviso: #95671c;
+    --error: #a33e3e;
+
+    --radio-sm: .45rem;
+    --radio: .8rem;
+    --radio-lg: 1.15rem;
+    --sombra-suave: 0 .25rem 1rem color-mix(in srgb, var(--al-cafe) 7%, transparent);
+    --sombra-tarjeta: 0 .5rem 1.6rem color-mix(in srgb, var(--al-cafe) 9%, transparent);
+    --anillo-foco: 0 0 0 .22rem var(--al-foco);
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 1rem;
+}
+
+body {
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: var(--huerto);
+    text-underline-offset: .16em;
+}
+
+a:hover {
+    color: var(--huerto-oscuro);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 0;
+    box-shadow: var(--anillo-foco);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--huerto-profundo);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+h1 { letter-spacing: -.025em; }
+
+.text-muted,
+.form-text {
+    color: var(--texto-suave) !important;
+}
+
+/* Navigation and page frame */
+.app-navbar,
+.bg-huerto {
+    background-color: var(--huerto-profundo) !important;
+}
+
+.app-navbar {
+    border-bottom: 0;
+    box-shadow: 0 .2rem .8rem rgb(16 42 30 / 12%);
+}
+
+.app-navbar .navbar-brand {
+    color: #fff;
+    letter-spacing: -.015em;
+}
+
+.app-navbar .nav-link {
+    border-radius: var(--radio-sm);
+    color: rgb(255 255 255 / 82%);
+    font-weight: 550;
+    margin-inline: .1rem;
+    padding-inline: .7rem;
+    transition: background-color .16s ease, color .16s ease;
+}
+
+.app-navbar .nav-link:hover,
+.app-navbar .nav-link:focus-visible {
+    background: rgb(255 255 255 / 12%);
+    color: #fff;
+}
+
+.app-navbar .navbar-toggler {
+    border-color: rgb(255 255 255 / 35%);
+}
+
+.app-main {
+    padding-bottom: 3rem !important;
+    padding-top: 2rem !important;
+}
+
+.app-footer {
+    margin-top: auto;
+}
+
+/* Brand color helpers */
+.text-huerto { color: var(--huerto) !important; }
+.bg-huerto-suave { background-color: var(--huerto-suave) !important; }
+.border-huerto { border-color: var(--huerto-hoja) !important; }
+
+/* Buttons */
+.btn {
+    border-radius: .62rem;
+    font-weight: 620;
+    line-height: 1.35;
+    padding: .55rem .9rem;
+    transition: background-color .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-huerto,
+.btn-success {
+    background-color: var(--huerto);
+    border-color: var(--huerto);
+    color: #fff;
+}
+
+.btn-huerto:hover,
+.btn-huerto:focus,
+.btn-success:hover,
+.btn-success:focus {
+    background-color: var(--huerto-oscuro);
+    border-color: var(--huerto-oscuro);
+    color: #fff;
+}
+
+.btn-outline-success,
+.btn-outline-huerto {
+    border-color: var(--huerto);
+    color: var(--huerto);
+}
+
+.btn-outline-success:hover,
+.btn-outline-huerto:hover {
+    background: var(--huerto);
+    border-color: var(--huerto);
+    color: #fff;
+}
+
+.btn-outline-danger {
+    color: var(--error);
+}
+
+.btn-light {
+    color: var(--huerto-profundo);
+    font-weight: 650;
+}
+
+/* Panels and cards */
+.card {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+}
+
+.card-header {
+    background: var(--al-sauce-claro);
+    border-bottom-color: var(--borde);
+    color: var(--huerto-profundo);
+    font-weight: 650;
+}
+
+.card-title { color: var(--huerto-profundo); }
+
+.tarjeta-huerto {
+    border-left: 4px solid var(--huerto);
+    overflow: hidden;
+    transition: box-shadow .18s ease, transform .18s ease;
+}
+
+.tarjeta-huerto:hover {
+    box-shadow: var(--sombra-tarjeta);
+    transform: translateY(-2px);
+}
+
+.heroe {
+    background: linear-gradient(125deg, var(--al-sauce-claro) 0%, var(--al-fondo) 68%, var(--al-fondo) 100%);
+    border: 1px solid var(--al-borde);
+    border-radius: var(--radio-lg);
+}
+
+/* Forms */
+.form-label {
+    color: var(--huerto-profundo);
+    font-size: .94rem;
+    font-weight: 650;
+    margin-bottom: .35rem;
+}
+
+.form-control,
+.form-select {
+    background-color: #fff;
+    border-color: var(--al-borde);
+    border-radius: .58rem;
+    color: var(--texto);
+    min-height: 2.75rem;
+    padding: .55rem .75rem;
+}
+
+textarea.form-control { min-height: 6rem; }
+
+.form-control::placeholder { color: var(--al-texto-suave); }
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--al-verde);
+    box-shadow: var(--anillo-foco);
+}
+
+.form-check-input:checked {
+    background-color: var(--huerto);
+    border-color: var(--huerto);
+}
+
+.form-check-input:focus { box-shadow: var(--anillo-foco); }
+
+/* Shared visual option cards for future garden, soil, fence and plant selectors */
+.opcion-visual {
+    display: block;
+    height: 100%;
+    position: relative;
+}
+
+.opcion-visual > input {
+    height: 1px;
+    opacity: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.opcion-visual__contenido {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    cursor: pointer;
+    height: 100%;
+    overflow: hidden;
+    transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.opcion-visual__contenido:hover {
+    border-color: var(--al-sauce);
+    box-shadow: var(--sombra-suave);
+    transform: translateY(-2px);
+}
+
+.opcion-visual > input:checked + .opcion-visual__contenido {
+    background: var(--al-sauce-claro);
+    border: 2px solid var(--huerto);
+    box-shadow: var(--anillo-foco);
+}
+
+.opcion-visual > input:focus-visible + .opcion-visual__contenido {
+    box-shadow: var(--anillo-foco);
+}
+
+.opcion-visual__imagen {
+    aspect-ratio: 16 / 10;
+    background: var(--huerto-suave);
+    object-fit: cover;
+    width: 100%;
+}
+
+.opcion-visual__texto { padding: .75rem; }
+
+/* Data tables, status, alerts and progress */
+.table {
+    --bs-table-color: var(--texto);
+    --bs-table-border-color: var(--borde);
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: var(--al-sauce-claro);
+    color: var(--huerto-profundo);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .025em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.table > :not(caption) > * > * { padding: .78rem .7rem; }
+.table tbody tr:last-child > * { border-bottom-width: 0; }
+
+.badge { border-radius: 999px; font-weight: 650; padding: .38em .68em; }
+.text-bg-success { background-color: var(--al-sauce-claro) !important; color: var(--al-verde-oscuro) !important; }
+.text-bg-warning { background-color: #fff2d5 !important; color: #775315 !important; }
+.text-bg-danger { background-color: #f8e4e2 !important; color: #8e3333 !important; }
+.text-bg-light { background-color: var(--al-fondo) !important; color: var(--al-verde-oscuro) !important; }
+
+.alert {
+    border: 1px solid transparent;
+    border-radius: var(--radio);
+}
+
+.alert-success { background: var(--al-sauce-claro); border-color: var(--al-sauce-medio); color: var(--al-verde-oscuro); }
+.alert-info { background: #eaf2f4; border-color: #d1e1e5; color: #315867; }
+.alert-warning { background: #fff4dc; border-color: #eedba9; color: #755318; }
+.alert-danger { background: #f9e9e7; border-color: #ebcdca; color: #8c3535; }
+
+.progress {
+    background: var(--al-fondo);
+    border-radius: 999px;
+    height: .8rem;
+    overflow: hidden;
+}
+
+.progress-bar.bg-huerto { background-color: var(--huerto) !important; }
+/* Maps and evidence */
+#mapa {
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+    height: 460px;
+    overflow: hidden;
+}
+
+.foto-evidencia {
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    max-height: 420px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.miniatura {
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-sm);
+    height: 72px;
+    object-fit: cover;
+    width: 96px;
+}
+
+.observacion {
+    background: #f9e9e7;
+    border-left: 4px solid var(--error);
+    border-radius: var(--radio-sm);
+    padding: .65rem .85rem;
+}
+
+.huerto-opcion { cursor: pointer; overflow: hidden; position: relative; transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease; }
+.huerto-opcion:hover { border-color: var(--al-verde); }
+.btn-check:checked ~ .huerto-opcion { border: 3px solid var(--al-verde-oscuro); background-color: var(--al-sauce-claro); box-shadow: 0 0 0 .22rem rgb(47 107 79 / 24%); }
+.opcion-seleccionada { display: none; position: absolute; top: .5rem; right: .5rem; z-index: 2; border-radius: 999px; padding: .28rem .55rem; color: #fff; background: var(--al-verde-oscuro); font-size: .78rem; font-weight: 700; box-shadow: 0 1px 4px rgb(0 0 0 / 25%); }
+.btn-check:checked ~ .huerto-opcion .opcion-seleccionada { display: inline-flex; align-items: center; }
+.btn-check:focus-visible + .huerto-opcion { outline: 3px solid #1b5e8a; outline-offset: 2px; }
+.ilustracion-opcion { height: 140px; object-fit: cover; }
+
+.huerto-virtual { border: 1px solid var(--borde); background: var(--al-fondo); min-height: 170px; }
+.huerto-virtual-suelo { width: min(100%, 320px); height: 110px; object-fit: cover; border-radius: .65rem; }
+.planta-virtual { background: rgb(255 255 255 / 82%); border: 1px solid var(--borde); border-radius: 999px; padding: .35rem .8rem; }
+.suelo-arcilloso { background: #ead8ca; }
+.suelo-limoso { background: #e9e2cc; }
+.suelo-arenoso { background: #f0e4bb; }
+.suelo-margoso { background: #dfe6d0; }
+.suelo-gredoso { background: #e3d3bf; }
+.suelo-pantanoso { background: #d9e2d5; }
+
+@media (max-width: 575.98px) {
+    .app-main { padding-top: 1.25rem !important; }
+    #mapa { height: 340px; }
+    .table-responsive-stack td,
+    .table-responsive-stack th { white-space: normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* ---- Marca ALLPANA en la barra superior ---- */
+.al-marca { display: inline-flex; align-items: center; gap: .65rem; padding: .15rem 0; text-decoration: none; }
+.al-marca-emblema {
+    display: grid; place-items: center;
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--al-fondo);
+    box-shadow: 0 2px 10px rgb(0 0 0 / 18%);
+    transition: transform .4s cubic-bezier(.2, .8, .2, 1);
+}
+.al-marca-emblema img { width: 36px; height: auto; display: block; }
+.al-marca:hover .al-marca-emblema { transform: rotate(-8deg) scale(1.05); }
+.al-marca-texto { display: grid; line-height: 1; color: #fff; }
+.al-marca-texto strong {
+    font-family: "Playfair Display", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 1.32rem; font-weight: 700; letter-spacing: .08em;
+}
+.al-marca-texto small { font-size: .62rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .78; margin-top: .2rem; }
+
+/* ---- Pie de página ALLPANA con follaje ---- */
+.al-pie {
+    position: relative;
+    margin-top: clamp(56px, 8vw, 110px);
+    padding: 2.4rem 0 1.4rem;
+    background: linear-gradient(180deg, var(--al-verde-oscuro), color-mix(in srgb, var(--al-verde-oscuro) 55%, var(--al-tinta)));
+    color: color-mix(in srgb, var(--al-gris-polvo) 82%, transparent);
+    font-size: .88rem;
+}
+.al-follaje {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% - 2px);
+    width: 100%;
+    height: clamp(56px, 8vw, 110px);
+    pointer-events: none;
+}
+.al-follaje-atras path { fill: color-mix(in srgb, var(--al-verde) 70%, var(--al-musgo)); transform-box: fill-box; transform-origin: 50% 100%; animation: al-mecer 6s ease-in-out infinite alternate; }
+.al-follaje-medio path { fill: var(--al-verde); transform-box: fill-box; transform-origin: 50% 100%; animation: al-mecer 4.5s ease-in-out infinite alternate-reverse; }
+.al-follaje-atras path:nth-child(odd), .al-follaje-medio path:nth-child(3n) { animation-delay: -2s; }
+.al-follaje-suelo { fill: var(--al-verde-oscuro); }
+@keyframes al-mecer { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+.al-pie-dentro { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.2rem; padding-bottom: 1.3rem; border-bottom: 1px solid color-mix(in srgb, var(--al-sauce) 22%, transparent); }
+.al-pie-marca { display: flex; align-items: center; gap: .75rem; }
+.al-pie-marca .al-marca-emblema { width: 44px; height: 44px; }
+.al-pie-marca .al-marca-emblema img { width: 32px; }
+.al-pie-marca strong { display: block; font-family: "Playfair Display", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; font-size: 1.2rem; letter-spacing: .08em; color: #fff; line-height: 1.1; }
+.al-pie-marca small { display: block; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--al-sauce); }
+.al-pie-enlaces { display: flex; flex-wrap: wrap; gap: .4rem 1.6rem; }
+.al-pie-enlaces a { position: relative; color: var(--al-gris-polvo-claro); font-weight: 600; text-decoration: none; padding: .2rem 0; }
+.al-pie-enlaces a::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 1.5px; background: var(--al-helecho); transform: scaleX(0); transform-origin: left; transition: transform .35s ease; }
+.al-pie-enlaces a:hover { color: #fff; }
+.al-pie-enlaces a:hover::after { transform: scaleX(1); }
+.al-pie-legal { padding-top: 1.1rem; font-size: .76rem; color: color-mix(in srgb, var(--al-gris-polvo) 60%, transparent); }
+@media (prefers-reduced-motion: reduce) {
+    .al-follaje path { animation: none !important; }
+}
+
+/* =====================================================================
+   Estética ALLPANA para todas las pantallas (misma línea que la portada)
+   ===================================================================== */
+:root { --al-serif: "Playfair Display", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif; }
+
+/* Ola café que cuelga de la barra superior en las páginas internas */
+.al-ola-nav {
+    display: block;
+    width: 100%;
+    height: clamp(18px, 2.6vw, 34px);
+    margin-top: -1px;
+    fill: var(--al-cafe);
+    pointer-events: none;
+}
+.al-ola-nav .al-ola-fondo { fill: var(--al-cafe); opacity: .35; }
+body:has(.al-portada) .al-ola-nav { display: none; }
+.app-navbar { box-shadow: none; }
+.app-main { padding-top: 1.25rem !important; }
+
+/* Títulos en serif, como la portada */
+.app-main h1, .app-main .h1, .app-main h2, .app-main .h2 {
+    font-family: var(--al-serif);
+    color: var(--al-titulo);
+    letter-spacing: -.015em;
+}
+.app-main h1, .app-main .h1 { font-weight: 700; }
+
+/* Botones redondeados con micro-elevación */
+.btn { border-radius: 999px; padding-inline: 1.1rem; }
+.btn-sm { padding-inline: .85rem; }
+.btn-huerto:hover, .btn-success:hover, .btn-primary:hover { box-shadow: 0 6px 16px color-mix(in srgb, var(--al-verde) 25%, transparent); }
+.btn-primary { background-color: var(--al-primario); border-color: var(--al-primario); }
+.btn-primary:hover, .btn-primary:focus { background-color: var(--al-primario-hover); border-color: var(--al-primario-hover); }
+.btn-outline-primary, .btn-outline-success, .btn-outline-secondary { color: var(--al-primario); border-color: var(--al-primario); }
+.btn-outline-primary:hover, .btn-outline-success:hover, .btn-outline-secondary:hover { background: var(--al-primario); border-color: var(--al-primario); color: #fff; }
+.btn-group > .btn { border-radius: 999px; }
+
+/* Tarjetas suaves que se elevan al pasar el cursor */
+.card {
+    border-radius: 18px;
+    box-shadow: var(--sombra-tarjeta);
+    transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s ease, border-color .35s ease;
+}
+a.card:hover, .card.tarjeta-enlace:hover { transform: translateY(-4px); border-color: var(--al-sauce); }
+.card-header { border-radius: 18px 18px 0 0 !important; }
+.card-header:only-child { border-radius: 18px !important; }
+
+/* Formularios */
+.form-control, .form-select { border-radius: 12px; border-color: var(--al-borde); }
+.form-control:focus, .form-select:focus { border-color: var(--al-verde); box-shadow: var(--anillo-foco); }
+.form-check-input:checked { background-color: var(--al-verde); border-color: var(--al-verde); }
+.form-label { color: var(--al-titulo); }
+
+/* Tablas, insignias y progreso */
+.table { --bs-table-hover-bg: color-mix(in srgb, var(--al-sauce) 18%, transparent); }
+.table-responsive, .table-wrap { border-radius: 16px; }
+.badge { border-radius: 999px; }
+.progress { border-radius: 999px; background: var(--al-sauce-claro); }
+.progress-bar { background: linear-gradient(90deg, var(--al-verde), var(--al-helecho)); }
+
+/* Navegación por pestañas y paginación */
+.nav-tabs .nav-link.active, .nav-pills .nav-link.active { color: var(--al-verde); }
+.nav-pills .nav-link.active { background: var(--al-sauce-claro); }
+.page-link { color: var(--al-verde); }
+.page-item.active .page-link { background: var(--al-verde); border-color: var(--al-verde); }
+
+/* Enlaces */
+/* Solo enlaces de texto sin clase propia (los botones y enlaces con diseño, como los de la portada, mantienen el suyo) */
+.app-main a:not([class]) { color: var(--al-verde); }
+.app-main a:not([class]):hover { color: var(--al-verde-oscuro); }
+
+@media (prefers-reduced-motion: reduce) {
+    .card, .btn { transition: none !important; }
+}
+
+
