@@ -1,0 +1,18 @@
+Verificación local de arquitectura — 12/11/2026
+Base: Develop 9a7bd05bc0c555bfaab7291342ed854660f8094d
+Rama local: Ariel_Baldeon; modificaciones sin commit ni push.
+Java 21.0.12.1; PostgreSQL 17.11; Maven 3.9.11.
+mvn verify con PostgreSQL externo desechable: 169 pruebas, 0 fallos, 0 errores, 0 omitidas.
+ArquitecturaTest reforzado: 8 pruebas, 0 fallos, 0 errores, 0 omitidas.
+JAR empaquetado y arrancado; 24 migraciones Flyway correctas.
+Comprobaciones HTTP: roles y páginas, catálogo, bodega, misión/aprobación/recompensa y privacidad de foto.
+Clases en paquetes planos antiguos dentro del JAR: ninguna.
+Migraciones históricas modificadas: ninguna.
+SHA-256 JAR: 18cf0c5bf5fda9b807141353eec7a041b67860fa03069842e26d381873ef1dd1
+
+Logs detallados en el directorio CALIDAD/tmp:
+  arquitectura-verificacion-final.log
+  arquitectura-reglas-final.log
+  arquitectura-app.log
+  arquitectura-http-final.json
+Los logs provienen de entornos y datos temporales de prueba.

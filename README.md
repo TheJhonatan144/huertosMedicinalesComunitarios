@@ -13,7 +13,7 @@ revisión humana autorizada → aprobación o rechazo (con observaciones y reenv
 ## Tecnología
 
 Java 21 · Spring Boot 4.1.2 · Maven Wrapper · Thymeleaf + Bootstrap 5 + JavaScript · Spring Security · PostgreSQL 17 ·
-Spring Data JPA/Hibernate + Flyway · Docker Compose · JUnit 5 + Testcontainers · Leaflet + OpenStreetMap.
+Spring Data JPA/Hibernate + Flyway · Docker Compose · JUnit Jupiter + Testcontainers · Leaflet + OpenStreetMap.
 Detalle de versiones en [docs/decisiones.md](docs/decisiones.md).
 
 ## Requisitos
@@ -49,10 +49,12 @@ La aplicación completa (vistas incluidas) se despliega en Render con el Bluepri
 ## Ejecutar las pruebas
 
 ```powershell
-.\mvnw.cmd test        # requiere Docker en ejecución (PostgreSQL real con Testcontainers)
+.\mvnw.cmd test        # unitarias, contratos y slice web; sin Docker ni PostgreSQL
+.\mvnw.cmd verify      # añade integración; PostgreSQL real con Testcontainers por defecto
 ```
 
-Resultados verificados y su alcance: [docs/pruebas.md](docs/pruebas.md).
+Organización y ciclos de vida: [guía de pruebas](src/test/README.md).
+Resultados y alcance: [calidad de pruebas](docs/calidad-pruebas.md) y [registro](docs/pruebas.md).
 
 ## Cuentas de demostración (solo perfil `demo`)
 
@@ -102,7 +104,7 @@ docker compose up -d --build           # se vuelve a cargar la demo
 ## Estructura
 
 ```
-src/main/java/ec/edu/epn/huertos/
+src/main/java/ec/edu/epn/huertos/   módulos con presentacion/aplicacion/dominio/persistencia/configuracion
   autenticacion/  usuarios, roles, inicio de sesión, autorización por rol en servicios
   comunidades/    comunidades, integrantes (cupo según tipo), asignación de revisores, panel del gestor
   huertos/        huerto y plantas
@@ -125,3 +127,19 @@ docs/                              documentación académica y técnica
 [pruebas](docs/pruebas.md) · [guion](docs/guion-demostracion.md) · [avance](docs/avance.md)
 
 Atribución del mapa: © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright), visible en el propio mapa.
+
+## Reglas de arquitectura
+
+Las capas y sus límites se comprueban con `mvnw.cmd -Dtest=ArquitecturaTest test` (sin Docker).
+Consulta [arquitectura vigente](docs/arquitectura.md) y [detalle de la reorganización](docs/cambios-arquitectura.md).
+Las pantallas siguen en `frontend/templates` y `frontend/static`; se empaquetan con el servidor.
+
+## Informe técnico y calidad de pruebas
+
+- [Informe de arquitectura y diseño técnico (PDF)](docs/informes/02_Arquitectura_V1.pdf).
+- [Diagrama de clases: tres vistas UML (PDF)](docs/informes/Diagrama_clases.pdf), con versiones SVG y PNG en la misma carpeta.
+- [Contenido editable y generador del informe](docs/informes/fuentes/LEEME.md).
+- [Calidad y refactorización de pruebas](docs/calidad-pruebas.md) y [guía de ejecución](src/test/README.md).
+- [Auditoría inicial de Develop](docs/auditoria/ANALISIS_INTEGRAL_Develop_9a7bd05.md) e [inventario del estado anterior](docs/auditoria/INVENTARIO_Develop_9a7bd05.md).
+
+La auditoría inicial describe Develop antes de refactorizar. El informe y la evidencia de verificación conservan el corte local anterior a su publicación; sus menciones a cambios sin commit ni push son históricas. La arquitectura vigente se describe en `docs/arquitectura.md`.

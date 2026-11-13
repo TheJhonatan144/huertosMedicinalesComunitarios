@@ -1,0 +1,28 @@
+Verificación local de calidad de pruebas — 12/11/2026
+Rama: Ariel_Baldeon. Cambios locales, sin commit ni push.
+
+ROJO: OrganizacionPruebasTest sobre estructura anterior:
+  2 pruebas, 2 fallos de aserción previstos, 0 errores, 0 omitidas.
+VERDE: mvn verify con semilla 20261112:
+  Surefire: 66 pruebas, 0 fallos, 0 errores, 0 omitidas.
+  Failsafe: 111 pruebas, 0 fallos, 0 errores, 0 omitidas.
+  Total: 177 pruebas. BUILD SUCCESS.
+REPETICIÓN: Failsafe con semilla 20261113, misma base PostgreSQL:
+  111 pruebas, 0 fallos, 0 errores, 0 omitidas. BUILD SUCCESS.
+  Mismas 17 clases, orden diferente confirmado.
+FINAL: mvn test tras retirar una aserción duplicada, cubierta por AfterEach:
+  66 pruebas, 0 fallos, 0 errores, 0 omitidas. BUILD SUCCESS.
+
+Aislamiento después de la ejecución:
+  22 tablas operativas: 0 filas.
+  Esquemas temporales de catálogo/migración: ninguno.
+  Plantillas de misión: 9; dependencias: 9, conservadas.
+  Dato de control fuera de huertos_pruebas: conservado en public.
+
+Java 21.0.12.1, Maven 3.9.11, PostgreSQL 17.11 externo desechable.
+No se ejecutó Docker; Testcontainers sigue como opción predeterminada.
+No se midió cobertura ni mutación; no se afirma TDD histórico de las funcionalidades.
+
+Logs: CALIDAD/tmp/calidad-pruebas-rojo.log,
+calidad-pruebas-verificacion.log, calidad-pruebas-segunda-semilla.log,
+calidad-pruebas-rapidas-final.log. Estado de aislamiento: calidad-aislamiento.json.

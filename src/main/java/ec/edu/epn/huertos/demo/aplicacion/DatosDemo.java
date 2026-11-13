@@ -1,0 +1,164 @@
+package ec.edu.epn.huertos.demo.aplicacion;
+
+import ec.edu.epn.huertos.autenticacion.dominio.Rol;
+import ec.edu.epn.huertos.autenticacion.dominio.Usuario;
+import ec.edu.epn.huertos.autenticacion.persistencia.UsuarioRepository;
+import ec.edu.epn.huertos.comunidades.dominio.AsignacionRevisor;
+import ec.edu.epn.huertos.comunidades.dominio.Comunidad;
+import ec.edu.epn.huertos.comunidades.dominio.Integrante;
+import ec.edu.epn.huertos.comunidades.persistencia.AsignacionRevisorRepository;
+import ec.edu.epn.huertos.comunidades.persistencia.ComunidadRepository;
+import ec.edu.epn.huertos.comunidades.persistencia.IntegranteRepository;
+import ec.edu.epn.huertos.huertos.aplicacion.EspacioHuertoServicio;
+import ec.edu.epn.huertos.huertos.aplicacion.HuertoCerramientoServicio;
+import ec.edu.epn.huertos.huertos.dominio.Huerto;
+import ec.edu.epn.huertos.huertos.dominio.Planta;
+import ec.edu.epn.huertos.huertos.persistencia.EspecieRepository;
+import ec.edu.epn.huertos.huertos.persistencia.HuertoRepository;
+import ec.edu.epn.huertos.huertos.persistencia.PlantaRepository;
+import ec.edu.epn.huertos.misiones.aplicacion.MisionServicio;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Datos SINTÉTICOS de demostración (perfil "demo"). Mecanismo provisional de provisión de usuarios:
+ * no existe registro público ni recuperación por correo. Solo carga datos si la tabla de usuarios está vacía;
+ * nunca borra ni modifica datos existentes. Todos los nombres, comunidades y plantas son ficticios o ilustrativos.
+ */
+@Component
+@Profile("demo")
+@Order(1)
+public class DatosDemo implements ApplicationRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(DatosDemo.class);
+
+    private final UsuarioRepository usuarios;
+    private final ComunidadRepository comunidades;
+    private final IntegranteRepository integrantes;
+    private final AsignacionRevisorRepository asignaciones;
+    private final HuertoRepository huertos;
+    private final PlantaRepository plantas;
+    private final EspecieRepository especies;
+    private final EspacioHuertoServicio espacios;
+    private final HuertoCerramientoServicio cerramientos;
+    private final MisionServicio misiones;
+    private final PasswordEncoder encoder;
+    private final String clave;
+
+    public DatosDemo(UsuarioRepository usuarios, ComunidadRepository comunidades, IntegranteRepository integrantes,
+                     AsignacionRevisorRepository asignaciones, HuertoRepository huertos, PlantaRepository plantas,
+                     EspecieRepository especies,
+                     PasswordEncoder encoder, EspacioHuertoServicio espacios,
+                     HuertoCerramientoServicio cerramientos, MisionServicio misiones,
+                     @Value("${app.demo.clave}") String clave) {
+        this.usuarios = usuarios;
+        this.comunidades = comunidades;
+        this.integrantes = integrantes;
+        this.asignaciones = asignaciones;
+        this.huertos = huertos;
+        this.plantas = plantas;
+        this.especies = especies;
+        this.espacios = espacios;
+        this.cerramientos = cerramientos;
+        this.misiones = misiones;
+        this.encoder = encoder;
+        this.clave = clave;
+    }
+
+    @Override
+    @Transactional
+    public void run(ApplicationArguments args) {
+        if (usuarios.count() > 0) {
+            log.info("Perfil demo: la base ya contiene usuarios; no se cargan datos de demostración.");
+            return;
+        }
+        Comunidad imbabura = comunidades.save(new Comunidad("Comunidad Demo Sumak Allpa",
+                "Comunidad ficticia de demostración en la sierra norte. Datos sintéticos.", "Imbabura", "Otavalo",
+                0.2342, -78.2610));
+        Comunidad chimborazo = comunidades.save(new Comunidad("Comunidad Demo Pachamama Wasi",
+                "Comunidad ficticia de demostración en la sierra central. Datos sintéticos.", "Chimborazo", "Riobamba",
+                -1.6636, -78.6547));
+
+        Huerto huertoA = huertos.save(new Huerto(imbabura.getId(), "Huerto Demo Sumak Allpa",
+                "Huerto comunitario ficticio para la demostración del prototipo.", 0.2350, -78.2600));
+        Huerto huertoB = huertos.save(new Huerto(chimborazo.getId(), "Huerto Demo Pachamama Wasi",
+                "Huerto comunitario ficticio para la demostración del prototipo.", -1.6640, -78.6540));
+        // El constructor corto deja el abono «No especificado», que no es una opción del formulario.
+        conAbono(huertoA, "COMPOST");
+        conAbono(huertoB, "RESTOS_VEGETALES");
+        espacios.sincronizar(huertoA.getId(), huertoA.getAreaM2(), List.of(huertoA.getDiseno()));
+        espacios.sincronizar(huertoB.getId(), huertoB.getAreaM2(), List.of(huertoB.getDiseno()));
+        cerramientos.sincronizar(huertoA.getId(), List.of("NATURAL"));
+        cerramientos.sincronizar(huertoB.getId(), List.of("CONVENCIONAL"));
+        // Ruta de misiones de inicio: la migración solo cubre huertos que ya existían al migrar.
+        misiones.crearParaHuerto(huertoA.getId());
+        misiones.crearParaHuerto(huertoB.getId());
+
+        // Plantas: nombres comunes ilustrativos; sin propiedades medicinales ni recomendaciones (pendiente de fuentes).
+        sembrarEjemplo(huertoA, "Manzanilla", "Matricaria chamomilla L.", 12);
+        sembrarEjemplo(huertoA, "Hierba luisa", "Cymbopogon citratus", 8);
+        sembrarEjemplo(huertoB, "Hierbabuena", "Mentha spicata L.", 10);
+        sembrarEjemplo(huertoB, "Ruda", "Ruta graveolens", 5);
+
+        // Comunidad A: gestor + 4 participantes (uno de baja para demostrar la regla de selección).
+        Usuario gestorA = crear("gestor_a", "Gestora Demo A", Rol.GESTOR_HUERTO);
+        integrantes.save(new Integrante(imbabura.getId(), gestorA.getId(), true));
+        alta(imbabura, "participante_a1", "Participante Demo A1", true);
+        alta(imbabura, "participante_a2", "Participante Demo A2", true);
+        alta(imbabura, "participante_a3", "Participante Demo A3", true);
+        alta(imbabura, "participante_a4", "Participante Demo A4 (de baja)", false);
+
+        // Comunidad B.
+        Usuario gestorB = crear("gestor_b", "Gestor Demo B", Rol.GESTOR_HUERTO);
+        integrantes.save(new Integrante(chimborazo.getId(), gestorB.getId(), true));
+        alta(chimborazo, "participante_b1", "Participante Demo B1", true);
+        alta(chimborazo, "participante_b2", "Participante Demo B2", true);
+
+        // Revisores: cada uno con una sola comunidad asignada.
+        Usuario revisorA = crear("revisor_a", "Administrador Ministerio Demo A", Rol.ADMIN_MINISTERIO_SALUD);
+        asignaciones.save(new AsignacionRevisor(revisorA.getId(), imbabura.getId()));
+        Usuario revisorB = crear("revisor_b", "Administrador Ministerio Demo B", Rol.ADMIN_MINISTERIO_SALUD);
+        asignaciones.save(new AsignacionRevisor(revisorB.getId(), chimborazo.getId()));
+
+        crear("admin_tecnico", "Administrador Técnico Demo", Rol.ADMIN_TECNICO);
+
+        log.info("Perfil demo: datos sintéticos cargados (2 comunidades, 11 cuentas de demostración).");
+    }
+
+    private void sembrarEjemplo(Huerto huerto, String nombreComun, String nombreCientifico, int cantidad) {
+        var especie = especies.findFirstByNombreCientificoIgnoreCaseOrderById(nombreCientifico)
+                .orElseGet(() -> especies.save(new ec.edu.epn.huertos.huertos.dominio.Especie(nombreComun, nombreCientifico)));
+        String descripcion = "Registro ilustrativo de demostración.";
+        Planta planta = new Planta(huerto.getId(), especie.getId(), especie.getNombreComun(), especie.getNombreCientifico(), cantidad, false);
+        planta.actualizar(planta.getNombreComun(), planta.getNombreCientifico(), descripcion, cantidad);
+        plantas.save(planta);
+    }
+
+    private Usuario crear(String nombreUsuario, String nombreCompleto, Rol rol) {
+        return usuarios.save(new Usuario(nombreUsuario, nombreCompleto, encoder.encode(clave), rol));
+    }
+
+    private void alta(Comunidad comunidad, String nombreUsuario, String nombreCompleto, boolean activo) {
+        Usuario usuario = crear(nombreUsuario, nombreCompleto, Rol.PARTICIPANTE);
+        Integrante integrante = new Integrante(comunidad.getId(), usuario.getId(), false);
+        if (!activo) {
+            integrante.darDeBaja();
+        }
+        integrantes.save(integrante);
+    }
+
+    /** Cambia solo el abono, conservando el resto de datos del huerto (entidad gestionada dentro de run). */
+    private static void conAbono(Huerto h, String abono) {
+        h.actualizar(h.getNombre(), h.getDescripcion(), h.getProvincia(), h.getParroquia(), h.getDireccion(),
+                h.getAreaM2(), h.getDiseno(), h.getTipoSuelo(), h.getFuenteAgua(), abono, h.getLatitud(), h.getLongitud());
+    }
+}

@@ -7,7 +7,7 @@
     <article class="card mb-3" th:each="s : ${solicitudes}">
         <div class="card-body">
             <div class="d-flex justify-content-between flex-wrap gap-2">
-                <h2 class="h5" th:text="${s.tipo() == T(ec.edu.epn.huertos.comunidades.TipoSolicitudComunidad).CREAR ? 'Crear comunidad' : 'Eliminar comunidad'}">Solicitud</h2>
+                <h2 class="h5" th:text="${s.tipo() == T(ec.edu.epn.huertos.comunidades.dominio.TipoSolicitudComunidad).CREAR ? 'Crear comunidad' : 'Eliminar comunidad'}">Solicitud</h2>
                 <span class="text-muted small" th:text="${#temporals.format(s.creadaEn(), 'dd/MM/yyyy HH:mm')}">Fecha</span>
             </div>
             <p><strong>Comunidad:</strong> <span th:text="${s.nombreComunidad()}">Nombre</span></p>
