@@ -28,7 +28,8 @@ public record HuertoVirtual(
     }
 
     /** Planta dibujada: nombre común (etiqueta) y sprite ilustrado (nunca una foto real). */
-    public record PlantaVirtual(String nombre, String sprite) {
+    public record PlantaVirtual(String nombre, String sprite, String estadoRevision) {
+        public PlantaVirtual(String nombre, String sprite) { this(nombre, sprite, "APROBADA"); }
         /** true = se dibuja con su archivo {@code /img/huerto/plantas/<sprite>.svg}; false = sprite genérico incrustado. */
         public boolean tieneArchivo() {
             return sprite != null && !SpritePlanta.GENERICA.equals(sprite);
