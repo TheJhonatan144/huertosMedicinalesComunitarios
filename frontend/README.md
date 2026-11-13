@@ -24,8 +24,8 @@ y `frontend/static` como `static/` dentro del JAR, que son las rutas que Spring 
 
 - Los controladores siguen devolviendo nombres de vista como `"publico/inicio"`.
 - En las plantillas, las rutas siguen siendo `@{/css/app.css}`, `@{/img/marca/allpana-emblema.png}`, etc.
-- Por compatibilidad, una plantilla que alguien agregue todavía en `src/main/resources/templates` también funciona,
-  pero lo nuevo debe ir aquí.
+- Las plantillas y estáticos se mantienen únicamente en `frontend/`; las ubicaciones antiguas bajo
+  `src/main/resources` están excluidas del empaquetado y comprobadas por las pruebas de arquitectura.
 
 ## Ver los cambios
 

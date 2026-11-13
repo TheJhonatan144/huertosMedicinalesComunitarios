@@ -1,0 +1,38 @@
+Integración de Develop en Ariel_Baldeon - 12/11/2026
+
+Estado local inicial: 92ddf99070e0b977a3624c67d8a6b043c2ff24c6
+Develop integrado: a6def9a
+Destino de publicación: exclusivamente Ariel_Baldeon.
+
+Compilación: 164 archivos Java productivos, BUILD SUCCESS.
+Pruebas rápidas (mvn test): 72, sin fallos, errores ni omitidas.
+Verificación completa (mvn verify):
+  Surefire: 72, sin fallos, errores ni omitidas.
+  Failsafe: 120, sin fallos, errores ni omitidas.
+  Total: 192. BUILD SUCCESS. Duración: 3 min 15 s.
+  Finalización: 12/11/2026 23:35:36 America/Bogota.
+
+Se conservan los escenarios anteriores y se agregan:
+  PlantaTest: 6 regresiones de dominio.
+  RevisionSiembraServicioIT: 9 regresiones con PostgreSQL/MVC,
+  incluida la exclusión mutua de dos decisiones concurrentes.
+Las reglas de arquitectura y organización de pruebas pasan dentro de Surefire.
+
+PostgreSQL 17.11 externo desechable, base nueva merge_develop_20261112.
+Esquema huertos_pruebas. No se ejecutó Docker/Testcontainers.
+Migración V2026111102 aplicada correctamente.
+Después de verify: 22 tablas operativas vacías; 9 plantillas y 9 dependencias
+de misión conservadas. Ningún dato real de una aplicación se utilizó.
+
+Los 16 archivos de interfaz/ilustraciones/migración modificados por Develop
+coinciden con esa rama. Las migraciones anteriores no se modifican.
+Git sin marcadores de conflicto y diff --check correcto antes del commit.
+
+Entorno: Java 21.0.12.1, Maven 3.9.11, PostgreSQL 17.11.
+Logs locales detallados: CALIDAD/tmp/merge-compilacion.log,
+merge-pruebas-rapidas.log y merge-verificacion-completa.log.
+Estado de limpieza local: CALIDAD/tmp/merge-aislamiento.json.
+Resultados XML: target/surefire-reports y target/failsafe-reports.
+
+Este resultado comprueba los escenarios ejecutados; no afirma que los otros
+pendientes funcionales previos estén resueltos. El PDF V1 es un corte anterior.

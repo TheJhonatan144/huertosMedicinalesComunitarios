@@ -96,12 +96,16 @@
         <!--
           Frontend separado del backend: las vistas Thymeleaf y los archivos estáticos viven en frontend/ y se
           empaquetan en las mismas rutas del classpath que usa Spring Boot por defecto (templates/ y static/),
-          así que el código Java no cambia. src/main/resources sigue incluido (configuración y migraciones) y,
-          por compatibilidad, cualquier plantilla que aún llegue a src/main/resources/templates también funciona.
+          src/main/resources conserva exclusivamente configuración y migraciones. frontend/ es la única
+          ubicación de presentación: se excluyen rutas antiguas para impedir dos versiones de una vista.
         -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>templates/**</exclude>
+                    <exclude>static/**</exclude>
+                </excludes>
             </resource>
             <resource>
                 <directory>frontend/templates</directory>
@@ -127,15 +131,27 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <!-- Las pruebas de integración (*IT) usan PostgreSQL real con Testcontainers y corren con "mvn test". -->
+                <!-- Pruebas rápidas: unitarias, contratos y slices web sin PostgreSQL. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <includes>
                         <include>**/*Test.java</include>
-                        <include>**/*IT.java</include>
                     </includes>
+                    <failIfNoTests>true</failIfNoTests>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.5.6</version>
+                <configuration>
+                    <includes><include>**/*IT.java</include></includes>
+                    <failIfNoTests>true</failIfNoTests>
+                </configuration>
+                <executions>
+                    <execution><goals><goal>integration-test</goal><goal>verify</goal></goals></execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -9,7 +9,7 @@ Vista ilustrada del huerto (estilo juego sencillo, vista desde arriba) que **sol
 |---|---|---|
 | Tipo de suelo (color, textura y etiqueta) | `huerto.tipo_suelo` (V8) | Variante propia para ARCILLOSO, LIMOSO, ARENOSO, MARGOSO, GREDOSO y PANTANOSO. Vacío o desconocido → apariencia neutra gris y aviso «Falta registrar el tipo de suelo» |
 | Composición | `huerto.diseno` (13 códigos de V12) | Se agrupa por prefijo: `TIERRA_*` (hierba + marco de troncos), `VERTICAL_*` (panel con bolsillos), `COLGANTE_*` (viga y macetas que se mecen), `PISO_*` (macetas sobre baldosas). Código que no sea uno de los 13 → composición neutra. La etiqueta muestra el código concreto («En piso · gradas») |
-| Plantas | `planta` del huerto + su `especie` (`PlantaVirtualLectura`) | Elegible = `plantada = true` **y** `activa = true`. **No** usa `cantidad` ni bodega. Orden: nombre común de la especie ascendente (empate por id de planta). Se dibujan hasta **9** (cuadrícula 3×3) después de filtrar; si hay más: «Mostrando 9 de N» |
+| Plantas | `planta` del huerto + su `especie` (`PlantaVirtualLectura`, join explícito por `especieId`) | Elegible = `plantada = true`, `activa = true` y revisión distinta de `RECHAZADA`. Las pendientes también se muestran. **No** usa `cantidad` ni bodega. Orden: nombre común de la especie ascendente (empate por id de planta). Se dibujan hasta **9** (cuadrícula 3×3) después de filtrar; si hay más: «Mostrando 9 de N» |
 | Ilustración | `SpritePlanta`: nombre científico de la especie y, como respaldo, nombre común (ver «Ilustraciones de plantas») | Especie con archivo → `<img>` de `/img/huerto/plantas/<clave>.svg`; sin archivo → sprite **genérico** incrustado. Nunca se muestran fotos reales |
 | Progreso | `GamificacionServicio.progreso(comunidadId)` | Solo se lee. La vista no otorga puntos ni recalcula; solo las actividades aprobadas lo hacen crecer (regla existente) |
 
@@ -115,7 +115,7 @@ Especie del catálogo que aún usa el sprite genérico: Ajo sacha (*Mansoa allia
 - Modificados: `GestorPanelController` (atributo `huertoVirtual`), `gestor/panel.html` (bloque reemplazado),
   `fragmentos/base.html` (enlace al CSS).
 - Pruebas: `HuertoVirtualIT`, `HuertoVirtualTest`, `PlantaVirtualLecturaIT`, `SpritePlantaTest`.
-- Sin migraciones nuevas. `PlantaRepository`, `Huerto` y `HuertoServicio` no se modificaron.
+- La incorporación posterior de revisión de siembras agrega `V2026111102__revision_siembra_plantas.sql`, consultas en `PlantaRepository` y metadatos en `Planta`. `RevisionSiembraServicio` está en aplicación y su controlador en presentación; las lecturas web utilizan DTO.
 - Las clases CSS usan el prefijo `hv-` para no chocar con `.huerto-virtual` y `.suelo-*` que ya existen en `app.css`.
 
 ## Cómo mostrarlo en otras pantallas (para sus dueños)
