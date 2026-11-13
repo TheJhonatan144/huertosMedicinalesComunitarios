@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1123" height="794" viewBox="0 0 841.89 595.28"><rect x="0" y="0" width="841.89" height="595.28" rx="0" fill="white" stroke="none"/>
+<rect x="40" y="32" width="25" height="4" rx="0" fill="#167264" stroke="none"/>
+<text x="75" y="33.4" font-family="Segoe UI, sans-serif" font-size="8" font-weight="700" fill="#5D726F">ALLPANA / ARQUITECTURA Y DISEÑO TÉCNICO</text>
+<text x="40" y="79.0" font-family="Segoe UI, sans-serif" font-size="25" font-weight="700" fill="#153B37">08. Clases: misiones y recompensas</text>
+<text x="40" y="105.0" font-family="Segoe UI, sans-serif" font-size="10" font-weight="400" fill="#5D726F">Referencias cruzadas explícitas por identificador; las recompensas son movimientos persistidos.</text>
+<polyline points="40,550 802,550" fill="none" stroke="#C9DCD5" stroke-width="1.15" />
+<text x="40" y="568.4" font-family="Segoe UI, sans-serif" font-size="8" font-weight="400" fill="#5D726F">V1.0 · Ariel · Integrante 2 · 12 NOV 2026 · Versión local</text>
+<text x="676" y="568.4" font-family="Segoe UI, sans-serif" font-size="8" font-weight="700" fill="#5D726F">UML 3/3  /  09</text>
+<rect x="40" y="128" width="220" height="133" rx="5" fill="white" stroke="#C9DCD5"/>
+<rect x="41" y="129" width="218" height="40" rx="0" fill="#EAF4EF" stroke="none"/>
+<text x="50" y="140.16" font-family="Segoe UI, sans-serif" font-size="7.7" font-weight="400" fill="#5D726F">misiones · entidad</text>
+<text x="50" y="157.6" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#153B37">MisionPlantilla</text>
+<text x="50" y="183.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- id: Long</text>
+<text x="50" y="201.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- codigo: String</text>
+<text x="50" y="219.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- puntosComunitarios: int</text>
+<polyline points="40,234 260,234" fill="none" stroke="#C9DCD5" stroke-width="1.15" />
+<text x="50" y="247.64" font-family="Consolas" font-size="8.3" font-weight="400" fill="#153B37">+ getRecurrencia(): RecurrenciaMision</text>
+<rect x="310" y="128" width="220" height="150" rx="5" fill="white" stroke="#C9DCD5"/>
+<rect x="311" y="129" width="218" height="40" rx="0" fill="#EAF4EF" stroke="none"/>
+<text x="320" y="140.16" font-family="Segoe UI, sans-serif" font-size="7.7" font-weight="400" fill="#5D726F">misiones · entidad</text>
+<text x="320" y="157.6" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#153B37">MisionHuerto</text>
+<text x="320" y="183.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- id, huertoId: Long</text>
+<text x="320" y="201.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- plantillaId, actividadId: Long</text>
+<text x="320" y="219.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- estado: EstadoMision</text>
+<polyline points="310,234 530,234" fill="none" stroke="#C9DCD5" stroke-width="1.15" />
+<text x="320" y="247.64" font-family="Consolas" font-size="8.3" font-weight="400" fill="#153B37">+ iniciar(id: Long): void</text>
+<text x="320" y="264.64" font-family="Consolas" font-size="8.3" font-weight="400" fill="#153B37">+ completar(): void</text>
+<rect x="580" y="128" width="220" height="115" rx="5" fill="white" stroke="#C9DCD5"/>
+<rect x="581" y="129" width="218" height="40" rx="0" fill="#F0F2F1" stroke="none"/>
+<text x="590" y="140.16" font-family="Segoe UI, sans-serif" font-size="7.7" font-weight="400" fill="#5D726F">huertos · referencia</text>
+<text x="590" y="157.6" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#153B37">Huerto</text>
+<text x="590" y="183.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- id: Long</text>
+<text x="590" y="201.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- comunidadId: Long</text>
+<polyline points="580,216 800,216" fill="none" stroke="#C9DCD5" stroke-width="1.15" />
+<text x="590" y="229.64" font-family="Consolas" font-size="8.3" font-weight="400" fill="#153B37">+ getId(): Long</text>
+<rect x="40" y="360" width="220" height="133" rx="5" fill="white" stroke="#C9DCD5"/>
+<rect x="41" y="361" width="218" height="40" rx="0" fill="#EAF4EF" stroke="none"/>
+<text x="50" y="372.16" font-family="Segoe UI, sans-serif" font-size="7.7" font-weight="400" fill="#5D726F">gamificacion · entidad</text>
+<text x="50" y="389.6" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#153B37">RecompensaIndividual</text>
+<text x="50" y="415.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- id, actividadId: Long</text>
+<text x="50" y="433.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- integranteId, comunidadId: Long</text>
+<text x="50" y="451.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- puntos: int</text>
+<polyline points="40,466 260,466" fill="none" stroke="#C9DCD5" stroke-width="1.15" />
+<text x="50" y="479.64" font-family="Consolas" font-size="8.3" font-weight="400" fill="#153B37">+ getPuntos(): int</text>
+<rect x="310" y="360" width="220" height="133" rx="5" fill="white" stroke="#C9DCD5"/>
+<rect x="311" y="361" width="218" height="40" rx="0" fill="#F0F2F1" stroke="none"/>
+<text x="320" y="372.16" font-family="Segoe UI, sans-serif" font-size="7.7" font-weight="400" fill="#5D726F">actividades · referencia</text>
+<text x="320" y="389.6" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#153B37">Actividad</text>
+<text x="320" y="415.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- id: Long</text>
+<text x="320" y="433.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- misionHuertoId: Long</text>
+<text x="320" y="451.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- estado: EstadoRevision</text>
+<polyline points="310,466 530,466" fill="none" stroke="#C9DCD5" stroke-width="1.15" />
+<text x="320" y="479.64" font-family="Consolas" font-size="8.3" font-weight="400" fill="#153B37">+ aplicarDecision(...): void</text>
+<rect x="580" y="360" width="220" height="133" rx="5" fill="white" stroke="#C9DCD5"/>
+<rect x="581" y="361" width="218" height="40" rx="0" fill="#EAF4EF" stroke="none"/>
+<text x="590" y="372.16" font-family="Segoe UI, sans-serif" font-size="7.7" font-weight="400" fill="#5D726F">gamificacion · entidad</text>
+<text x="590" y="389.6" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#153B37">RecompensaComunitaria</text>
+<text x="590" y="415.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- id, actividadId: Long</text>
+<text x="590" y="433.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- comunidadId: Long</text>
+<text x="590" y="451.96" font-family="Consolas" font-size="8.7" font-weight="400" fill="#153B37">- puntos, progreso: int</text>
+<polyline points="580,466 800,466" fill="none" stroke="#C9DCD5" stroke-width="1.15" />
+<text x="590" y="479.64" font-family="Consolas" font-size="8.3" font-weight="400" fill="#153B37">+ getProgreso(): int</text>
+<polyline points="260,196 310,196" fill="none" stroke="#167264" stroke-width="1.15" />
+<text x="263" y="188.24" font-family="Segoe UI, sans-serif" font-size="7.8" font-weight="700" fill="#167264">1</text>
+<text x="286" y="207.24" font-family="Segoe UI, sans-serif" font-size="7.8" font-weight="700" fill="#167264">0..*</text>
+<polyline points="530,196 580,196" fill="none" stroke="#167264" stroke-width="1.15" />
+<text x="533" y="188.24" font-family="Segoe UI, sans-serif" font-size="7.8" font-weight="700" fill="#167264">0..*</text>
+<text x="556" y="207.24" font-family="Segoe UI, sans-serif" font-size="7.8" font-weight="700" fill="#167264">1</text>
+<polyline points="260,428 310,428" fill="none" stroke="#167264" stroke-width="1.15" />
+<text x="263" y="420.24" font-family="Segoe UI, sans-serif" font-size="7.8" font-weight="700" fill="#167264">0..*</text>
+<text x="286" y="439.24" font-family="Segoe UI, sans-serif" font-size="7.8" font-weight="700" fill="#167264">1</text>
+<polyline points="530,428 580,428" fill="none" stroke="#167264" stroke-width="1.15" />
+<text x="533" y="420.24" font-family="Segoe UI, sans-serif" font-size="7.8" font-weight="700" fill="#167264">1</text>
+<text x="556" y="439.24" font-family="Segoe UI, sans-serif" font-size="7.8" font-weight="700" fill="#167264">0..1</text>
+<polyline points="420.0,278 420.0,319.0 420.0,319.0 420.0,360" fill="none" stroke="#167264" stroke-width="1.15" />
+<text x="426.0" y="290.4" font-family="Segoe UI, sans-serif" font-size="8" font-weight="700" fill="#167264">0..1</text>
+<text x="426.0" y="352.4" font-family="Segoe UI, sans-serif" font-size="8" font-weight="700" fill="#167264">0..1</text>
+<rect x="40" y="523" width="762" height="25" rx="4" fill="#EAF4EF" stroke="none"/>
+<text x="50" y="537.72" font-family="Segoe UI, sans-serif" font-size="8.4" font-weight="400" fill="#5D726F">Dos FK opcionales y únicas vinculan misión-actividad. Recompensa individual: máximo una por actividad/integrante.</text></svg>

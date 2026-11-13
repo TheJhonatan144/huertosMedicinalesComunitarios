@@ -1,0 +1,23 @@
+{
+  "paginas_informe": 18,
+  "paginas_clases": 3,
+  "rama": "Ariel_Baldeon",
+  "base_commit": "9a7bd05bc0c555bfaab7291342ed854660f8094d",
+  "clases_dominio_comprobadas": [
+    "Usuario",
+    "Integrante",
+    "Comunidad",
+    "Especie",
+    "Planta",
+    "Huerto",
+    "ActividadParticipante",
+    "Actividad",
+    "Revision",
+    "EnvioEvidencia",
+    "MisionPlantilla",
+    "MisionHuerto",
+    "RecompensaIndividual",
+    "RecompensaComunitaria"
+  ],
+  "nota": "Resultados de pruebas citados desde evidencia local existente; no reejecutados por esta entrega."
+}

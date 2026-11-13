@@ -1,12 +1,19 @@
 # Pruebas
 
+## Estado vigente de la suite
+
+**177 pruebas: 66 rápidas y 111 de integración, sin fallos, errores ni omisiones.** La integración pasó también con otra semilla sobre la misma base temporal. La guía vigente es [src/test/README.md](../src/test/README.md), y los criterios, cambios y alcance se documentan en [calidad-pruebas.md](calidad-pruebas.md).
+
+Los resultados de 63 y 169 pruebas registrados más abajo corresponden a ejecuciones históricas anteriores a esta reorganización. No representan el tamaño actual de la suite.
+
 ## Cómo ejecutarlas
 
 ```powershell
-.\mvnw.cmd test          # JDK 21 + Docker en ejecución (Testcontainers levanta PostgreSQL 17-alpine real)
+.\mvnw.cmd test          # rápidas; JDK 21, sin Docker
+.\mvnw.cmd verify        # añade integración; PostgreSQL real con Testcontainers por defecto
 ```
 
-`maven-surefire-plugin` está configurado para ejecutar `*Test` (unitarias) y `*IT` (integración) con `mvn test`.
+Surefire ejecuta `*Test` en `test`; Failsafe ejecuta `*IT` en `integration-test` y comprueba el resultado en `verify`.
 Las pruebas de integración usan **una instancia real de PostgreSQL** (no H2 ni simulaciones) con las mismas migraciones Flyway que producción,
 y **hilos reales** para la concurrencia. Cada prueba crea datos con nombres únicos.
 
@@ -54,3 +61,7 @@ El recorrido HTTP real encontró un error de un trigger (ver [avance](avance.md)
 - **Cumplimiento normativo** (protección de datos, accesibilidad u otras normas): no evaluado.
 - Fotografías grandes reales de teléfonos (p. ej. 12–50 MP): no probadas; los límites son provisionales.
 - Ejecución en Linux/macOS: solo probado en Windows 11 con Docker Desktop.
+
+## Verificación de la reorganización por capas (2026-11-12)
+
+169 pruebas, cero fallos, errores u omisiones con el POM real, Java 21 y PostgreSQL 17 temporal, sin excluir clases. Incluye ocho reglas arquitectónicas. Véanse [cambios y alcance](cambios-arquitectura.md) y [evidencia](verificacion-arquitectura.txt). La configuración Testcontainers por defecto se conserva; esta ejecución utilizó el modo PostgreSQL externo de PruebaIntegracion.

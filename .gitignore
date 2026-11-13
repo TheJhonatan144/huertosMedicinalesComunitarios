@@ -1,6 +1,6 @@
 target/
 .env
-datos/
+/datos/
 *.log
 .idea/
 *.iml
