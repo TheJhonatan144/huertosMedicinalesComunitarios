@@ -65,4 +65,4 @@ Cada fila indica su **tipo**:
 
 ## Fechas
 
-No se elabora cronograma con la fecha del 13 de noviembre de 2026 porque su vigencia no fue confirmada con el equipo. Las fases del [avance](avance.md) se organizan por entregables.
+No se elabora cronograma con la fecha del 13 de noviembre de 2026 porque su vigencia no fue confirmada con el equipo. El seguimiento anterior por entregables se conserva en el [archivo histórico de avance](historico/avance.md).

@@ -6,7 +6,6 @@ apoyar la gestión de huertos medicinales comunitarios del Ecuador.
 **Recorrido principal:** mapa público → comunidad y huerto → actividad con participantes → fotografía como evidencia →
 revisión humana autorizada → aprobación o rechazo (con observaciones y reenvío) → puntos y progreso → ranking e historial.
 
-> Alcance, supuestos y pendientes: [docs/alcance-prototipo.md](docs/alcance-prototipo.md), [docs/pendientes.md](docs/pendientes.md).
 > El riego es una **actividad manual**; no hay sensores ni automatización. Los datos son **sintéticos** y los textos de plantas son
 > **ilustrativos**, sin recomendaciones clínicas.
 
@@ -71,7 +70,7 @@ Contraseña de todas: `Demo-2026!` (configurable con `DEMO_CLAVE`). **Son creden
 | `revisor_b` | Administrador del Ministerio de Salud | revisa solo B y gestiona solicitudes comunitarias |
 | `admin_tecnico` | Administrador técnico | crea cuentas MSP y controla reasignaciones excepcionales |
 
-Las cuentas demo las crea el cargador sintético ([DatosDemo](src/main/java/ec/edu/epn/huertos/demo/DatosDemo.java)). También se puede crear una cuenta personal desde la portada; esta empieza sin comunidad. Crear una comunidad y su primer huerto genera una solicitud que el Administrador del Ministerio de Salud debe aprobar. Para integrarse a otra comunidad, el gestor envía una invitación que la persona acepta desde Mi cuenta.
+Las cuentas demo las crea el cargador sintético ([DatosDemo](src/main/java/ec/edu/epn/huertos/demo/aplicacion/DatosDemo.java)). También se puede crear una cuenta personal desde la portada; esta empieza sin comunidad. Crear una comunidad y su primer huerto genera una solicitud que el Administrador del Ministerio de Salud debe aprobar. Para integrarse a otra comunidad, el gestor envía una invitación que la persona acepta desde Mi cuenta.
 
 En un despliegue, el primer administrador técnico se puede provisionar una sola vez definiendo `ADMIN_TECNICO_USUARIO`, `ADMIN_TECNICO_NOMBRE` y `ADMIN_TECNICO_CLAVE` en el entorno; la clave debe tener al menos 12 caracteres. En una base demo vacía se crea además la cuenta `admin_tecnico` con la contraseña demo. Retira las variables de bootstrap tras usarlas. El administrador técnico crea usuarios MSP con una clave inicial y reasigna comunidades solo como excepción, indicando motivo.
 
@@ -122,9 +121,16 @@ docs/                              documentación académica y técnica
 
 ## Documentación
 
-[alcance](docs/alcance-prototipo.md) · [arquitectura](docs/arquitectura.md) · [decisiones](docs/decisiones.md) ·
-[pendientes](docs/pendientes.md) · [backlog](docs/backlog.md) · [trazabilidad](docs/trazabilidad.md) ·
-[pruebas](docs/pruebas.md) · [guion](docs/guion-demostracion.md) · [avance](docs/avance.md)
+Los tres documentos fundamentales de la entrega son:
+
+1. **Diseño del sistema:** `Informe_diseno_Allpana` (nombre acordado por el equipo; integrar el archivo final en `docs/referencias/`).
+2. **Requisitos:** `Requisitos Huertos Medicinales Comunitarios.pdf` (documento fuente; integrar la copia final en `docs/referencias/`).
+3. **Casos de prueba:** `Casos de prueba.pdf` (documento de TDD y pruebas del incremento; integrar la copia final en `docs/referencias/`).
+
+La documentación técnica vigente está en [arquitectura](docs/arquitectura.md), [decisiones](docs/decisiones.md),
+[integración de Develop](docs/integracion-develop.md), [pruebas](docs/pruebas.md), [calidad de pruebas](docs/calidad-pruebas.md),
+[mapa de pruebas](docs/mapa-pruebas.md) y [guion de demostración](docs/guion-demostracion.md). Los documentos de etapas anteriores
+se conservan en [`docs/historico/`](docs/historico/).
 
 Atribución del mapa: © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright), visible en el propio mapa.
 

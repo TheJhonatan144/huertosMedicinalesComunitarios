@@ -19,7 +19,7 @@ En `Descargas` hay otros documentos de nombre parecido (`Propuesta_Arquitectura_
 | # | Pendiente | Impacto |
 |---|---|---|
 | P-01 | **RB06**: valores definitivos de recompensas, incrementos de progreso y umbrales de niveles | Hoy son de demostración (configurables) |
-| P-02 | **RF10**: corregir la fuente según la propuesta de [decisiones](decisiones.md) | Contradice RB05/RB09 |
+| P-02 | **RF10**: corregir la fuente según la propuesta de [decisiones](../decisiones.md) | Contradice RB05/RB09 |
 | P-03 | Límites de fotografías (tamaño, formatos, dimensiones) | Provisionales: 5 MiB, JPEG/PNG, 8000 px, 25 MP |
 | P-04 | Definir el proceso institucional del Ministerio para provisionar y retirar cuentas revisoras | Las invitaciones comunitarias ya se aceptan desde la cuenta |
 | P-05 | Quién puede ver las fotografías (¿participantes de la actividad? ¿público tras aprobar?) | Hoy: solo gestor y revisor asignado |

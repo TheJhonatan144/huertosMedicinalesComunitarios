@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * VALORES DE DEMOSTRACIÓN. RB06 (valores de recompensa) no está aprobada: todo es configurable
- * y no debe presentarse como regla definitiva (ver docs/pendientes.md).
+ * y no debe presentarse como regla definitiva (ver docs/historico/pendientes.md).
  */
 @ConfigurationProperties("app.gamificacion")
 public record PropiedadesGamificacion(

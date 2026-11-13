@@ -50,7 +50,7 @@ Contra la aplicación **en ejecución** (local y en contenedor) con `curl` y ses
 
 ## Hallazgos de las pruebas
 
-El recorrido HTTP real encontró un error de un trigger (ver [avance](avance.md)) que las pruebas posteriores ya cubren.
+El recorrido HTTP real encontró un error de un trigger (ver [registro histórico de avance](historico/avance.md)) que las pruebas posteriores ya cubren.
 
 ## Lo que NO se verificó (no se afirma)
 
